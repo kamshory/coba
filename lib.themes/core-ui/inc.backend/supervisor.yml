@@ -1,0 +1,43 @@
+menu:
+  - name: Buku Harian
+    icon: book
+    menu_item:
+      - name: Hari Ini
+        url: buku-harian.php
+        icon: book
+      - name: Upload Foto
+        url: upload-foto.php
+        icon: image  
+      - name: Riwayat
+        url: riwayat-buku-harian.php
+        icon: history  
+      - name: Acc Buku Harian
+        url: acc-buku-harian.php
+        icon: check  
+  - name: Informasi Proyek
+    icon: layers
+    menu_item:
+      - name: Galeri Proyek
+        url: galeri-proyek.php
+        icon: image
+      - name: Lokasi Proyek
+        url: lokasi-proyek.php
+        icon: location-pin  
+      - name: Daftar Proyek
+        url: daftar-proyek.php
+        icon: list-numbered  
+  - name: Referensi
+    icon: puzzle
+    menu_item:
+      - name: Daftar Peralatan
+        url: daftar-peralatan.php
+        icon: truck
+      - name: Daftar Material
+        url: daftar-material.php
+        icon: gem
+      - name: Kelas Tower
+        url: kelas-tower.php
+        icon: arrow-top
+      - name: Tipe Pondasi
+        url: tipe-pondasi.php
+        icon: border-outer
