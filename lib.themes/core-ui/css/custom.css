@@ -423,4 +423,34 @@ button.calendar-button.belum-acc {
 button.calendar-button.sudah-acc {
   background-color: green;
   color: white;
+}
+
+.notification-subject {
+  display: inline-block;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item svg.icon {
+  vertical-align: text-top;
+  margin-top: -3px;
+  margin-left: 0px !important;
+  margin-right: 2px !important;
+}
+
+.dropdown-menu-body-with-footer .message.text-wrap {
+  width: calc(100% - 48px);
+}
+.dropdown-menu-body-with-footer .message.text-wrap .fw-semibold {
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+header .nav-item.dropdown a .icon {
+  vertical-align: baseline;
 }/*# sourceMappingURL=custom.css.map */

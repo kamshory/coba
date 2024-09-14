@@ -29,7 +29,7 @@ require_once dirname(__DIR__) . "/inc.app/auth.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/admin", "pengguna", "Pengguna");
+$currentModule = new PicoModule($appConfig, $database, $appModule, "/admin", "pengaturan-pengguna", "Pengaturan Pengguna");
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
@@ -45,7 +45,11 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$user->setFirstName($inputPost->getFirstName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setLastName($inputPost->getLastName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$user->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$password1 = sha1(sha1($password));
+	$user->setPassword($password1);
+
 	$user->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setWebsite($inputPost->getWebsite(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -71,7 +75,11 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$user->setFirstName($inputPost->getFirstName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setLastName($inputPost->getLastName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$user->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$password1 = sha1(sha1($password));
+	$user->setPassword($password1);
+
 	$user->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setWebsite($inputPost->getWebsite(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -85,6 +93,14 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$user->setWaktuUbah($currentAction->getTime());
 	$user->setIpUbah($currentAction->getIp());
 	$user->setUserId($inputPost->getUserId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	
+	if($currentUser->getUserId() == $user->getUserId())
+	{
+		$user->setBlocked(false);
+		$user->setActive(true);
+		$sessions->adminPassword = $password1;
+	}
+	
 	$user->update();
 	$newId = $user->getUserId();
 	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->user_id, $newId);
@@ -96,7 +112,19 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$user = new User(null, $database);
-			$user->setUserId($rowId)->setAktif(true)->update();
+			try
+			{
+				$user->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->user_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
+				)
+				->setAktif(true)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here when record is not found
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -108,7 +136,19 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$user = new User(null, $database);
-			$user->setUserId($rowId)->setAktif(false)->update();
+			try
+			{
+				$user->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->user_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
+				)
+				->setAktif(false)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here when record is not found
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -294,7 +334,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input class="form-control" type="password" name="password" id="password" value="<?php echo $user->getPassword();?>" autocomplete="off"/>
+							<input class="form-control" type="password" name="password" id="password" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -450,6 +490,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
+		<?php
+		if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($user->getWaitingFor()))
+		{
+				?>
+				<div class="alert alert-info"><?php echo UserAction::getWaitingForMessage($appLanguage, $user->getWaitingFor());?></div>
+				<?php
+		}
+		?>
+		
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
@@ -524,8 +573,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?><button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->user_id, $user->getUserId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button><?php } ?>&#xD;
+							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($user->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
+							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
+							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
+							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($user->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
+							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
+							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($user->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
+							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
+							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->user_id, $user->getUserId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<?php } ?>
+		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
+							<input type="hidden" name="user_id" value="<?php echo $user->getUserId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -699,17 +759,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				"propertyName" => "nama"
 			)
 			);
-			$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-			
-			if($pageData->getTotalResult() > 0)
-			{
-				$pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
-				->setNavigation(
-				'<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
-				'<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
-				)
-				->setMargin($appConfig->getData()->getPageMargin())
-				;
+			try{
+				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+				if($pageData->getTotalResult() > 0)
+				{		
+				    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+				    ->setNavigation(
+				    '<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
+				    '<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
+				    )
+				    ->setMargin($appConfig->getData()->getPageMargin())
+				    ;
 			?>
 			<div class="pagination pagination-top">
 			    <div class="pagination-number">
@@ -815,10 +875,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			}
 			else
 			{
-			?>
+			    ?>
 			    <div class="alert alert-info"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			    <?php
+			}
+			?>
+			
 			<?php
 			}
+			catch(Exception $e)
+			{
+			    ?>
+			    <div class="alert alert-danger"><?php echo $appInclude->printException($e);?></div>
+			    <?php
+			} 
 			?>
 			<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>
 		</div>

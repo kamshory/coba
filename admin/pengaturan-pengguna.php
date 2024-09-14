@@ -45,7 +45,11 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$user->setFirstName($inputPost->getFirstName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setLastName($inputPost->getLastName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$user->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$password1 = sha1(sha1($password));
+	$user->setPassword($password1);
+
 	$user->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setWebsite($inputPost->getWebsite(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -71,7 +75,11 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$user->setFirstName($inputPost->getFirstName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setLastName($inputPost->getLastName(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$user->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$password1 = sha1(sha1($password));
+	$user->setPassword($password1);
+
 	$user->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setWebsite($inputPost->getWebsite(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$user->setPhone($inputPost->getPhone(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -90,6 +98,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	{
 		$user->setBlocked(false);
 		$user->setActive(true);
+		$sessions->adminPassword = $password1;
 	}
 	
 	$user->update();
@@ -325,7 +334,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input class="form-control" type="password" name="password" id="password" value="<?php echo $user->getPassword();?>" autocomplete="off"/>
+							<input class="form-control" type="password" name="password" id="password" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>

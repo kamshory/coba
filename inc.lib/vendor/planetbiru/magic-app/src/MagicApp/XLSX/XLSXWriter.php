@@ -901,7 +901,7 @@ class XLSXWriter //NOSONAR
 		return key($arr);
 	}
 	//------------------------------------------------------------------
-	private static function determineNumberFormatType($num_format)
+	private static function determineNumberFormatType($num_format) //NOSONAR
 	{
 		$num_format = preg_replace("/\[(Black|Blue|Cyan|Green|Magenta|Red|White|Yellow)\]/i", "", $num_format);
 		if ($num_format == 'GENERAL') {

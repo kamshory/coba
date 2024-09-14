@@ -668,6 +668,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<span class="fa fa-folder"></span>
 								</td>
 								<?php } ?>
+								<td class="data-controll data-location">
+									<span class="fa fa-location-dot"></span>
+								</td>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="kode_lokasi" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getKodeLokasi();?></a></td>
@@ -701,6 +704,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->lokasi_proyek_id, $lokasiProyek->getLokasiProyekId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
+								<td class="data-controll data-location">
+									<a href="https://www.google.com/maps/@<?php echo $lokasiProyek->getLatitude();?>,<?php echo $lokasiProyek->getLongitude();?>,17z" target="_blank"><span class="fa fa-location-dot"></span></a>
+								</td>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nama"><?php echo $lokasiProyek->getNama();?></td>
 								<td data-col-name="kode_lokasi"><?php echo $lokasiProyek->getKodeLokasi();?></td>

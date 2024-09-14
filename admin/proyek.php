@@ -581,7 +581,7 @@ $appEntityLanguage = new AppEntityLanguage(new Proyek(), $appConfig, $currentUse
 
 $specMap = array(
     "nama" => PicoSpecification::filter("nama", "fulltext"),
-	"ktskId" => PicoSpecification::filter("ktskId", "number"),
+	"ktskId" => PicoSpecification::filter("ktskId", "number[]"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
@@ -712,8 +712,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getKtsk();?></span>
 					<span class="filter-control">
-							<select name="ktsk_id" class="form-control">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+							<select name="ktsk_id[]" class="form-control" data-placeholder="<?php echo $appLanguage->getSelectItems();?>" multiple multi-select>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new KtskMin(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->aktif, true))

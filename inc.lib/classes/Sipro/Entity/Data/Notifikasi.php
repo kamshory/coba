@@ -111,9 +111,9 @@ class Notifikasi extends MagicObject
 	/**
 	 * Dibaca
 	 * 
-	 * @Column(name="dibaca", type="tinyint(4)", length=4, nullable=true)
+	 * @Column(name="dibaca", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Dibaca")
-	 * @var integer
+	 * @var boolean
 	 */
 	protected $dibaca;
 

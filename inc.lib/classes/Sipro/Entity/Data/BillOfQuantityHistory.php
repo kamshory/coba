@@ -16,7 +16,7 @@ use MagicObject\MagicObject;
 class BillOfQuantityHistory extends MagicObject
 {
 	/**
-	 * Bill Of Quantity ID
+	 * Bill Of Quantity History ID
 	 * 
 	 * @Id
 	 * @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ class BillOfQuantityHistory extends MagicObject
 	 */
 	protected $billOfQuantityHistoryId;
 
-    /**
+	/**
 	 * Bill Of Quantity ID
 	 * 
 	 * @Column(name="bill_of_quantity_id", type="bigint(20)", length=20, nullable=true)
@@ -35,12 +35,12 @@ class BillOfQuantityHistory extends MagicObject
 	 * @var integer
 	 */
 	protected $billOfQuantityId;
-	
+
 	/**
-	 * Parent Boq
+	 * Bill Of Quantity
 	 * 
 	 * @JoinColumn(name="bill_of_quantity_id", referenceColumnName="bill_of_quantity_id")
-	 * @Label(content="Parent Boq")
+	 * @Label(content="Bill Of Quantity")
 	 * @var BillOfQuantityMin
 	 */
 	protected $billOfQuantity;
@@ -73,13 +73,13 @@ class BillOfQuantityHistory extends MagicObject
 	protected $parentId;
 
 	/**
-	 * Parent Boq
+	 * Parent
 	 * 
 	 * @JoinColumn(name="parent_id", referenceColumnName="bill_of_quantity_id")
-	 * @Label(content="Parent Boq")
+	 * @Label(content="Parent")
 	 * @var BillOfQuantityMin
 	 */
-	protected $parentBoq;
+	protected $parent;
 
 	/**
 	 * Level
@@ -118,6 +118,15 @@ class BillOfQuantityHistory extends MagicObject
 	protected $volume;
 
 	/**
+	 * Bobot
+	 * 
+	 * @Column(name="bobot", type="float", nullable=true)
+	 * @Label(content="Bobot")
+	 * @var double
+	 */
+	protected $bobot;
+
+	/**
 	 * Volume Proyek
 	 * 
 	 * @Column(name="volume_proyek", type="float", nullable=true)
@@ -125,6 +134,24 @@ class BillOfQuantityHistory extends MagicObject
 	 * @var double
 	 */
 	protected $volumeProyek;
+
+	/**
+	 * Persen
+	 * 
+	 * @Column(name="persen", type="float", nullable=true)
+	 * @Label(content="Persen")
+	 * @var double
+	 */
+	protected $persen;
+
+	/**
+	 * Waktu Ubah Volume Proyek
+	 * 
+	 * @Column(name="waktu_ubah_volume_proyek", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Ubah Volume Proyek")
+	 * @var string
+	 */
+	protected $waktuUbahVolumeProyek;
 
 	/**
 	 * Harga
@@ -165,7 +192,7 @@ class BillOfQuantityHistory extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false, extra="on update CURRENT_TIMESTAMP")
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */

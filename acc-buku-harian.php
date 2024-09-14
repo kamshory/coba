@@ -29,7 +29,7 @@ $currentModule = new PicoModule($appConfig, $database, null, "/", "acc-buku-hari
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$supervisorId = $currentLogedInSupervisor->getSupervisorId();
+$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
 
 if($inputPost->getUserAction() == 'acc')
 {
@@ -115,7 +115,7 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -233,7 +233,7 @@ require_once __DIR__ . "/inc.app/footer-supervisor.php";
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 $periode = $inputGet->getPeriode(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 $accKoordinator = $inputGet->getAccKoordinator(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
@@ -310,7 +310,7 @@ $bukuHarianMin = new BukuHarian(null, $database);
 $bukuHarianMax = new BukuHarian(null, $database);
 
 $pSpecification = PicoSpecification::getInstance()
-	->addAnd(array('supervisorId', $currentLogedInSupervisor->getSupervisorId()))
+	->addAnd(array('supervisorId', $currentLoggedInSupervisor->getSupervisorId()))
 	->addAnd(PicoPredicate::getInstance()->notEquals('tanggal', null))
 	->addAnd(PicoPredicate::getInstance()->notEquals('tanggal', '0000-00-00'))
 	;
@@ -484,7 +484,7 @@ if(!$currentAction->isRequestViaAjax()){
 								<td data-col-name="proyek_id"><?php echo $bukuHarian->getProyek();?></td>
 								<td data-col-name="tanggal"><?php echo $bukuHarian->getTanggal();?></td>
 								<td data-col-name="ktsk_id"><?php echo $bukuHarian->getKtsk();?></td>
-								<td data-col-name="acc_ktsk"><?php echo $bukuHarian->optionAccKoordinator($appLanguage->getSudah(), $appLanguage->getBelum());?></td>
+								<td data-col-name="acc_ktsk"><?php echo $bukuHarian->optionAccKoordinator($appLanguage->getAlready(), $appLanguage->getNotYet());?></td>
 							</tr>
 							<?php 
 							}

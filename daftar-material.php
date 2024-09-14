@@ -34,7 +34,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$material = new Material(null, $database);
 	$material->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$material->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$material->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$material->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$material->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$material->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$material->setWaktuBuat($currentAction->getTime());
@@ -55,7 +55,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 
 	try
 	{
-		$material->findOneByMaterialIdAndSupervisorId($materialId, $currentLogedInSupervisor->getSupervisorId());
+		$material->findOneByMaterialIdAndSupervisorId($materialId, $currentLoggedInSupervisor->getSupervisorId());
 
 		$material
 		->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -84,7 +84,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			$material = new Material(null, $database);
 			try
 			{
-				$material->findOneByMaterialIdAndSupervisorId($materialId, $currentLogedInSupervisor->getSupervisorId());
+				$material->findOneByMaterialIdAndSupervisorId($materialId, $currentLoggedInSupervisor->getSupervisorId());
 
 				$materialPekerjaan = new MaterialPekerjaan(null, $database);
         		$materialPekerjaan->deleteByMaterialId($materialId);
@@ -184,7 +184,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$material = new Material(null, $database);
 	try{
-		$material->findOneByMaterialIdAndSupervisorId($inputGet->getMaterialId(), $currentLogedInSupervisor->getSupervisorId());
+		$material->findOneByMaterialIdAndSupervisorId($inputGet->getMaterialId(), $currentLoggedInSupervisor->getSupervisorId());
 		if($material->hasValueMaterialId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Material(), $appConfig, $currentUser->getLanguageId());
@@ -324,7 +324,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate() && $currentLogedInSupervisor->getSupervisorId() == $material->getSupervisorId()){ ?>
+							<?php if($userPermission->isAllowedUpdate() && $currentLoggedInSupervisor->getSupervisorId() == $material->getSupervisorId()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->material_id, $material->getMaterialId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		

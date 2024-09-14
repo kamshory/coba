@@ -17,23 +17,88 @@ use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
-use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\Notifikasi;
 use Sipro\AppIncludeImpl;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
+$currentModule = new PicoModule($appConfig, $database, null, "/", "notifikasi", "Notifikasi");
+$appInclude = new AppIncludeImpl($appConfig, $currentModule);
+
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/admin", "notifikasi", "Notifikasi");
-$userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
-$appInclude = new AppIncludeImpl($appConfig, $currentModule);
-
-if(!$userPermission->allowedAccess($inputGet, $inputPost))
+if($inputGet->getOpen() != null)
 {
-	require_once $appInclude->appForbiddenPage(__DIR__);
+	try
+	{
+		$notif = new Notifikasi(null, $database);
+		$notif->findOneByNotifikasiIdAndUserId($inputGet->getOpen(), $currentUser->getUserId());
+		
+		$notif->setDibaca(true)->update();
+		if($notif->hasValueTautan())
+		{
+			header("Location: ".$notif->getTautan());
+		}
+		else
+		{
+			header("Location: ".basename($_SERVER['PHP_SELF']));
+		}
+	}
+	catch(Exception $e)
+	{
+		header("Location: ".basename($_SERVER['PHP_SELF']));
+	}
 	exit();
+}
+
+if($inputPost->getUserAction() == 'read')
+{
+	if($inputPost->countableCheckedRowId())
+	{
+		foreach($inputPost->getCheckedRowId() as $rowId)
+		{
+			$notifikasi = new Notifikasi(null, $database);
+			try
+			{
+				$notifikasi->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notifikasiId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->userId, $currentUser->getUserId()))
+				)
+				->setDibaca(true)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
+		}
+	}
+	$currentModule->redirectToItself();
+}
+if($inputPost->getUserAction() == 'unread')
+{
+	if($inputPost->countableCheckedRowId())
+	{
+		foreach($inputPost->getCheckedRowId() as $rowId)
+		{
+			$notifikasi = new Notifikasi(null, $database);
+			try
+			{
+				$notifikasi->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notifikasiId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->userId, $currentUser->getUserId()))
+				)
+				->setDibaca(false)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
+		}
+	}
+	$currentModule->redirectToItself();
 }
 
 if($inputGet->getUserAction() == UserAction::DETAIL)
@@ -41,7 +106,7 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 	$notifikasi = new Notifikasi(null, $database);
 	try{
 		$subqueryMap = array(
-		"supervisorId" => array(
+		"userId" => array(
 			"columnName" => "supervisor_id",
 			"entityName" => "SupervisorMin",
 			"tableName" => "supervisor",
@@ -55,7 +120,7 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 			"tableName" => "user",
 			"primaryKey" => "user_id",
 			"objectName" => "user",
-			"propertyName" => "nama"
+			"propertyName" => "first_name"
 		)
 		);
 		$notifikasi->findOneWithPrimaryKeyValue($inputGet->getNotifikasiId(), $subqueryMap);
@@ -185,7 +250,7 @@ $specMap = array(
 );
 $sortOrderMap = array(
     "grupPengguna" => "grupPengguna",
-	"supervisorId" => "supervisorId",
+	"userId" => "userId",
 	"userId" => "userId",
 	"icon" => "icon",
 	"subjek" => "subjek",
@@ -200,13 +265,13 @@ $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // Additional filter here
 $specification->addAnd(PicoPredicate::getInstance()->equals('grupPengguna', 'user'));
-$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentAction->getUserId()));
+$specification->addAnd(PicoPredicate::getInstance()->equals('userId', $currentUser->getUserId()));
 
 // You can define your own sortable
 // Pay attention to security issues
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 	array(
-		"sortBy" => "waktuBuat", 
+		"sortBy" => "notifikasiId", 
 		"sortType" => PicoSort::ORDER_TYPE_DESC
 	)
 ));
@@ -215,22 +280,7 @@ $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getD
 $dataLoader = new Notifikasi(null, $database);
 
 $subqueryMap = array(
-"supervisorId" => array(
-	"columnName" => "supervisor_id",
-	"entityName" => "SupervisorMin",
-	"tableName" => "supervisor",
-	"primaryKey" => "supervisor_id",
-	"objectName" => "supervisor",
-	"propertyName" => "nama"
-), 
-"userId" => array(
-	"columnName" => "user_id",
-	"entityName" => "UserMin",
-	"tableName" => "user",
-	"primaryKey" => "user_id",
-	"objectName" => "user",
-	"propertyName" => "nama"
-)
+
 );
 
 /*ajaxSupport*/
@@ -242,21 +292,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getGrupPengguna();?></span>
-					<span class="filter-control">
-							<select name="grup_pengguna" class="form-control" data-value="<?php echo $inputGet->getGrupPengguna();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="supervisor" <?php echo AppFormBuilder::selected($inputGet->getGrupPengguna(), 'supervisor');?>>Supervisor</option>
-								<option value="user" <?php echo AppFormBuilder::selected($inputGet->getGrupPengguna(), 'user');?>>Admin</option>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getDibaca();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getStatus();?></span>
 					<span class="filter-control">
 							<select name="dibaca" class="form-control" data-value="<?php echo $inputGet->getDibaca();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="" <?php echo AppFormBuilder::selected($inputGet->getDibaca(), '');?>>Semua</option>
 								<option value="0" <?php echo AppFormBuilder::selected($inputGet->getDibaca(), '0');?>>Belum Dibaca</option>
 								<option value="1" <?php echo AppFormBuilder::selected($inputGet->getDibaca(), '1');?>>Sudah Dibaca</option>
@@ -267,12 +305,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedCreate()){ ?>
-		
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
-				</span>
-				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
@@ -299,30 +331,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="notifikasi_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-notifikasi-id"/>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td class="data-controll data-editor">
-									<span class="fa fa-edit"></span>
-								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-controll data-viewer">
-									<span class="fa fa-folder"></span>
+									<span class="fa fa-envelope"></span>
 								</td>
-								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="grup_pengguna" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGrupPengguna();?></a></td>
-								<td data-col-name="supervisor_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisor();?></a></td>
-								<td data-col-name="user_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUser();?></a></td>
-								<td data-col-name="icon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIcon();?></a></td>
 								<td data-col-name="subjek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSubjek();?></a></td>
 								<td data-col-name="teks" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTeks();?></a></td>
 								<td data-col-name="tautan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTautan();?></a></td>
-								<td data-col-name="dibaca" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDibaca();?></a></td>
 							</tr>
 						</thead>
 					
@@ -335,30 +353,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="notifikasi_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-notifikasi-id" name="checked_row_id[]" value="<?php echo $notifikasi->getNotifikasiId();?>"/>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
 								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->notifikasi_id, $notifikasi->getNotifikasiId());?>"><span class="fa fa-edit"></span></a>
+									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(null, null, null, array('open'=>$notifikasi->getNotifikasiId()));?>"><span class="fa fa-<?php echo $notifikasi->optionDibaca('envelope-open-text', 'envelope');?>"></span></a>
 								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedDetail()){ ?>
-								<td>
-									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->notifikasi_id, $notifikasi->getNotifikasiId());?>"><span class="fa fa-folder"></span></a>
-								</td>
-								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="grup_pengguna"><?php echo isset($mapForGrupPengguna) && isset($mapForGrupPengguna[$notifikasi->getGrupPengguna()]) && isset($mapForGrupPengguna[$notifikasi->getGrupPengguna()]["label"]) ? $mapForGrupPengguna[$notifikasi->getGrupPengguna()]["label"] : "";?></td>
-								<td data-col-name="supervisor_id"><?php echo $notifikasi->issetSupervisor() ? $notifikasi->getSupervisor()->getNama() : "";?></td>
-								<td data-col-name="user_id"><?php echo $notifikasi->issetUser() ? $notifikasi->getUser()->getNama() : "";?></td>
-								<td data-col-name="icon"><?php echo $notifikasi->getIcon();?></td>
 								<td data-col-name="subjek"><?php echo $notifikasi->getSubjek();?></td>
 								<td data-col-name="teks"><?php echo $notifikasi->getTeks();?></td>
 								<td data-col-name="tautan"><?php echo $notifikasi->getTautan();?></td>
-								<td data-col-name="dibaca"><?php echo isset($mapForDibaca) && isset($mapForDibaca[$notifikasi->getDibaca()]) && isset($mapForDibaca[$notifikasi->getDibaca()]["label"]) ? $mapForDibaca[$notifikasi->getDibaca()]["label"] : "";?></td>
 							</tr>
 							<?php 
 							}
@@ -369,9 +373,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</div>
 				<div class="button-wrapper">
 					<div class="button-area">
-						<?php if($userPermission->isAllowedDelete()){ ?>
-						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
-						<?php } ?>
+						<button type="submit" class="btn btn-primary" name="user_action" value="read"><?php echo $appLanguage->getMarkAsRead();?></button>
+						<button type="submit" class="btn btn-primary" name="user_action" value="unread"><?php echo $appLanguage->getMarkAsUnread();?></button>
 					</div>
 				</div>
 			</form>

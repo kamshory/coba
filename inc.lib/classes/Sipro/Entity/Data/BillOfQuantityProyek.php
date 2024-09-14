@@ -26,7 +26,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * @var integer
 	 */
 	protected $billOfQuantityProyekId;
-	
+
 	/**
 	 * Proyek ID
 	 * 
@@ -44,7 +44,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * @var ProyekMin
 	 */
 	protected $proyek;
-	
+
 	/**
 	 * Buku Harian ID
 	 * 
@@ -89,6 +89,60 @@ class BillOfQuantityProyek extends MagicObject
 	 * @var double
 	 */
 	protected $volume;
+
+	/**
+	 * Waktu Buat
+	 * 
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Waktu Buat")
+	 * @var string
+	 */
+	protected $waktuBuat;
+
+	/**
+	 * Waktu Ubah
+	 * 
+	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Ubah")
+	 * @var string
+	 */
+	protected $waktuUbah;
+
+	/**
+	 * Supervisor Buat
+	 * 
+	 * @Column(name="supervisor_buat", type="bigint(20)", length=20, nullable=true)
+	 * @Label(content="Supervisor Buat")
+	 * @var integer
+	 */
+	protected $supervisorBuat;
+
+	/**
+	 * Pembuat
+	 * 
+	 * @JoinColumn(name="supervisor_buat", referenceColumnName="supervisor_id")
+	 * @Label(content="Pembuat")
+	 * @var SupervisorMin
+	 */
+	protected $pembuat;
+
+	/**
+	 * Supervisor Ubah
+	 * 
+	 * @Column(name="supervisor_ubah", type="bigint(20)", length=20, nullable=true)
+	 * @Label(content="Supervisor Ubah")
+	 * @var integer
+	 */
+	protected $supervisorUbah;
+
+	/**
+	 * Pengubah
+	 * 
+	 * @JoinColumn(name="supervisor_ubah", referenceColumnName="supervisor_id")
+	 * @Label(content="Pengubah")
+	 * @var SupervisorMin
+	 */
+	protected $pengubah;
 
 	/**
 	 * Aktif

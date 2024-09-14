@@ -21,8 +21,8 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\BillOfQuantityHistory;
 use Sipro\AppIncludeImpl;
-use Sipro\Entity\Data\ProyekMin;
 use Sipro\Entity\Data\BillOfQuantityMin;
+use Sipro\Entity\Data\ProyekMin;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 
@@ -40,372 +40,19 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	require_once $appInclude->appForbiddenPage(__DIR__);
 	exit();
 }
-
-if($inputPost->getUserAction() == UserAction::CREATE)
-{
-	$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-	$billOfQuantityHistory->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setParentId($inputPost->getParentId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setLevel($inputPost->getLevel(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$billOfQuantityHistory->setAdminBuat($currentUser->getUserId());
-	$billOfQuantityHistory->setWaktuBuat($currentAction->getTime());
-	$billOfQuantityHistory->setIpBuat($currentAction->getIp());
-	$billOfQuantityHistory->setAdminUbah($currentUser->getUserId());
-	$billOfQuantityHistory->setWaktuUbah($currentAction->getTime());
-	$billOfQuantityHistory->setIpUbah($currentAction->getIp());
-	$billOfQuantityHistory->insert();
-	$newId = $billOfQuantityHistory->getBillOfQuantityHistoryId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->bill_of_quantity_history_id, $newId);
-}
-else if($inputPost->getUserAction() == UserAction::UPDATE)
-{
-	$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-	$billOfQuantityHistory->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setParentId($inputPost->getParentId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setLevel($inputPost->getLevel(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityHistory->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$billOfQuantityHistory->setAdminUbah($currentUser->getUserId());
-	$billOfQuantityHistory->setWaktuUbah($currentAction->getTime());
-	$billOfQuantityHistory->setIpUbah($currentAction->getIp());
-	$billOfQuantityHistory->setBillOfQuantityHistoryId($inputPost->getBillOfQuantityHistoryId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityHistory->update();
-	$newId = $billOfQuantityHistory->getBillOfQuantityHistoryId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->bill_of_quantity_history_id, $newId);
-}
-else if($inputPost->getUserAction() == UserAction::ACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId() as $rowId)
-		{
-			$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-			try
-			{
-				$billOfQuantityHistory->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->billOfQuantityHistoryId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
-				)
-				->setAktif(true)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId() as $rowId)
-		{
-			$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-			try
-			{
-				$billOfQuantityHistory->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->billOfQuantityHistoryId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
-				)
-				->setAktif(false)
-				->update();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::DELETE)
-{
-	if($inputPost->countableCheckedRowId())
-	{
-		foreach($inputPost->getCheckedRowId() as $rowId)
-		{
-			try
-			{
-				$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-				$billOfQuantityHistory->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->bill_of_quantity_history_id, $rowId))
-				)
-				->delete();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
-			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-if($inputGet->getUserAction() == UserAction::CREATE)
-{
-$appEntityLanguage = new AppEntityLanguage(new BillOfQuantityHistory(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-insert">
-	<div class="jambi-wrapper">
-		<form name="createform" id="createform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBillOfQuantityId();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="bill_of_quantity_id" id="bill_of_quantity_id"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getProyek();?></td>
-						<td>
-							<select class="form-control" name="proyek_id" id="proyek_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ProyekMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->proyekId, Field::of()->nama)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getParent();?></td>
-						<td>
-							<select class="form-control" name="parent_id" id="parent_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BillOfQuantityMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->billOfQuantityId, Field::of()->nama)
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLevel();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="level" id="level"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSatuan();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="satuan" id="satuan"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getVolume();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="volume" id="volume"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getHarga();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="text" name="harga" id="harga"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAktif();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1"/> <?php echo $appEntityLanguage->getAktif();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-require_once $appInclude->mainAppFooter(__DIR__);
-}
-else if($inputGet->getUserAction() == UserAction::UPDATE)
-{
-	$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
-	try{
-		$billOfQuantityHistory->findOneByBillOfQuantityHistoryId($inputGet->getBillOfQuantityHistoryId());
-		if($billOfQuantityHistory->issetBillOfQuantityHistoryId())
-		{
-$appEntityLanguage = new AppEntityLanguage(new BillOfQuantityHistory(), $appConfig, $currentUser->getLanguageId());
-require_once $appInclude->mainAppHeader(__DIR__);
-?>
-<div class="page page-jambi page-update">
-	<div class="jambi-wrapper">
-		<form name="updateform" id="updateform" action="" method="post">
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td><?php echo $appEntityLanguage->getBillOfQuantityId();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="bill_of_quantity_id" id="bill_of_quantity_id" value="<?php echo $billOfQuantityHistory->getBillOfQuantityId();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getProyek();?></td>
-						<td>
-							<select class="form-control" name="proyek_id" id="proyek_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ProyekMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->proyekId, Field::of()->nama, $billOfQuantityHistory->getProyekId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getParent();?></td>
-						<td>
-							<select class="form-control" name="parent_id" id="parent_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BillOfQuantityMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->billOfQuantityId, Field::of()->nama, $billOfQuantityHistory->getParentId())
-								; ?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getLevel();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="level" id="level" value="<?php echo $billOfQuantityHistory->getLevel();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
-						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $billOfQuantityHistory->getNama();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSatuan();?></td>
-						<td>
-							<input class="form-control" type="text" name="satuan" id="satuan" value="<?php echo $billOfQuantityHistory->getSatuan();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getVolume();?></td>
-						<td>
-							<input class="form-control" type="text" name="volume" id="volume" value="<?php echo $billOfQuantityHistory->getVolume();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getHarga();?></td>
-						<td>
-							<input class="form-control" type="text" name="harga" id="harga" value="<?php echo $billOfQuantityHistory->getHarga();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="sort_order" id="sort_order" value="<?php echo $billOfQuantityHistory->getSortOrder();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAktif();?></td>
-						<td>
-							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1" <?php echo $billOfQuantityHistory->createCheckedAktif();?>/> <?php echo $appEntityLanguage->getAktif();?></label>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td>
-							<button type="submit" class="btn btn-success" name="user_action" value="update"><?php echo $appLanguage->getButtonSave();?></button>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
-							<input type="hidden" name="bill_of_quantity_history_id" value="<?php echo $billOfQuantityHistory->getBillOfQuantityHistoryId();?>"/>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
-	</div>
-</div>
-<?php 
-		}
-		else
-		{
-			// Do somtething here when data is not found
-			?>
-			<div class="alert alert-warning"><?php echo $appLanguage->getMessageDataNotFound();?></div>
-			<?php
-		}
-require_once $appInclude->mainAppFooter(__DIR__);
-	}
-	catch(Exception $e)
-	{
-require_once $appInclude->mainAppHeader(__DIR__);
-		// Do somtething here when exception
-		?>
-		<div class="alert alert-danger"><?php echo $e->getMessage();?></div>
-		<?php
-require_once $appInclude->mainAppFooter(__DIR__);
-	}
-}
-else if($inputGet->getUserAction() == UserAction::DETAIL)
+if($inputGet->getUserAction() == UserAction::DETAIL)
 {
 	$billOfQuantityHistory = new BillOfQuantityHistory(null, $database);
 	try{
 		$subqueryMap = array(
+		"billOfQuantityId" => array(
+			"columnName" => "bill_of_quantity_id",
+			"entityName" => "BillOfQuantityMin",
+			"tableName" => "bill_of_quantity",
+			"primaryKey" => "bill_of_quantity_id",
+			"objectName" => "bill_of_quantity",
+			"propertyName" => "nama"
+		), 
 		"proyekId" => array(
 			"columnName" => "proyek_id",
 			"entityName" => "ProyekMin",
@@ -419,7 +66,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"entityName" => "BillOfQuantityMin",
 			"tableName" => "bill_of_quantity",
 			"primaryKey" => "bill_of_quantity_id",
-			"objectName" => "billOfQuantityMin",
+			"objectName" => "parent",
 			"propertyName" => "nama"
 		)
 		);
@@ -446,8 +93,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
-						<td><?php echo $appEntityLanguage->getBillOfQuantityId();?></td>
-						<td><?php echo $billOfQuantityHistory->getBillOfQuantityId();?></td>
+						<td><?php echo $appEntityLanguage->getBillOfQuantity();?></td>
+						<td><?php echo $billOfQuantityHistory->issetBillOfQuantity() ? $billOfQuantityHistory->getBillOfQuantity()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getProyek();?></td>
@@ -455,7 +102,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getParent();?></td>
-						<td><?php echo $billOfQuantityHistory->issetBillOfQuantityMin() ? $billOfQuantityHistory->getBillOfQuantityMin()->getNama() : "";?></td>
+						<td><?php echo $billOfQuantityHistory->issetParent() ? $billOfQuantityHistory->getParent()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLevel();?></td>
@@ -472,6 +119,22 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getVolume();?></td>
 						<td><?php echo $billOfQuantityHistory->getVolume();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getBobot();?></td>
+						<td><?php echo $billOfQuantityHistory->getBobot();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getVolumeProyek();?></td>
+						<td><?php echo $billOfQuantityHistory->getVolumeProyek();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getPersen();?></td>
+						<td><?php echo $billOfQuantityHistory->getPersen();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getWaktuUbahVolumeProyek();?></td>
+						<td><?php echo $billOfQuantityHistory->getWaktuUbahVolumeProyek();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getHarga();?></td>
@@ -515,11 +178,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<tbody>
 					<tr>
 						<td></td>
-						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->bill_of_quantity_history_id, $billOfQuantityHistory->getBillOfQuantityHistoryId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
-							<?php } ?>
-		
+						<td>		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 							<input type="hidden" name="bill_of_quantity_history_id" value="<?php echo $billOfQuantityHistory->getBillOfQuantityHistoryId();?>"/>
 						</td>
@@ -555,8 +214,10 @@ else
 $appEntityLanguage = new AppEntityLanguage(new BillOfQuantityHistory(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "proyekId" => PicoSpecification::filter("proyekId", "number"),
+    "billOfQuantityId" => PicoSpecification::filter("billOfQuantityId", "number"),
+	"proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"parentId" => PicoSpecification::filter("parentId", "number"),
+	"level" => PicoSpecification::filter("level", "number"),
 	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
@@ -567,6 +228,10 @@ $sortOrderMap = array(
 	"nama" => "nama",
 	"satuan" => "satuan",
 	"volume" => "volume",
+	"bobot" => "bobot",
+	"volumeProyek" => "volumeProyek",
+	"persen" => "persen",
+	"waktuUbahVolumeProyek" => "waktuUbahVolumeProyek",
 	"harga" => "harga",
 	"sortOrder" => "sortOrder",
 	"aktif" => "aktif"
@@ -581,12 +246,8 @@ $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 // Pay attention to security issues
 $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 	array(
-		"sortBy" => "parentId", 
-		"sortType" => PicoSort::ORDER_TYPE_ASC
-	),
-	array(
-		"sortBy" => "sortOrder", 
-		"sortType" => PicoSort::ORDER_TYPE_ASC
+		"sortBy" => "billOfQuantityHistoryId", 
+		"sortType" => PicoSort::ORDER_TYPE_DESC
 	)
 ));
 
@@ -594,6 +255,14 @@ $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getD
 $dataLoader = new BillOfQuantityHistory(null, $database);
 
 $subqueryMap = array(
+"billOfQuantityId" => array(
+	"columnName" => "bill_of_quantity_id",
+	"entityName" => "BillOfQuantityMin",
+	"tableName" => "bill_of_quantity",
+	"primaryKey" => "bill_of_quantity_id",
+	"objectName" => "bill_of_quantity",
+	"propertyName" => "nama"
+), 
 "proyekId" => array(
 	"columnName" => "proyek_id",
 	"entityName" => "ProyekMin",
@@ -607,15 +276,15 @@ $subqueryMap = array(
 	"entityName" => "BillOfQuantityMin",
 	"tableName" => "bill_of_quantity",
 	"primaryKey" => "bill_of_quantity_id",
-	"objectName" => "billOfQuantityMin",
+	"objectName" => "parent",
 	"propertyName" => "nama"
 )
 );
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
-    $exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
-    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+    $exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+    $fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
     $sheetName = "Sheet 1";
 
 	$headerFormat = new XLSXDataFormat($dataLoader, 3);
@@ -623,13 +292,17 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 	$exporter->write($pageData, $fileName, $sheetName, array(
 		$appLanguage->getNumero() => $headerFormat->asNumber(),
 		$appEntityLanguage->getBillOfQuantityHistoryId() => $headerFormat->getBillOfQuantityHistoryId(),
-		$appEntityLanguage->getBillOfQuantityId() => $headerFormat->getBillOfQuantityId(),
+		$appEntityLanguage->getBillOfQuantity() => $headerFormat->asString(),
 		$appEntityLanguage->getProyek() => $headerFormat->asString(),
 		$appEntityLanguage->getParent() => $headerFormat->asString(),
 		$appEntityLanguage->getLevel() => $headerFormat->getLevel(),
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getSatuan() => $headerFormat->getSatuan(),
 		$appEntityLanguage->getVolume() => $headerFormat->getVolume(),
+		$appEntityLanguage->getBobot() => $headerFormat->getBobot(),
+		$appEntityLanguage->getVolumeProyek() => $headerFormat->getVolumeProyek(),
+		$appEntityLanguage->getPersen() => $headerFormat->getPersen(),
+		$appEntityLanguage->getWaktuUbahVolumeProyek() => $headerFormat->getWaktuUbahVolumeProyek(),
 		$appEntityLanguage->getHarga() => $headerFormat->getHarga(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getAdminBuat() => $headerFormat->getAdminBuat(),
@@ -645,13 +318,17 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		return array(
 			sprintf("%d", $index + 1),
 			$row->getBillOfQuantityHistoryId(),
-			$row->getBillOfQuantityId(),
+			$row->issetBillOfQuantity() ? $row->getBillOfQuantity()->getNama() : "",
 			$row->issetProyek() ? $row->getProyek()->getNama() : "",
-			$row->issetBillOfQuantityMin() ? $row->getBillOfQuantityMin()->getNama() : "",
+			$row->issetParent() ? $row->getParent()->getNama() : "",
 			$row->getLevel(),
 			$row->getNama(),
 			$row->getSatuan(),
 			$row->getVolume(),
+			$row->getBobot(),
+			$row->getVolumeProyek(),
+			$row->getPersen(),
+			$row->getWaktuUbahVolumeProyek(),
 			$row->getHarga(),
 			$row->getSortOrder(),
 			$row->getAdminBuat(),
@@ -673,10 +350,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
+				
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getProyek();?></span>
 					<span class="filter-control">
-							<select name="proyek_id" class="form-control">
+							<select class="form-control" name="proyek_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ProyekMin(null, $database), 
 								PicoSpecification::getInstance()
@@ -692,19 +370,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getParent();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getLevel();?></span>
 					<span class="filter-control">
-							<select name="parent_id" class="form-control">
+							<select class="form-control" name="level" data-value="<?php echo $inputGet->getLevel();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BillOfQuantityMin(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true))
-									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->billOfQuantityId, Field::of()->nama, $inputGet->getParentId())
-								; ?>
+								<option value="1" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '1');?>>1</option>
+								<option value="2" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '2');?>>2</option>
+								<option value="3" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '3');?>>3</option>
+								<option value="4" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '4');?>>4</option>
+								<option value="5" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '5');?>>5</option>
+								<option value="6" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '6');?>>6</option>
+								<option value="7" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '7');?>>7</option>
+								<option value="8" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '8');?>>8</option>
+								<option value="9" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '9');?>>9</option>
+								<option value="10" <?php echo AppFormBuilder::selected($inputGet->getLevel(), '10');?>>10</option>
 							</select>
 					</span>
 				</span>
@@ -723,12 +402,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		
 				<span class="filter-group">
 					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
-				</span>
-				<?php } ?>
-				
-				<?php if($userPermission->isAllowedCreate()){ ?>
-				<span class="filter-group">
-					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -757,29 +430,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
-								<td class="data-controll data-selector" data-key="bill_of_quantity_history_id">
-									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-bill-of-quantity-history-id"/>
-								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td class="data-controll data-editor">
-									<span class="fa fa-edit"></span>
-								</td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td class="data-controll data-viewer">
 									<span class="fa fa-folder"></span>
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="bill_of_quantity_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBillOfQuantityId();?></a></td>
 								<td data-col-name="proyek_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getProyek();?></a></td>
-								<td data-col-name="parent_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getParent();?></a></td>
 								<td data-col-name="level" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLevel();?></a></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="satuan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSatuan();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
+								<td data-col-name="bobot" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBobot();?></a></td>
+								<td data-col-name="volume_proyek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolumeProyek();?></a></td>
+								<td data-col-name="persen" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPersen();?></a></td>
+								<td data-col-name="waktu_ubah_volume_proyek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuUbahVolumeProyek();?></a></td>
 								<td data-col-name="harga" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getHarga();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
@@ -795,29 +460,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							?>
 		
 							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
-								<?php if($userPermission->isAllowedBatchAction()){ ?>
-								<td class="data-selector" data-key="bill_of_quantity_history_id">
-									<input type="checkbox" class="checkbox check-slave checkbox-bill-of-quantity-history-id" name="checked_row_id[]" value="<?php echo $billOfQuantityHistory->getBillOfQuantityHistoryId();?>"/>
-								</td>
-								<?php } ?>
-								<?php if($userPermission->isAllowedUpdate()){ ?>
-								<td>
-									<a class="edit-control" href="<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->bill_of_quantity_history_id, $billOfQuantityHistory->getBillOfQuantityHistoryId());?>"><span class="fa fa-edit"></span></a>
-								</td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedDetail()){ ?>
 								<td>
 									<a class="detail-control field-master" href="<?php echo $currentModule->getRedirectUrl(UserAction::DETAIL, Field::of()->bill_of_quantity_history_id, $billOfQuantityHistory->getBillOfQuantityHistoryId());?>"><span class="fa fa-folder"></span></a>
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="bill_of_quantity_id"><?php echo $billOfQuantityHistory->getBillOfQuantityId();?></td>
 								<td data-col-name="proyek_id"><?php echo $billOfQuantityHistory->issetProyek() ? $billOfQuantityHistory->getProyek()->getNama() : "";?></td>
-								<td data-col-name="parent_id"><?php echo $billOfQuantityHistory->issetBillOfQuantityMin() ? $billOfQuantityHistory->getBillOfQuantityMin()->getNama() : "";?></td>
 								<td data-col-name="level"><?php echo $billOfQuantityHistory->getLevel();?></td>
 								<td data-col-name="nama"><?php echo $billOfQuantityHistory->getNama();?></td>
 								<td data-col-name="satuan"><?php echo $billOfQuantityHistory->getSatuan();?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantityHistory->getVolume();?></td>
+								<td data-col-name="bobot"><?php echo $billOfQuantityHistory->getBobot();?></td>
+								<td data-col-name="volume_proyek"><?php echo $billOfQuantityHistory->getVolumeProyek();?></td>
+								<td data-col-name="persen"><?php echo $billOfQuantityHistory->getPersen();?></td>
+								<td data-col-name="waktu_ubah_volume_proyek"><?php echo $billOfQuantityHistory->getWaktuUbahVolumeProyek();?></td>
 								<td data-col-name="harga"><?php echo $billOfQuantityHistory->getHarga();?></td>
 								<td data-col-name="sort_order"><?php echo $billOfQuantityHistory->getSortOrder();?></td>
 								<td data-col-name="aktif"><?php echo $billOfQuantityHistory->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
@@ -831,9 +488,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</div>
 				<div class="button-wrapper">
 					<div class="button-area">
-						<?php if($userPermission->isAllowedDelete()){ ?>
-						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
-						<?php } ?>
 					</div>
 				</div>
 			</form>

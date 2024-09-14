@@ -291,7 +291,7 @@ class BukuHarianMin extends MagicObject
 	 * Ktsk ID
 	 * 
 	 * @Column(name="ktsk_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="Ktsk ID")
+	 * @Label(content="KTSK ID")
 	 * @var integer
 	 */
 	protected $ktskId;

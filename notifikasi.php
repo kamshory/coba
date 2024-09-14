@@ -33,7 +33,7 @@ if($inputGet->getOpen() != null)
 	try
 	{
 		$notif = new Notifikasi(null, $database);
-		$notif->findOneByNotifikasiIdAndSupervisorId($inputGet->getOpen(), $currentLogedInSupervisor->getSupervisorId());
+		$notif->findOneByNotifikasiIdAndSupervisorId($inputGet->getOpen(), $currentLoggedInSupervisor->getSupervisorId());
 		
 		$notif->setDibaca(true)->update();
 		if($notif->hasValueTautan())
@@ -63,7 +63,7 @@ if($inputPost->getUserAction() == 'read')
 			{
 				$notifikasi->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notifikasiId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLogedInSupervisor->getSupervisorId()))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLoggedInSupervisor->getSupervisorId()))
 				)
 				->setDibaca(true)
 				->update();
@@ -87,7 +87,7 @@ if($inputPost->getUserAction() == 'unread')
 			{
 				$notifikasi->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->notifikasiId, $rowId))
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLogedInSupervisor->getSupervisorId()))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLoggedInSupervisor->getSupervisorId()))
 				)
 				->setDibaca(false)
 				->update();
@@ -265,7 +265,7 @@ $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // Additional filter here
 $specification->addAnd(PicoPredicate::getInstance()->equals('grupPengguna', 'supervisor'));
-$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLogedInSupervisor->getSupervisorId()));
+$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLoggedInSupervisor->getSupervisorId()));
 
 // You can define your own sortable
 // Pay attention to security issues

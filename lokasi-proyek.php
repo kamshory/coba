@@ -38,7 +38,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$lokasiProyek->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$lokasiProyek->setKodeLokasi($inputPost->getKodeLokasi(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$lokasiProyek->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$lokasiProyek->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$lokasiProyek->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$lokasiProyek->setLatitude($inputPost->getLatitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$lokasiProyek->setLongitude($inputPost->getLongitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$lokasiProyek->setAtitude($inputPost->getAtitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
@@ -59,7 +59,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$lokasiProyek->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$lokasiProyek->setKodeLokasi($inputPost->getKodeLokasi(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$lokasiProyek->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$lokasiProyek->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$lokasiProyek->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$lokasiProyek->setLatitude($inputPost->getLatitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$lokasiProyek->setLongitude($inputPost->getLongitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$lokasiProyek->setAtitude($inputPost->getAtitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
@@ -84,7 +84,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 				$lokasiProyek->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->lokasiProyekId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLogedInSupervisor->getSupervisorId()))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLoggedInSupervisor->getSupervisorId()))
 				)
 				->setAktif(true)
 				->update();
@@ -109,7 +109,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 				$lokasiProyek->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->lokasiProyekId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLogedInSupervisor->getSupervisorId()))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLoggedInSupervisor->getSupervisorId()))
 				)
 				->setAktif(false)
 				->update();
@@ -133,7 +133,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 				$lokasiProyek = new LokasiProyek(null, $database);
 				$lokasiProyek->where(PicoSpecification::getInstance()
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->lokasi_proyek_id, $rowId))
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLogedInSupervisor->getSupervisorId()))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->supervisorId, $currentLoggedInSupervisor->getSupervisorId()))
 				)
 				->delete();
 			}

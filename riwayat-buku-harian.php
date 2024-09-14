@@ -68,7 +68,7 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -181,7 +181,7 @@ require_once __DIR__ . "/inc.app/footer-supervisor.php";
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 $periode = $inputGet->getPeriode(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
 $specMap = array(
@@ -205,7 +205,7 @@ $sortOrderMap = array(
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // Additional filter here
-$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLogedInSupervisor->getSupervisorId()));
+$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLoggedInSupervisor->getSupervisorId()));
 if($periode != "")
 {
 	$specification->addAnd(PicoPredicate::getInstance()->like('tanggal', PicoPredicate::generateLikeStarts($periode)));
@@ -259,7 +259,7 @@ $bukuHarianMin = new BukuHarian(null, $database);
 $bukuHarianMax = new BukuHarian(null, $database);
 
 $pSpecification = PicoSpecification::getInstance()
-	->addAnd(array('supervisorId', $currentLogedInSupervisor->getSupervisorId()))
+	->addAnd(array('supervisorId', $currentLoggedInSupervisor->getSupervisorId()))
 	->addAnd(PicoPredicate::getInstance()->notEquals('tanggal', null))
 	->addAnd(PicoPredicate::getInstance()->notEquals('tanggal', '0000-00-00'))
 	;
@@ -312,7 +312,7 @@ $arr_period = array_reverse($arr_period);
 			<form action="" method="get" class="filter-form">
 			
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appLanguage->getPeriode();?></span>
+					<span class="filter-label"><?php echo $appLanguage->getPeriod();?></span>
 					<span class="filter-control">
 						<select name="periode" id="periode" class="form-control">
 							<option value=""><?php echo $appLanguage->getSelectOptionSelectMonth();?></option>

@@ -12,7 +12,7 @@ $inputPost = new InputPost();
 $option = $inputPost->getOption();
 $id = $inputPost->getId();
 
-$supervisorId = $currentLogedInSupervisor->getSupervisorId();
+$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
 
 if($id && $option == 'delete')
 {

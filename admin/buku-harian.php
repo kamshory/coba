@@ -312,7 +312,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="koordinator_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getKoordinatorId();?></a></td>
 								<td data-col-name="acc_koordinator" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAccKoordinator();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
-								<td><a href="#"><?php echo $appLanguage->getLokasi();?></a></td>
+								<td><a href="#"><?php echo $appLanguage->getLocation();?></a></td>
 							</tr>
 						</thead>
 					
@@ -345,7 +345,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="koordinator_id"><?php echo $bukuHarian->hasValueKoordinator() ? $bukuHarian->getKoordinator()->getNama() : "";?></td>
 								<td data-col-name="acc_koordinator"><?php echo $bukuHarian->optionAccKoordinator($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $bukuHarian->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td><a href="https://www.google.com/maps/@<?php echo $bukuHarian->getLatitude();?>,<?php echo $bukuHarian->getLongitude();?>,14z" target="_blank"><?php echo $appLanguage->getLokasi();?></a></td>
+								<td><a href="https://www.google.com/maps/@<?php echo $bukuHarian->getLatitude();?>,<?php echo $bukuHarian->getLongitude();?>,14z" target="_blank"><?php echo $appLanguage->getLocation();?></a></td>
 							</tr>
 							<?php 
 							}

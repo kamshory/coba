@@ -93,7 +93,7 @@ class Modul extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="url", type="varchar(100)", length=100, nullable=false)
-	 * @Label(content="Url")
+	 * @Label(content="URL")
 	 * @var string
 	 */
 	protected $url;

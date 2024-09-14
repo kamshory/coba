@@ -10,7 +10,7 @@ use Sipro\Util\CalendarUtil;
 
 require_once __DIR__ . "/inc.app/auth-supervisor.php";
 
-$supervisorId = $currentLogedInSupervisor->getSupervisorId();
+$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
 
 $inputGet = new InputGet();
 

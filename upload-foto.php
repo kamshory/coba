@@ -88,7 +88,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 							<?php 
 							$supervisorProyek = new SupervisorProyek(null, $database);
 							$specs1 = PicoSpecification::getInstance()
-								->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+								->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 								->add(['supervisor.aktif', true])
 								->add(['proyek.aktif', true])
 							;

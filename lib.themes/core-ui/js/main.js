@@ -231,6 +231,7 @@ const cardChart4 = new Chart(document.getElementById('card-chart4'), {
     }
   }
 });
+
 const mainChart = new Chart(document.getElementById('main-chart'), {
   type: 'line',
   data: {
@@ -309,4 +310,6 @@ const mainChart = new Chart(document.getElementById('main-chart'), {
     }
   }
 });
+
+
 //# sourceMappingURL=main.js.map

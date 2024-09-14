@@ -38,7 +38,7 @@ class AppFormBuilder
         {
             $value = $row->get($primaryKey);
             $label = $row->get($valueKey);
-            $selected = isset($currentValue) && $currentValue == $value;
+            $selected = isset($currentValue) && ($currentValue == $value || (is_array($currentValue) && in_array($value, $currentValue)));
             $attrs = $this->createAttributes($additionalOutput, $row);
             $selectOption->add($label, $value, $selected, $attrs, $row);
         }

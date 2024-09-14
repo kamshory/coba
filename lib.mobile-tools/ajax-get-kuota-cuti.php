@@ -8,7 +8,7 @@ use Sipro\Entity\Data\KuotaCuti;
 
 require_once dirname(__DIR__) . "/inc.app/auth-supervisor.php";
 $tahun = date('Y');
-$supervisorId = $currentLogedInSupervisor->getSupervisorId();
+$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
 
 $specs = PicoSpecification::getInstance()
 	->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $supervisorId))

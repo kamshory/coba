@@ -63,7 +63,14 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$billOfQuantity->setParentId($inputPost->getParentId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$billOfQuantity->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantity->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$volume = $inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	$billOfQuantity->setVolume($volume);
+	$bobot = $inputPost->getBobot(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	if($bobot <= 0 && $volume > 0)
+	{
+		$bobot = 1;
+	}
+	$billOfQuantity->setBobot($bobot);
 	$billOfQuantity->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$billOfQuantity->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -107,7 +114,14 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$billOfQuantity->setParentId($inputPost->getParentId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$billOfQuantity->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantity->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$volume = $inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	$billOfQuantity->setVolume($volume);
+	$bobot = $inputPost->getBobot(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	if($bobot <= 0 && $volume > 0)
+	{
+		$bobot = 1;
+	}
+	$billOfQuantity->setBobot($bobot);
 	$billOfQuantity->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$billOfQuantity->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -179,22 +193,11 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 				$billOfQuantityCopy->find($rowId);
 				$billOfQuantityHistory = new BillOfQuantityHistory($billOfQuantityCopy, $database);
 				$billOfQuantityHistory->insert();
+				$billOfQuantityCopy->delete();
 			}
 			catch(Exception $e)
 			{
 				// do nothing
-			}
-			try
-			{
-				$billOfQuantity = new BillOfQuantity(null, $database);
-				$billOfQuantity->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->bill_of_quantity_id, $rowId))
-				)
-				->delete();
-			}
-			catch(Exception $e)
-			{
-				// Do something here to handle exception
 			}
 		}
 	}
@@ -293,6 +296,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getVolume();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="number" step="any" name="volume" id="volume"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getBobot();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="bobot" id="bobot"/>
 						</td>
 					</tr>
 					<tr>
@@ -412,6 +421,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getVolume();?></td>
 						<td>
 							<input class="form-control" type="number" step="any" name="volume" id="volume" value="<?php echo $billOfQuantity->getVolume();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getBobot();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="bobot" id="bobot" value="<?php echo $billOfQuantity->getBobot();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -539,6 +554,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $billOfQuantity->getVolume();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getBobot();?></td>
+						<td><?php echo $billOfQuantity->getBobot();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getHarga();?></td>
 						<td><?php echo $billOfQuantity->getHarga();?></td>
 					</tr>
@@ -631,6 +650,7 @@ $sortOrderMap = array(
 	"nama" => "nama",
 	"satuan" => "satuan",
 	"volume" => "volume",
+	"bobot" => "bobot",
 	"harga" => "harga",
 	"sortOrder" => "sortOrder",
 	"aktif" => "aktif"
@@ -693,6 +713,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getSatuan() => $headerFormat->getSatuan(),
 		$appEntityLanguage->getVolume() => $headerFormat->getVolume(),
+		$appEntityLanguage->getBobot() => $headerFormat->getBobot(),
 		$appEntityLanguage->getHarga() => $headerFormat->getHarga(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getAdminBuat() => $headerFormat->getAdminBuat(),
@@ -714,6 +735,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getNama(),
 			$row->getSatuan(),
 			$row->getVolume(),
+			$row->getBobot(),
 			$row->getHarga(),
 			$row->getSortOrder(),
 			$row->getAdminBuat(),
@@ -900,6 +922,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="parent_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getParent();?></a></td>
 								<td data-col-name="satuan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSatuan();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
+								<td data-col-name="bobot" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBobot();?></a></td>
 								<td data-col-name="harga" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getHarga();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
@@ -945,6 +968,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="parent_id"><?php echo $billOfQuantity->issetParentBoq() ? $billOfQuantity->getParentBoq()->getNama() : "";?></td>
 								<td data-col-name="satuan"><?php echo $billOfQuantity->getSatuan();?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantity->getVolume();?></td>
+								<td data-col-name="bobot"><?php echo $billOfQuantity->getBobot();?></td>
 								<td data-col-name="harga"><?php echo $billOfQuantity->getHarga();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $billOfQuantity->getSortOrder();?></td>
 								<td data-col-name="aktif"><?php echo $billOfQuantity->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>

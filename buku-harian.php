@@ -17,9 +17,11 @@ use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
+use MagicObject\Exceptions\NoRecordFoundException;
 use MagicObject\SetterGetter;
 use Sipro\Entity\Data\AcuanPengawasanPekerjaan;
 use Sipro\Entity\Data\BillOfQuantity;
+use Sipro\Entity\Data\BillOfQuantityProyek;
 use Sipro\Entity\Data\BukuHarian;
 use Sipro\Entity\Data\BukuHarianMin;
 use Sipro\Entity\Data\JenisPekerjaan;
@@ -32,6 +34,7 @@ use Sipro\Entity\Data\SupervisorProyek;
 use Sipro\Entity\Data\TipePondasi;
 use Sipro\Util\CalendarUtil;
 use Sipro\Util\CommonUtil;
+use Sipro\Util\DateUtil;
 
 require_once __DIR__ . "/inc.app/auth-supervisor.php";
 
@@ -43,11 +46,9 @@ $inputPost = new InputPost();
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$bukuHarian = new BukuHarian(null, $database);
-	$bukuHarian->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$bukuHarian->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$bukuHarian->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$bukuHarian->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$bukuHarian->setPermasalahan($inputPost->getPermasalahan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$bukuHarian->setRekomendasi($inputPost->getRekomendasi(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$bukuHarian->setLatitude($inputPost->getLatitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$bukuHarian->setLongitude($inputPost->getLongitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$bukuHarian->setAltitude($inputPost->getAltitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
@@ -142,6 +143,8 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 
 if(isset($_POST['save-work']))
 {
+	$now = $currentAction->getTime();
+	
 	$buku_harian_id = $inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 	$proyek_id = $inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 	$jenis_pekerjaan_id = $inputPost->getJenisPekerjaanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
@@ -306,6 +309,82 @@ if(isset($_POST['save-work']))
 		// do nothing
 	}
 
+	$boqProyekId = $inputPost->getBoqProyekId();
+	$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
+	
+	if(isset($boqProyekId) && is_array($boqProyekId))
+	{
+		foreach($boqProyekId as $rand)
+		{
+			$boqId = $inputPost->get('boq_proyek_id_rand_'.$rand);
+			$volumeProyek = $inputPost->get('volume_rand_'.$rand);
+
+			$billOfQuantity = new BillOfQuantity(null, $database);
+			$billOfQuantityProyek = new BillOfQuantityProyek(null, $database);
+			
+			try
+			{
+				$billOfQuantity->find($boqId);
+				try
+				{
+					// BOQ Proyek ditemukan
+					$billOfQuantityProyek->findOneByProyekIdAndBukuHarianIdAndBillOfQuantityIdAndSupervisorBuat($proyek_id, $buku_harian_id, $boqId, $supervisorId);
+					$billOfQuantityProyek
+						->setVolume($volumeProyek)
+						->setSupervisorUbah($supervisorId)
+						->setWaktuUbah($now)
+					;
+					// update volume
+					$billOfQuantityProyek->update();
+				}
+				catch(NoRecordFoundException $e)
+				{
+					// BOQ Proyek tidak ditemukan
+					
+					if($volumeProyek < $billOfQuantity->getVolumeProyek())
+					{
+						// ambil dari volume proyek
+						$volumeProyek = $billOfQuantity->getVolumeProyek();
+					}
+					
+					$billOfQuantityProyek
+						->setProyekId($proyek_id)
+						->setBukuHarianId($buku_harian_id)
+						->setBillOfQuantityId($boqId)
+						->setVolume($volumeProyek)
+						->setSupervisorBuat($supervisorId)
+						->setSupervisorUbah($supervisorId)
+						->setWaktuBuat($now)
+						->setWaktuUbah($now)
+						->setAktif(true)
+					;
+					$billOfQuantityProyek->insert();
+
+					$volume = $billOfQuantity->getVolume();
+
+					if($volume > 0)
+					{
+						$persen = 100 * $volumeProyek / $volume;
+					}
+					else
+					{
+						$persen = 0;
+					}
+					$billOfQuantity->setVolumeProyek($volumeProyek);
+					$billOfQuantity->setPersen($persen);
+					$billOfQuantity->setWaktuUbahVolumeProyek($now);
+					
+					// update volume dan persen
+					$billOfQuantity->update();
+				}
+			}
+			catch(Exception $e)
+			{
+				// do nothing
+			}
+		}
+	}
+
 	$pekerjaan = new Pekerjaan(null, $database);
 
 	$pekerjaan->where(
@@ -332,8 +411,8 @@ if(isset($_POST['save-work']))
 
 if(isset($_POST['add-work']))
 {
-	$waktu_buat = date('Y-m-d H:i:s');
-	$waktu_ubah = date('Y-m-d H:i:s');
+	$waktu_buat = $currentAction->getTime();
+	$waktu_ubah = $waktu_buat;
 	$ip_buat = $_SERVER['REMOTE_ADDR'];
 	$ip_ubah = $_SERVER['REMOTE_ADDR'];
 
@@ -483,7 +562,7 @@ if(isset($_POST['add-work']))
 
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 ?>
 <div class="page page-jambi page-insert">
@@ -555,12 +634,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 							<?php 
 							$supervisorProyek = new SupervisorProyek(null, $database);
 							$specs1 = PicoSpecification::getInstance()
-								->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+								->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 								->add(['supervisor.aktif', true])
 								->add(['proyek.aktif', true])
 							;
 							$sorts1 = PicoSortable::getInstance()
-								->add(['proyek.proyekId', PicoSort::ORDER_TYPE_ASC])
+								->add(['proyek.proyekId', PicoSort::ORDER_TYPE_DESC])
 							;
 							try
 							{
@@ -598,18 +677,6 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						<input class="form-control" type="date" name="tanggal" id="tanggal" value="<?php echo $tanggal;?>">
 						</td>
 					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getPermasalahan();?></td>
-						<td>
-							<textarea class="form-control" name="permasalahan" id="permasalahan" spellcheck="false" required="required"></textarea>
-						</td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getRekomendasi();?></td>
-						<td>
-							<textarea class="form-control" name="rekomendasi" id="rekomendasi" spellcheck="false" required="required"></textarea>
-						</td>
-					</tr>
 				</tbody>
 			</table>
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -640,7 +707,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		if($bukuHarian->hasValueBukuHarianId())
 		{
 			$proyekId = $bukuHarian->getProyekId();
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 ?>
 <div class="page page-jambi page-update">
@@ -656,12 +723,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 								<?php 
 								$supervisorProyek = new SupervisorProyek(null, $database);
 								$specs1 = PicoSpecification::getInstance()
-									->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+									->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 									->add(['supervisor.aktif', true])
 									->add(['proyek.aktif', true])
 								;
 								$sorts1 = PicoSortable::getInstance()
-									->add(['proyek.proyekId', PicoSort::ORDER_TYPE_ASC])
+									->add(['proyek.proyekId', PicoSort::ORDER_TYPE_DESC])
 								;
 								try
 								{
@@ -778,7 +845,7 @@ else if($inputGet->getUserAction() == 'add-work' && $inputGet->getBukuHarianId()
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -799,11 +866,6 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 		<script type="text/javascript">
 		var dataCuaca = <?php echo json_encode($data_cuaca);?>;
 		var bukuHarianID = <?php echo $bukuHarian->getBukuHarianId();?>;
-		$(document).ready(function(e) {
-			initArea('area.cuaca-control');
-			initMenu('.menu-cuaca-item a');
-			renderCuaca('area.cuaca-control', dataCuaca);
-		});
 		</script>
 		<script type="text/javascript" src="lib.assets/mobile-script/buku-harian-editor.js"></script>
 	
@@ -1065,7 +1127,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 	<div class="modal-dialog">
 		<div class="modal-content">
 		<div class="modal-header">
-			<h5 class="modal-title" id="add-location-modalLabel"><?php echo $appLanguage->getTambahLokasiProyek();?></h5>
+			<h5 class="modal-title" id="add-location-modalLabel"><?php echo $appLanguage->getAddProjectLocation();?></h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>
@@ -1175,7 +1237,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -1260,7 +1322,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 				include "inc.app/dom-buku-harian.php";
 			?>
 			<div class="button-area">
-				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-work', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getTambahPekerjaan();?></button>
+				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-work', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getAddWork();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 				<input type="hidden" name="buku_harian_id" value="<?php echo $bukuHarian->getBukuHarianId();?>"/>
@@ -1293,8 +1355,8 @@ require_once __DIR__ . "/inc.app/footer-supervisor.php";
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
-
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
+$proyekId = $inputGet->getProyekId();
 $specMap = array(
     "supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"proyekId" => PicoSpecification::filter("proyekId", "number")
@@ -1316,7 +1378,7 @@ $sortOrderMap = array(
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // Additional filter here
-$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLogedInSupervisor->getSupervisorId()));
+$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLoggedInSupervisor->getSupervisorId()));
 $specification->addAnd(PicoPredicate::getInstance()->equals('tanggal', date('Y-m-d')));
 
 // You can define your own sortable
@@ -1401,11 +1463,24 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 				}
 			</script>
 			<?php
-			$supervisorId = $currentLogedInSupervisor->getSupervisorId();
+			$supervisorId = $currentLoggedInSupervisor->getSupervisorId();
 
 			$inputGet = new InputGet();
 			
-			$calendar = new CalendarUtil(2024, 8, 0, true);
+			$periodeOri = date('Y-m');
+			$periode = $inputGet->getPeriode();
+			if(empty($periode))
+			{
+				$periode = date('Y-m');
+			}
+			$periode2 = strtotime($periode."-15");
+
+			$sebelumnya = date('Y-m', $periode2 - (31 * 86400));
+			$sesudahnya = date('Y-m', $periode2 + (31 * 86400));
+
+			$periodeArr = explode('-', $periode);
+
+			$calendar = new CalendarUtil(intval($periodeArr[0]), intval($periodeArr[1]), 0, true);
 			
 			$cal = $calendar->getCalendar();
 			$calInline = $calendar->getCalendarInline();
@@ -1422,7 +1497,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 			->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $supervisorId))
 			->addAnd(PicoPredicate::getInstance()->equals('proyekId', $proyekId))
 			->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals('tanggal', $startDate.' 00:00:00'))
-			->addAnd(PicoPredicate::getInstance()->lessThan('tanggal', $endDate.' 00:00:00'))
+			->addAnd(PicoPredicate::getInstance()->lessThan('tanggal', $endDate.' 23:59:59'))
 			;
 			
 			$bukuHarianFinder = new BukuHarianMin(null, $database);
@@ -1471,6 +1546,9 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 					max-width: 100%;
 					box-sizing: border-box;
 				}
+				.calendar .btn{
+					padding: 2px 8px;
+				}
 			</style>
 			<div class="calendar">
 				
@@ -1484,12 +1562,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 								<?php 
 								$supervisorProyek = new SupervisorProyek(null, $database);
 								$specs1 = PicoSpecification::getInstance()
-									->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+									->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 									->add(['supervisor.aktif', true])
 									->add(['proyek.aktif', true])
 								;
 								$sorts1 = PicoSortable::getInstance()
-									->add(['proyek.proyekId', PicoSort::ORDER_TYPE_ASC])
+									->add(['proyek.proyekId', PicoSort::ORDER_TYPE_DESC])
 								;
 								try
 								{
@@ -1515,7 +1593,19 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						</span>
 					</form>
 				</div>
+
 				<table width="100%">
+					<thead>
+						<tr>
+							<td style="text-align: left;">
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo basename($_SERVER['PHP_SELF']);?>?proyek_id=<?php echo $proyekId;?>&periode=<?php echo $sebelumnya;?>'"><i class="fa-solid fa-chevron-left"></i></button>
+							</td>
+							<td colspan="5" style="font-size: 1rem; text-align: center;"><?php echo DateUtil::translateDate($appLanguage, date('F Y', $periode2));?></td>
+							<td style="text-align: right;">
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo basename($_SERVER['PHP_SELF']);?>?proyek_id=<?php echo $proyekId;?>&periode=<?php echo $sesudahnya;?>'"<?php echo $periode == $periodeOri ? ' disabled':'';?>><i class="fa-solid fa-chevron-right"></i></button>
+							</td>
+						</tr>
+					</thead>
 					<tbody>
 						<tr>
 							<td>Min</td>

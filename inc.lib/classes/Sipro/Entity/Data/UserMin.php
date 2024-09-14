@@ -57,21 +57,11 @@ class UserMin extends MagicObject
 	protected $token;
 
 	/**
-	 * Kode Teller
-	 * 
-	 * @NotNull
-	 * @Column(name="kode_teller", type="varchar(45)", length=45, nullable=false)
-	 * @Label(content="Kode Teller")
-	 * @var string
-	 */
-	protected $kodeTeller;
-
-	/**
 	 * First Name
 	 * 
 	 * @NotNull
 	 * @Column(name="first_name", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="First Name")
+	 * @Label(content="Nama Depan")
 	 * @var string
 	 */
 	protected $firstName;
@@ -81,7 +71,7 @@ class UserMin extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="last_name", type="varchar(40)", length=40, nullable=false)
-	 * @Label(content="Last Name")
+	 * @Label(content="Nama Belakang")
 	 * @var string
 	 */
 	protected $lastName;
@@ -121,7 +111,7 @@ class UserMin extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="gender_id", type="tinyint(4)", length=4, nullable=false)
-	 * @Label(content="Gender ID")
+	 * @Label(content="Jenis Kelamin")
 	 * @var integer
 	 */
 	protected $genderId;
@@ -140,7 +130,7 @@ class UserMin extends MagicObject
 	 * Admin Tsk
 	 * 
 	 * @Column(name="admin_tsk", type="tinyint(1)", length=1, nullable=true)
-	 * @Label(content="Admin Tsk")
+	 * @Label(content="Admin TSK")
 	 * @var boolean
 	 */
 	protected $adminTsk;
@@ -149,7 +139,7 @@ class UserMin extends MagicObject
 	 * Ktsk ID
 	 * 
 	 * @Column(name="ktsk_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="Ktsk ID")
+	 * @Label(content="KTSK ID")
 	 * @var integer
 	 */
 	protected $ktskId;

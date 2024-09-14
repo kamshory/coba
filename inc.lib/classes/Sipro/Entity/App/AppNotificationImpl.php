@@ -1,6 +1,6 @@
 <?php
 
-namespace Sipro\Entity\Data;
+namespace Sipro\Entity\App;
 
 use MagicObject\MagicObject;
 

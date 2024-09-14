@@ -34,7 +34,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$peralatan = new Peralatan(null, $database);
 	$peralatan->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$peralatan->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$peralatan->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$peralatan->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$peralatan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$peralatan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$peralatan->setWaktuBuat($currentAction->getTime());
@@ -54,7 +54,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$peralatan = new Peralatan(null, $database);
 	try
 	{
-		$peralatan->findOneByPeralatanIdAndSupervisorId($peralatanId, $currentLogedInSupervisor->getSupervisorId());
+		$peralatan->findOneByPeralatanIdAndSupervisorId($peralatanId, $currentLoggedInSupervisor->getSupervisorId());
 
 		$peralatan->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
 		->setSatuan($inputPost->getSatuan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true))
@@ -82,7 +82,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			$peralatan = new Peralatan(null, $database);
 			try
 			{
-				$peralatan->findOneByPeralatanIdAndSupervisorId($peralatanId, $currentLogedInSupervisor->getSupervisorId());
+				$peralatan->findOneByPeralatanIdAndSupervisorId($peralatanId, $currentLoggedInSupervisor->getSupervisorId());
 
 				$peralatanPekerjaan = new PeralatanPekerjaan(null, $database);
 				$peralatanPekerjaan->deleteByPeralatanId($peralatanId);
@@ -182,7 +182,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$peralatan = new Peralatan(null, $database);
 	try{
-		$peralatan->findOneByPeralatanIdAndSupervisorId($inputGet->getPeralatanId(), $currentLogedInSupervisor->getSupervisorId());
+		$peralatan->findOneByPeralatanIdAndSupervisorId($inputGet->getPeralatanId(), $currentLoggedInSupervisor->getSupervisorId());
 		if($peralatan->hasValuePeralatanId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Peralatan(), $appConfig, $currentUser->getLanguageId());
@@ -322,7 +322,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate() && $currentLogedInSupervisor->getSupervisorId() == $peralatan->getSupervisorId()){ ?>
+							<?php if($userPermission->isAllowedUpdate() && $currentLoggedInSupervisor->getSupervisorId() == $peralatan->getSupervisorId()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->peralatan_id, $peralatan->getPeralatanId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		

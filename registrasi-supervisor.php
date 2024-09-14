@@ -24,8 +24,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 
 		$email = $inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
-		$specs = PicoSpecification::getInstance()
-		->addAnd(PicoPredicate::getInstance()->equals(PicoPredicate::functionLower('email'), strtolower($email)));
+		$specs = PicoSpecification::getInstance()->addAnd(PicoPredicate::getInstance()->equals(PicoPredicate::functionLower('email'), strtolower($email)));
 
 		$supervisorCheck = new Supervisor(null, $database);
 		

@@ -21,7 +21,7 @@ class KtskMin extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.IDENTITY)
 	 * @NotNull
 	 * @Column(name="ktsk_id", type="bigint(20)", length=20, nullable=false, extra="auto_increment")
-	 * @Label(content="Ktsk ID")
+	 * @Label(content="KTSK ID")
 	 * @var integer
 	 */
 	protected $ktskId;

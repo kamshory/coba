@@ -21,13 +21,27 @@ class AppEntityLanguage extends PicoEntityLanguage
      * @var string
      */
     private $currentLanguage;
-    
+
     /**
-     * Class name
+     * Full class name
      *
      * @var string
      */
-    private $className;
+    private $fullClassName;
+    
+    /**
+     * Base class name
+     *
+     * @var string
+     */
+    private $baseClassName;
+
+    /**
+     * Base language directory
+     *
+     * @var string
+     */
+    private $baseLanguageDirectory;
     
     /**
      * Constructor
@@ -39,19 +53,39 @@ class AppEntityLanguage extends PicoEntityLanguage
     public function __construct($entity, $appConfig, $currentLanguage)
     {
         parent::__construct($entity);
-        $this->className = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace());
-        $this->appConfig = $appConfig;
-        $this->currentLanguage = $currentLanguage;
-        
-        // add language
-        $baseEntityDirectory = $appConfig->getEntityBaseDirectory()."/".$currentLanguage;
-        $languageFilePath = $baseEntityDirectory."/".$this->className.".ini";
-        if(file_exists($languageFilePath))
+
+        $langs = $this->loadEntityLanguage($entity, $appConfig, $currentLanguage);
+
+        if(!$langs->empty())
         {
-            $langs = new MagicObject();
-            $langs->loadIniFile($languageFilePath);
             $this->addLanguage($currentLanguage, $langs->value(), true);
         }
+    }
+
+    /**
+     * Load entity language
+     *
+     * @param MagicObject $entity
+     * @param SecretObject $appConfig
+     * @param string $currentLanguage
+     * @return MagicObject
+     */
+    public function loadEntityLanguage($entity, $appConfig, $currentLanguage)
+    {
+        $langs = new MagicObject();
+        $this->baseClassName = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace());
+        $this->fullClassName = $this->baseClassName(get_class($entity), $appConfig->getEntityBaseNamespace(), 1);
+        $this->appConfig = $appConfig;
+        $this->currentLanguage = $currentLanguage;
+        $this->baseLanguageDirectory = $appConfig->getApplication()->getBaseLanguageDirectory();
+        
+        // add language
+        $languageFilePath = $this->baseLanguageDirectory."/".$currentLanguage."/Entity/".$this->fullClassName.".ini";
+        if(file_exists($languageFilePath))
+        {
+            $langs->loadIniFile($languageFilePath);
+        }
+        return $langs;
     }
     
     /**
@@ -60,7 +94,7 @@ class AppEntityLanguage extends PicoEntityLanguage
      * @param string $className
      * @return string
      */
-    private function baseClassName($className, $prefix)
+    private function baseClassName($className, $prefix, $parent = 0)
     {
         $result = null;
         if(!isset($prefix))
@@ -72,7 +106,19 @@ class AppEntityLanguage extends PicoEntityLanguage
             else
             {
                 $arr = explode("\\", trim($className, "\\"));
-                $result = end($arr);
+                if($parent > 0)
+                {
+                    $arr2 = array();
+                    for($i = count($arr) - 1, $j = 0; $i >= 0 && $j <= $parent; $i--, $j++)
+                    {
+                        $arr2[] = $arr[$i];
+                    }
+                    $result = implode("\\", array_reverse($arr2));
+                }
+                else
+                {
+                    $result = end($arr);
+                }
             }
         }
         else

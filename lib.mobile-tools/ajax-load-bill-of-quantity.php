@@ -22,7 +22,7 @@ try
     ;
     $pageData = $boq->findAll($specs);
     $boqUtil = new BoqUtil($pageData->getResult(), $parentId, true);
-    echo $boqUtil->selectOption(null);
+    echo $boqUtil->selectOption(null, true);
 }
 catch(Exception $e)
 {

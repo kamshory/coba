@@ -130,9 +130,10 @@ class BoqUtil
      * Get options for select
      * 
      * @param integer $value Selected value
+     * @param boolean $minmax
      * @return string
      */
-    public function selectOption($value = null)
+    public function selectOption($value = null, $minmax = false)
     {
         $options = array();
         $min = isset($this->boqLevel[$this->parentId]) ? $this->boqLevel[$this->parentId] + 1 : 1;
@@ -140,10 +141,14 @@ class BoqUtil
         {
             $disabled = $this->getAttibuteDisabled($boq);
             $selected = isset($value) && $boq->getBillOfQuantityId() == $value ? ' selected="selected"' : '';
+            $minVal = intval($boq->getVolumeProyek());
+            $maxVal = intval($boq->getVolume());
+
+            $mixmaxStr = $minmax && $boq->getVolume() > 0 ? " ($minVal - $maxVal)" : "";
 
             $level = $boq->getLevel();
-            $space = $level > $min ? str_repeat('&nbsp;', ($level-$min) * 2)."-&nbsp;" : "";
-            $options[] = '<option value="'.$boq->getBillOfQuantityId().'" data-volume="'.$boq->getVolume().'" data-volume-proyek="'.$boq->getVolumeProyek().'"'.$selected.$disabled.'>'.$space.$boq->getNama().'</option>';        
+            $space = $level > $min ? str_repeat('&nbsp;', ($level-$min) * 2)."&dash;&nbsp;" : "";
+            $options[] = '<option value="'.$boq->getBillOfQuantityId().'" data-volume="'.$boq->getVolume().'" data-volume-proyek="'.$boq->getVolumeProyek().'"'.$selected.$disabled.'>'.$space.$boq->getNama().$mixmaxStr.'</option>';        
         }
         return implode("\r\n", $options);
     }

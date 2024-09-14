@@ -43,45 +43,48 @@ else
     <meta name="theme-color" content="#ffffff">
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/config.js"></script>
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/color-modes.js"></script>
-    <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/jquery/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/jquery/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/custom.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/ajax.min.js"></script>
+    <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/planetbiru/multi-select/multi-select.css">
+    <script type="text/javascript" src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/planetbiru/multi-select/multi-select.js"></script>
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/simplebar/css/simplebar.css">
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>css/vendors/simplebar.css">
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>css/style.css">
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/fontawesome-free-6.5.2-web/css/all.min.css">
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>css/custom.css">
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/datetime-picker/bootstrap-datetimepicker.min.css">
+    
   </head>
   <body>
     <div class="sidebar sidebar-fixed border-end" id="sidebar">
       <div class="sidebar-header border-bottom">
         <div class="sidebar-brand">
           <div class="sidebar-brand-full">
-            
+
           </div>
           <div class="sidebar-brand-narrow">
-            
+
           </div>
         </div>
         <button class="btn-close d-lg-none" type="button" data-coreui-dismiss="offcanvas" data-coreui-theme="dark" aria-label="Close" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()"></button>
       </div>
-      
+
       <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
         <li class="nav-item"><a class="nav-link" href="./">
             <svg class="nav-icon">
               <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-speedometer"></use>
-            </svg> Dashboard</a></li>      
-        <li class="nav-title"><?php echo $appLanguage->getMainMenu();?></li>   
-        
+            </svg> Dashboard</a></li>
+        <li class="nav-title"><?php echo $appLanguage->getMainMenu();?></li>
+
         <?php
-        
+
 
         $mainMenu = new MagicObject();
         $mainMenu->loadYamlFile(__DIR__."/supervisor.yml", false, true, true);
-        
+
         foreach($mainMenu->getMenu() as $parent)
         {
             $parentIcon = $parent->getIcon();
@@ -121,25 +124,25 @@ else
             <li class="nav-item"><a class="nav-link" href="./">Dashboard</a></li>
             <li class="nav-item"><a class="nav-link">&raquo;</a></li>
             <li class="nav-item"><a class="nav-link" href="<?php echo basename($_SERVER['PHP_SELF']);?>"><?php echo $currentModule->getModuleTitle();?></a></li>
-          </ul>      
-          
+          </ul>
+
           <?php
             require_once __DIR__ . "/supervisor-header-menu-1.php";
           ?>
-          
+
           <?php
             require_once __DIR__ . "/supervisor-header-menu-2.php";
           ?>
-          
-          
+
+
         </div>
       </header>
 
-      <div class="pb-container">    
+      <div class="pb-container">
         <div class="progress progress-infinite">
           <div class="progress-loading" >
-          </div>                       
-        </div> 
+          </div>
+        </div>
       </div>
       <div class="body flex-grow-1">
         <div class="px-3">
@@ -147,4 +150,3 @@ else
 
 
 
-      

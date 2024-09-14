@@ -16,7 +16,9 @@ table tr td table.tabel-control tr > td:nth-child(3)
     width:30px;
     padding:2px 0px 2px 2px;
 }
-table tr td table.tabel-control tr > td select, table tr td table.tabel-control tr > td input[type="number"], table tr td table.tabel-control tr > td input[type="button"]{
+table tr td table.tabel-control tr > td select, 
+table tr td table.tabel-control tr > td input[type="number"], 
+table tr td table.tabel-control tr > td input[type="button"]{
     width:100%;
     min-width:100%;
     box-sizing:border-box;

@@ -128,13 +128,13 @@ $inputGet = new InputGet();
                                 <td>
                                     <select class="form-control" name="jabatan_id" id="jabatan_id">
                                         <option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-                                        <?php echo AppFormBuilder::getInstance()->createSelectOption(new JabatanMin(null, $database), 
+                                        <?php echo AppFormBuilder::getInstance()->createSelectOption(new JabatanMin(null, $database),
                                         PicoSpecification::getInstance()
                                             ->addAnd(new PicoPredicate(Field::of()->aktif, true))
-                                            ->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+                                            ->addAnd(new PicoPredicate(Field::of()->draft, true)),
                                         PicoSortable::getInstance()
                                             ->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-                                            ->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+                                            ->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)),
                                         Field::of()->jabatanId, Field::of()->nama, $inputPost->getJabatanId())
                                         ; ?>
                                     </select>
@@ -211,7 +211,7 @@ $inputGet = new InputGet();
                   }
                   ?>
                 </div>
-              </div>            
+              </div>
             </div>
           </div>
         </div>

@@ -40,7 +40,7 @@ $inputPost = new InputPost();
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$bukuHarian = new BukuHarian(null, $database);
-	$bukuHarian->setSupervisorId($currentLogedInSupervisor->getSupervisorId());
+	$bukuHarian->setSupervisorId($currentLoggedInSupervisor->getSupervisorId());
 	$bukuHarian->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$bukuHarian->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$bukuHarian->setPermasalahan($inputPost->getPermasalahan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
@@ -453,7 +453,7 @@ if(isset($_POST['add-work']))
 
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 ?>
 <div class="page page-jambi page-insert">
@@ -525,7 +525,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 							<?php 
 							$supervisorProyek = new SupervisorProyek(null, $database);
 							$specs1 = PicoSpecification::getInstance()
-								->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+								->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 								->add(['supervisor.aktif', true])
 								->add(['proyek.aktif', true])
 							;
@@ -610,7 +610,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 		if($bukuHarian->hasValueBukuHarianId())
 		{
 			$proyekId = $bukuHarian->getProyekId();
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 ?>
 <div class="page page-jambi page-update">
@@ -626,7 +626,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 								<?php 
 								$supervisorProyek = new SupervisorProyek(null, $database);
 								$specs1 = PicoSpecification::getInstance()
-									->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+									->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 									->add(['supervisor.aktif', true])
 									->add(['proyek.aktif', true])
 								;
@@ -748,7 +748,7 @@ else if($inputGet->getUserAction() == 'add-work' && $inputGet->getBukuHarianId()
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -997,7 +997,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 	<div class="modal-dialog">
 		<div class="modal-content">
 		<div class="modal-header">
-			<h5 class="modal-title" id="add-location-modalLabel"><?php echo $appLanguage->getTambahLokasiProyek();?></h5>
+			<h5 class="modal-title" id="add-location-modalLabel"><?php echo $appLanguage->getAddProjectLocation();?></h5>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 			</button>
@@ -1107,7 +1107,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 				$tv = $bukuHarian->get('c'.$tt);
 				$data_cuaca[$tt] = isset($x[$tv]) ? $x[$tv] : null;
 			}
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 			// define map here
 			
@@ -1192,7 +1192,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 				include "inc.app/dom-buku-harian.php";
 			?>
 			<div class="button-area">
-				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-work', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getTambahPekerjaan();?></button>
+				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-work', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getAddWork();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 				<input type="hidden" name="buku_harian_id" value="<?php echo $bukuHarian->getBukuHarianId();?>"/>
@@ -1225,7 +1225,7 @@ require_once __DIR__ . "/inc.app/footer-supervisor.php";
 }
 else 
 {
-$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLogedInSupervisor->getLanguageId());
+$appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 
 $specMap = array(
     "supervisorId" => PicoSpecification::filter("supervisorId", "number"),
@@ -1248,7 +1248,7 @@ $sortOrderMap = array(
 $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // Additional filter here
-$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLogedInSupervisor->getSupervisorId()));
+$specification->addAnd(PicoPredicate::getInstance()->equals('supervisorId', $currentLoggedInSupervisor->getSupervisorId()));
 $specification->addAnd(PicoPredicate::getInstance()->equals('tanggal', date('Y-m-d')));
 
 // You can define your own sortable
@@ -1307,7 +1307,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 							<?php 
 							$supervisorProyek = new SupervisorProyek(null, $database);
 							$specs1 = PicoSpecification::getInstance()
-								->add(['supervisorId', $currentLogedInSupervisor->getSupervisorId()])
+								->add(['supervisorId', $currentLoggedInSupervisor->getSupervisorId()])
 								->add(['supervisor.aktif', true])
 								->add(['proyek.aktif', true])
 							;

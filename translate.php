@@ -78,41 +78,34 @@ foreach($arr as $file)
 if(isset($_POST['translate']))
 {
     $inputStr = trim($_POST['translate']);
+    $keysStr = trim($_POST['keys']);
     if(strlen($inputStr))
     {
         $tranlate = explode("\r\n", $inputStr);
-        if(file_exists($inputSource))
+        $keys = explode("|", $keysStr);
+        if(file_exists($inputId))
         {
-            $inputArray = PicoIniUtil::parseIniFile($inputSource);
+            $inputArray = PicoIniUtil::parseIniFile($inputId);
         }
         else
         {
             $inputArray = array();
         }
         $i = 0;
-        foreach($tranlate as $line)
+        foreach($tranlate as $index=>$line)
         {
             $j = 0;
-            foreach($inputArray as $key=>$val)
-            {
-                if($i == $j)
-                {
-                    $inputArray[$key] = $line;
-                }
-                $j++;
-            }
+            $key = $keys[$index];
+            $inputArray[$key] = $line;
             $i++;
         }
+        
         $outputArray = PicoIniUtil::parseIniFile($inputId); 
         foreach($inputArray as $key=>$value)
         {
             $outputArray[$key] = $value;
-        }   
+        } 
         write_ini_file($outputArray, $inputId);
-        if(file_exists($inputSource))
-        {
-            unlink($inputSource);
-        }
     }
 }
 foreach($arr as $file)
@@ -136,6 +129,13 @@ else
     $inputArray = array();
 }
 $outputArray = @PicoIniUtil::parseIniFile($inputId);
+foreach($outputArray as $key=>$value)
+{
+    if(isset($inputArray[$key]))
+    {
+        unset($inputArray[$key]);
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -191,11 +191,13 @@ $outputArray = @PicoIniUtil::parseIniFile($inputId);
                 <table>
                     <tbody>
                         <tr>
+                            
                             <td width="50%"><textarea name="original" id="original" spellcheck="false"><?php echo implode("\r\n", array_values($inputArray));?></textarea></td>
                             <td width="50%"><textarea name="translate" id="translate" spellcheck="false"></textarea></td>
                         </tr>
                     </tbody>
                 </table>
+                <input type="hidden" name="keys" value="<?php echo implode("|", array_keys($inputArray));?>" >
                 <div class="button-area">
                     <input type="submit" value="Save">
                 </div>

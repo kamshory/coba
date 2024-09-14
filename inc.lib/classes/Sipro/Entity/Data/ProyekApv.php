@@ -113,7 +113,7 @@ class ProyekApv extends MagicObject
 	 * Ktsk ID
 	 * 
 	 * @Column(name="ktsk_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="Ktsk ID")
+	 * @Label(content="KTSK ID")
 	 * @var integer
 	 */
 	protected $ktskId;
@@ -122,7 +122,7 @@ class ProyekApv extends MagicObject
 	 * Ktsk
 	 * 
 	 * @JoinColumn(name="ktsk_id", referenceColumnName="ktsk_id")
-	 * @Label(content="Ktsk")
+	 * @Label(content="KTSK")
 	 * @var KtskMin
 	 */
 	protected $ktsk;

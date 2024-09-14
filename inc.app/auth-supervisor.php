@@ -10,12 +10,12 @@ use Sipro\Entity\Data\Supervisor;
 require_once __DIR__."/app.php";
 require_once __DIR__."/session.php";
 
-$currentLogedInSupervisor = new Supervisor(null, $database);
+$currentLoggedInSupervisor = new Supervisor(null, $database);
 if(isset($sessions->supervisorUsername) && isset($sessions->supervisorPassword))
 {
     try
     {
-        $currentLogedInSupervisor->findOneByUsernameAndPasswordAndActiveAndBlocked($sessions->supervisorUsername, sha1($sessions->supervisorPassword), true, false);
+        $currentLoggedInSupervisor->findOneByUsernameAndPasswordAndActiveAndBlocked($sessions->supervisorUsername, sha1($sessions->supervisorPassword), true, false);
     }
     catch(Exception $e)
     {
@@ -25,12 +25,12 @@ if(isset($sessions->supervisorUsername) && isset($sessions->supervisorPassword))
         exit();
     }
 
-    $currentLogedInSupervisor->setLanguageId('id');
-    $currentLogedInSupervisor->setUserId($currentLogedInSupervisor->getSupervisorId());
+    $currentLoggedInSupervisor->setLanguageId('id');
+    $currentLoggedInSupervisor->setUserId($currentLoggedInSupervisor->getSupervisorId());
 
     $appLanguage = new AppLanguage(
         $appConfig,
-        $currentLogedInSupervisor->getLanguageId(),
+        $currentLoggedInSupervisor->getLanguageId(),
         function($var, $value)
         {
             $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
@@ -57,7 +57,7 @@ if(isset($sessions->supervisorUsername) && isset($sessions->supervisorPassword))
     $currentAction->setTime(date('Y-m-d H:i:s'));
     $currentAction->setIp($_SERVER['REMOTE_ADDR']);
 
-    $currentAction->setUserId($currentLogedInSupervisor->getSupervisorId());
+    $currentAction->setUserId($currentLoggedInSupervisor->getSupervisorId());
 
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
         $currentAction->setRequestViaAjax(true);
@@ -86,4 +86,4 @@ $perms->allowedBatchAction = true;
 
 $userPermission = new MagicObject($perms);
 
-$currentUser = $currentLogedInSupervisor;
+$currentUser = $currentLoggedInSupervisor;

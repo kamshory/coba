@@ -1,8 +1,8 @@
 menu:
-  - name: Buku Harian
+  - name: Laporan
     icon: book
     menu_item:
-      - name: Hari Ini
+      - name: Buku Harian
         url: buku-harian.php
         icon: book
       - name: Upload Foto
@@ -14,6 +14,9 @@ menu:
       - name: Acc Buku Harian
         url: acc-buku-harian.php
         icon: check  
+      - name: Bill of Quantity Proyek
+        url: bill-of-quantity-proyek.php
+        icon: 3d  
   - name: Informasi Proyek
     icon: layers
     menu_item:

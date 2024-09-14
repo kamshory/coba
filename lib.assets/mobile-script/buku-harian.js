@@ -1,4 +1,5 @@
 var to = setTimeout(function(){}, 100);
+
 function initArea(selector)
 {
     $(document).on('click', selector, function(e){
@@ -21,6 +22,7 @@ function initArea(selector)
 		e.preventDefault();
 	});
 }
+
 function initMenu(selector)
 {
 	$(document).on('click', selector, function(e){
@@ -36,6 +38,7 @@ function initMenu(selector)
 		e.preventDefault();
 	});
 }
+
 function renderCuaca(selector, data)
 {
 	var html = '<span class="icon-cuaca" id="icon-cuaca-1"></span>';
@@ -64,12 +67,14 @@ function renderCuaca(selector, data)
         });
     });
 }
+
 var getCoords = function(str)
 {
 	var arr = str.split(',');
 	var coords = [[parseInt(arr[0]), parseInt(arr[1])], [parseInt(arr[2]), parseInt(arr[3])], [parseInt(arr[4]), parseInt(arr[5])]];
 	return coords;
 };
+
 var getCentroid = function (coord) 
 {
 	var center = coord.reduce(function (x,y) {
