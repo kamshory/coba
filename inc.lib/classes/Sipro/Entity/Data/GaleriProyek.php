@@ -212,51 +212,6 @@ class GaleriProyek extends MagicObject
 	protected $altitude;
 
 	/**
-	 * Waktu Buat
-	 * 
-	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
-	 * @Label(content="Waktu Buat")
-	 * @var string
-	 */
-	protected $waktuBuat;
-
-	/**
-	 * Waktu Ubah
-	 * 
-	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
-	 * @Label(content="Waktu Ubah")
-	 * @var string
-	 */
-	protected $waktuUbah;
-
-	/**
-	 * Waktu Foto
-	 * 
-	 * @Column(name="waktu_foto", type="datetime", length=19, nullable=true)
-	 * @Label(content="Waktu Foto")
-	 * @var string
-	 */
-	protected $waktuFoto;
-
-	/**
-	 * IP Buat
-	 * 
-	 * @Column(name="ip_buat", type="varchar(45)", length=45, nullable=true, updatable=false)
-	 * @Label(content="IP Buat")
-	 * @var string
-	 */
-	protected $ipBuat;
-
-	/**
-	 * IP Ubah
-	 * 
-	 * @Column(name="ip_ubah", type="varchar(45)", length=45, nullable=true)
-	 * @Label(content="IP Ubah")
-	 * @var string
-	 */
-	protected $ipUbah;
-
-	/**
 	 * Admin Buat
 	 * 
 	 * @Column(name="admin_buat", type="bigint(20)", length=20, nullable=true, updatable=false)
@@ -266,6 +221,15 @@ class GaleriProyek extends MagicObject
 	protected $adminBuat;
 
 	/**
+	 * Pembuat
+	 * 
+	 * @JoinColumn(name="admin_buat", referenceColumnName="user_id")
+	 * @Label(content="Pembuat")
+	 * @var User
+	 */
+	protected $pembuat;
+
+	/**
 	 * Admin Ubah
 	 * 
 	 * @Column(name="admin_ubah", type="bigint(20)", length=20, nullable=true)
@@ -273,6 +237,60 @@ class GaleriProyek extends MagicObject
 	 * @var integer
 	 */
 	protected $adminUbah;
+
+	/**
+	 * Pengubah
+	 * 
+	 * @JoinColumn(name="admin_ubah", referenceColumnName="user_id")
+	 * @Label(content="Pengubah")
+	 * @var User
+	 */
+	protected $pengubah;
+
+	/**
+	 * Waktu Buat
+	 * 
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Waktu Buat")
+	 * @var string
+	 */
+	protected $waktuBuat;
+
+	/**
+	 * Waktu Ubah
+	 * 
+	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Ubah")
+	 * @var string
+	 */
+	protected $waktuUbah;
+
+	/**
+	 * Waktu Foto
+	 * 
+	 * @Column(name="waktu_foto", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Foto")
+	 * @var string
+	 */
+	protected $waktuFoto;
+
+	/**
+	 * IP Buat
+	 * 
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @Label(content="IP Buat")
+	 * @var string
+	 */
+	protected $ipBuat;
+
+	/**
+	 * IP Ubah
+	 * 
+	 * @Column(name="ip_ubah", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="IP Ubah")
+	 * @var string
+	 */
+	protected $ipUbah;
 
 	/**
 	 * Aktif

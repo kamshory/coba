@@ -49,6 +49,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	$billOfQuantityProyek->setBukuHarianId($inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$billOfQuantityProyek->setVolumeProyek($inputPost->setVolumeProyek(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$billOfQuantityProyek->setAdminUbah($currentAction->getUserId());
 	$billOfQuantityProyek->setWaktuUbah($currentAction->getTime());
 	$billOfQuantityProyek->setIpUbah($currentAction->getIp());
@@ -327,6 +328,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $billOfQuantityProyek->getVolume();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getVolumeProyek();?></td>
+						<td><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
 						<td><?php echo $billOfQuantityProyek->getWaktuBuat();?></td>
 					</tr>
@@ -388,7 +393,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new BillOfQuantityProyek(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "proyekId" => PicoSpecification::filter("proyekId", "number[]"),
+    "proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"billOfQuantityId" => PicoSpecification::filter("billOfQuantityId", "number"),
 	"supervisorBuat" => PicoSpecification::filter("supervisorBuat", "number"),
 	"supervisorUbah" => PicoSpecification::filter("supervisorUbah", "number")
@@ -398,6 +403,7 @@ $sortOrderMap = array(
 	"bukuHarianId" => "bukuHarianId",
 	"billOfQuantityId" => "billOfQuantityId",
 	"volume" => "volume",
+	"volumeProyek" => "volumeProyek",
 	"supervisorBuat" => "supervisorBuat",
 	"supervisorUbah" => "supervisorUbah"
 );
@@ -480,7 +486,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getProyek();?></span>
 					<span class="filter-control">
-							<select name="proyek_id[]" class="form-control" multiple multi-select>
+							<select name="proyek_id" class="form-control">
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ProyekMin(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->aktif, true))
@@ -596,6 +602,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="buku_harian_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBukuHarian();?></a></td>
 								<td data-col-name="bill_of_quantity_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBillOfQuantity();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
+								<td data-col-name="volume_proyek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolumeProyek();?></a></td>
 								<td data-col-name="supervisor_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorBuat();?></a></td>
 								<td data-col-name="supervisor_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorUbah();?></a></td>
 							</tr>
@@ -630,6 +637,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="buku_harian_id"><?php echo $billOfQuantityProyek->issetBukuHarian() ? $billOfQuantityProyek->getBukuHarian()->getTanggal() : "";?></td>
 								<td data-col-name="bill_of_quantity_id"><?php echo $billOfQuantityProyek->issetBillOfQuantity() ? $billOfQuantityProyek->getBillOfQuantity()->getNama() : "";?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantityProyek->getVolume();?></td>
+								<td data-col-name="volume_proyek"><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
 								<td data-col-name="supervisor_buat"><?php echo $billOfQuantityProyek->issetPembuat() ? $billOfQuantityProyek->getPembuat()->getNama() : "";?></td>
 								<td data-col-name="supervisor_ubah"><?php echo $billOfQuantityProyek->issetPengubah() ? $billOfQuantityProyek->getPengubah()->getNama() : "";?></td>
 							</tr>

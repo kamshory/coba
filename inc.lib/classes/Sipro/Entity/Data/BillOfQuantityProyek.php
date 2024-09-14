@@ -91,6 +91,15 @@ class BillOfQuantityProyek extends MagicObject
 	protected $volume;
 
 	/**
+	 * Volume Proyek
+	 * 
+	 * @Column(name="volume_proyek", type="float", nullable=true)
+	 * @Label(content="Volume Proyek")
+	 * @var double
+	 */
+	protected $volumeProyek;
+
+	/**
 	 * Waktu Buat
 	 * 
 	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)

@@ -63,33 +63,6 @@ class LokasiProyekMin extends MagicObject
 	protected $supervisorId;
 
 	/**
-	 * Latitude
-	 * 
-	 * @Column(name="latitude", type="double", nullable=true)
-	 * @Label(content="Latitude")
-	 * @var double
-	 */
-	protected $latitude;
-
-	/**
-	 * Longitude
-	 * 
-	 * @Column(name="longitude", type="double", nullable=true)
-	 * @Label(content="Longitude")
-	 * @var double
-	 */
-	protected $longitude;
-
-	/**
-	 * Atitude
-	 * 
-	 * @Column(name="atitude", type="double", nullable=true)
-	 * @Label(content="Atitude")
-	 * @var double
-	 */
-	protected $atitude;
-
-	/**
 	 * Aktif
 	 * 
 	 * @Column(name="aktif", type="tinyint(1)", length=1, default_value="1", nullable=true)

@@ -163,6 +163,24 @@ class BillOfQuantityHistory extends MagicObject
 	protected $harga;
 
 	/**
+	 * Acuan Pengawasan ID
+	 * 
+	 * @Column(name="acuan_pengawasan_id", type="bigint(20)", length=20, nullable=true)
+	 * @Label(content="Acuan Pengawasan ID")
+	 * @var integer
+	 */
+	protected $acuanPengawasanId;
+
+	/**
+	 * Acuan Pengawasan
+	 * 
+	 * @JoinColumn(name="acuan_pengawasan_id", referenceColumnName="acuan_pengawasan_id")
+	 * @Label(content="Acuan Pengawasan")
+	 * @var AcuanPengawasan
+	 */
+	protected $acuanPengawasan;
+
+	/**
 	 * Sort Order
 	 * 
 	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
@@ -229,7 +247,7 @@ class BillOfQuantityHistory extends MagicObject
 	 * Aktif
 	 * 
 	 * @NotNull
-	 * @Column(name="aktif", type="tinyint(4)", length=4, default_value="1", nullable=false)
+	 * @Column(name="aktif", type="tinyint(1)", length=1, default_value="1", nullable=false)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Aktif")
 	 * @var integer

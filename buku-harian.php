@@ -325,12 +325,14 @@ if(isset($_POST['save-work']))
 			try
 			{
 				$billOfQuantity->find($boqId);
+				$volume = $billOfQuantity->getVolume();
 				try
 				{
 					// BOQ Proyek ditemukan
 					$billOfQuantityProyek->findOneByProyekIdAndBukuHarianIdAndBillOfQuantityIdAndSupervisorBuat($proyek_id, $buku_harian_id, $boqId, $supervisorId);
 					$billOfQuantityProyek
-						->setVolume($volumeProyek)
+						->setVolume($volume)
+						->setVolumeProyek($volumeProyek)
 						->setSupervisorUbah($supervisorId)
 						->setWaktuUbah($now)
 					;
@@ -351,7 +353,8 @@ if(isset($_POST['save-work']))
 						->setProyekId($proyek_id)
 						->setBukuHarianId($buku_harian_id)
 						->setBillOfQuantityId($boqId)
-						->setVolume($volumeProyek)
+						->setVolume($volume)
+						->setVolumeProyek($volumeProyek)
 						->setSupervisorBuat($supervisorId)
 						->setSupervisorUbah($supervisorId)
 						->setWaktuBuat($now)
@@ -359,8 +362,6 @@ if(isset($_POST['save-work']))
 						->setAktif(true)
 					;
 					$billOfQuantityProyek->insert();
-
-					$volume = $billOfQuantity->getVolume();
 
 					if($volume > 0)
 					{

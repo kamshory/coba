@@ -336,7 +336,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * Waktu Acc Ktsk
 	 * 
-	 * @Column(name="waktu_acc_ktsk", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_acc_ktsk", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Acc Ktsk")
 	 * @var string
 	 */
@@ -372,7 +372,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * Waktu Acc Koordinator
 	 * 
-	 * @Column(name="waktu_acc_koordinator", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_acc_koordinator", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Acc Koordinator")
 	 * @var string
 	 */
@@ -426,7 +426,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -435,7 +435,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * Waktu Ubah
 	 * 
-	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Ubah")
 	 * @var string
 	 */
@@ -444,7 +444,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * IP Buat
 	 * 
-	 * @Column(name="ip_buat", type="varchar(45)", length=45, nullable=true, updatable=false)
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Buat")
 	 * @var string
 	 */
@@ -453,7 +453,7 @@ class BukuHarian extends MagicObject
 	/**
 	 * IP Ubah
 	 * 
-	 * @Column(name="ip_ubah", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="ip_ubah", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Ubah")
 	 * @var string
 	 */

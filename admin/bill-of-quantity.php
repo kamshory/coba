@@ -24,6 +24,7 @@ use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 use Sipro\Entity\Data\BillOfQuantity;
 use Sipro\AppIncludeImpl;
+use Sipro\Entity\Data\AcuanPengawasan;
 use Sipro\Entity\Data\BillOfQuantityHistory;
 use Sipro\Entity\Data\ProyekMin;
 use Sipro\Entity\Data\BillOfQuantityMin;
@@ -72,6 +73,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	}
 	$billOfQuantity->setBobot($bobot);
 	$billOfQuantity->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantity->setAcuanPengawasanId($inputPost->getAcuanPengawasanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$billOfQuantity->setAdminBuat($currentUser->getUserId());
@@ -123,6 +125,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	}
 	$billOfQuantity->setBobot($bobot);
 	$billOfQuantity->setHarga($inputPost->getHarga(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantity->setAcuanPengawasanId($inputPost->getAcuanPengawasanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantity->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$billOfQuantity->setAdminUbah($currentUser->getUserId());
@@ -311,6 +314,22 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAcuanPengawasan();?></td>
+						<td>
+							<select class="form-control" name="acuan_pengawasan_id" id="acuan_pengawasan_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AcuanPengawasan(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->acuanPengawasanId, PicoSort::ORDER_TYPE_DESC)), 
+								Field::of()->acuanPengawasanId, Field::of()->nama, $inputGet->getAcuanPengawasanId())
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
@@ -436,6 +455,22 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAcuanPengawasan();?></td>
+						<td>
+							<select class="form-control" name="acuan_pengawasan_id" id="acuan_pengawasan_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new AcuanPengawasan(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->acuanPengawasanId, PicoSort::ORDER_TYPE_DESC)), 
+								Field::of()->acuanPengawasanId, Field::of()->nama, $billOfQuantity->getAcuanPengawasanId())
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td>
 							<input class="form-control" type="number" step="1" name="sort_order" id="sort_order" value="<?php echo $billOfQuantity->getSortOrder();?>" autocomplete="off"/>
@@ -505,6 +540,30 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "bill_of_quantity_id",
 			"objectName" => "parentBoq",
 			"propertyName" => "nama"
+		),
+		"acuanPengawasanId" => array(
+			"columnName" => "acuan_pengawasan_id",
+			"entityName" => "AcuanPengawasan",
+			"tableName" => "acuan_pengawasan",
+			"primaryKey" => "acuan_pengawasan_id",
+			"objectName" => "acuanPengawasan",
+			"propertyName" => "nama"
+		),
+		"pembuat" => array(
+			"columnName" => "admin_buat",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pembuat",
+			"propertyName" => "first_name"
+		), 
+		"pengubah" => array(
+			"columnName" => "admin_ubah",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pengubah",
+			"propertyName" => "first_name"
 		)
 		);
 		$billOfQuantity->findOneWithPrimaryKeyValue($inputGet->getBillOfQuantityId(), $subqueryMap);
@@ -562,16 +621,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $billOfQuantity->getHarga();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getAcuanPengawasan();?></td>
+						<td><?php echo $billOfQuantity->issetAcuanPengawasan() ? $billOfQuantity->getAcuanPengawasan()->getNama() : "";?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td><?php echo $billOfQuantity->getSortOrder();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
-						<td><?php echo $billOfQuantity->getAdminBuat();?></td>
+						<td><?php echo $appEntityLanguage->getPembuat();?></td>
+						<td><?php echo $billOfQuantity->issetPembuat() ? $billOfQuantity->getPembuat()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
-						<td><?php echo $billOfQuantity->getAdminUbah();?></td>
+						<td><?php echo $appEntityLanguage->getPengubah();?></td>
+						<td><?php echo $billOfQuantity->issetPengubah() ? $billOfQuantity->getPengubah()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
@@ -641,11 +704,13 @@ $appEntityLanguage = new AppEntityLanguage(new BillOfQuantity(), $appConfig, $cu
 $specMap = array(
     "proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"level" => PicoSpecification::filter("level", "number"),
-	"parentId" => PicoSpecification::filter("parentId", "number")
+	"parentId" => PicoSpecification::filter("parentId", "number"),
+	"acuanPengawasanId" => PicoSpecification::filter("acuanPengawasanId", "number")
 );
 $sortOrderMap = array(
     "proyekId" => "proyekId",
 	"parentId" => "parentId",
+	"acuanPengawasanId" => "acuanPengawasanId",
 	"level" => "level",
 	"nama" => "nama",
 	"satuan" => "satuan",
@@ -693,6 +758,14 @@ $subqueryMap = array(
 	"primaryKey" => "bill_of_quantity_id",
 	"objectName" => "parentBoq",
 	"propertyName" => "nama"
+),
+"acuanPengawasanId" => array(
+	"columnName" => "acuan_pengawasan_id",
+	"entityName" => "AcuanPengawasan",
+	"tableName" => "acuan_pengawasan",
+	"primaryKey" => "acuan_pengawasan_id",
+	"objectName" => "acuanPengawasan",
+	"propertyName" => "nama"
 )
 );
 
@@ -707,14 +780,15 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 	$exporter->write($pageData, $fileName, $sheetName, array(
 		$appLanguage->getNumero() => $headerFormat->asNumber(),
 		$appEntityLanguage->getBillOfQuantityId() => $headerFormat->getBillOfQuantityId(),
-		$appEntityLanguage->getProyek() => $headerFormat->asString(),
-		$appEntityLanguage->getParent() => $headerFormat->asString(),
+		$appEntityLanguage->getProyek() => $headerFormat->getProyek(),
+		$appEntityLanguage->getParent() => $headerFormat->getParent(),
 		$appEntityLanguage->getLevel() => $headerFormat->getLevel(),
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getSatuan() => $headerFormat->getSatuan(),
 		$appEntityLanguage->getVolume() => $headerFormat->getVolume(),
 		$appEntityLanguage->getBobot() => $headerFormat->getBobot(),
 		$appEntityLanguage->getHarga() => $headerFormat->getHarga(),
+		$appEntityLanguage->getAcuanPengawasan() => $headerFormat->getAcuanPengawasan(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getAdminBuat() => $headerFormat->getAdminBuat(),
 		$appEntityLanguage->getAdminUbah() => $headerFormat->getAdminUbah(),
@@ -737,6 +811,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getVolume(),
 			$row->getBobot(),
 			$row->getHarga(),
+			$row->issetAcuanPengawasan() ? $row->getAcuanPengawasan()->getNama() : "",
 			$row->getSortOrder(),
 			$row->getAdminBuat(),
 			$row->getAdminUbah(),
@@ -924,6 +999,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
 								<td data-col-name="bobot" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBobot();?></a></td>
 								<td data-col-name="harga" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getHarga();?></a></td>
+								<td data-col-name="acuan_pengawasan_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAcuanPengawasan();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 							</tr>
@@ -970,6 +1046,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="volume"><?php echo $billOfQuantity->getVolume();?></td>
 								<td data-col-name="bobot"><?php echo $billOfQuantity->getBobot();?></td>
 								<td data-col-name="harga"><?php echo $billOfQuantity->getHarga();?></td>
+								<td data-col-name="acuan_pengawasan_id"><?php echo $billOfQuantity->issetAcuanPengawasan() ? $billOfQuantity->getAcuanPengawasan()->getNama() : "";?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $billOfQuantity->getSortOrder();?></td>
 								<td data-col-name="aktif"><?php echo $billOfQuantity->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>

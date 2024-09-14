@@ -68,6 +68,22 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "bill_of_quantity_id",
 			"objectName" => "parent",
 			"propertyName" => "nama"
+		),
+		"pembuat" => array(
+			"columnName" => "admin_buat",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pembuat",
+			"propertyName" => "first_name"
+		), 
+		"pengubah" => array(
+			"columnName" => "admin_ubah",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pengubah",
+			"propertyName" => "first_name"
 		)
 		);
 		$billOfQuantityHistory->findOneWithPrimaryKeyValue($inputGet->getBillOfQuantityHistoryId(), $subqueryMap);
@@ -145,12 +161,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $billOfQuantityHistory->getSortOrder();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
-						<td><?php echo $billOfQuantityHistory->getAdminBuat();?></td>
+						<td><?php echo $appEntityLanguage->getPembuat();?></td>
+						<td><?php echo $billOfQuantity->issetPembuat() ? $billOfQuantity->getPembuat()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
-						<td><?php echo $billOfQuantityHistory->getAdminUbah();?></td>
+						<td><?php echo $appEntityLanguage->getPengubah();?></td>
+						<td><?php echo $billOfQuantity->issetPengubah() ? $billOfQuantity->getPengubah()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>

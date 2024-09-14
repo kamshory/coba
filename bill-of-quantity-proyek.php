@@ -41,6 +41,7 @@ if($inputPost->getUserAction() == UserAction::UPDATE)
 	$billOfQuantityProyek->setBukuHarianId($inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$billOfQuantityProyek->setVolumeProyek($inputPost->setVolumeProyek(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$billOfQuantityProyek->setAdminUbah($currentAction->getUserId());
 	$billOfQuantityProyek->setWaktuUbah($currentAction->getTime());
 	$billOfQuantityProyek->setIpUbah($currentAction->getIp());
@@ -319,6 +320,10 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						<td><?php echo $billOfQuantityProyek->getVolume();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getVolumeProyek();?></td>
+						<td><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
 						<td><?php echo $billOfQuantityProyek->getWaktuBuat();?></td>
 					</tr>
@@ -390,6 +395,7 @@ $sortOrderMap = array(
 	"bukuHarianId" => "bukuHarianId",
 	"billOfQuantityId" => "billOfQuantityId",
 	"volume" => "volume",
+	"volumeProyek" => "volumeProyek",
 	"supervisorBuat" => "supervisorBuat",
 	"supervisorUbah" => "supervisorUbah"
 );
@@ -589,6 +595,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 								<td data-col-name="buku_harian_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBukuHarian();?></a></td>
 								<td data-col-name="bill_of_quantity_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBillOfQuantity();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
+								<td data-col-name="volume_proyek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolumeProyek();?></a></td>
 								<td data-col-name="supervisor_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorBuat();?></a></td>
 								<td data-col-name="supervisor_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorUbah();?></a></td>
 							</tr>
@@ -623,6 +630,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 								<td data-col-name="buku_harian_id"><?php echo $billOfQuantityProyek->issetBukuHarian() ? $billOfQuantityProyek->getBukuHarian()->getTanggal() : "";?></td>
 								<td data-col-name="bill_of_quantity_id"><?php echo $billOfQuantityProyek->issetBillOfQuantity() ? $billOfQuantityProyek->getBillOfQuantity()->getNama() : "";?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantityProyek->getVolume();?></td>
+								<td data-col-name="volume_proyek"><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
 								<td data-col-name="supervisor_buat"><?php echo $billOfQuantityProyek->issetPembuat() ? $billOfQuantityProyek->getPembuat()->getNama() : "";?></td>
 								<td data-col-name="supervisor_ubah"><?php echo $billOfQuantityProyek->issetPengubah() ? $billOfQuantityProyek->getPengubah()->getNama() : "";?></td>
 							</tr>

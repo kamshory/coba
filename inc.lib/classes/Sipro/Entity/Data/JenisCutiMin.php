@@ -29,7 +29,7 @@ class JenisCutiMin extends MagicObject
 	/**
 	 * Nama
 	 * 
-	 * @Column(name="nama", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="nama", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Nama")
 	 * @var string
 	 */

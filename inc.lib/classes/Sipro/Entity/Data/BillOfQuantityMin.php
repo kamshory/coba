@@ -110,7 +110,7 @@ class BillOfQuantityMin extends MagicObject
 	/**
 	 * Waktu Ubah Volume Proyek
 	 * 
-	 * @Column(name="waktu_ubah_volume_proyek", type="timestamp", length=19, nullable=true, updatable=false, extra="on update CURRENT_TIMESTAMP")
+	 * @Column(name="waktu_ubah_volume_proyek", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Ubah Volume Proyek")
 	 * @var string
 	 */
@@ -124,6 +124,15 @@ class BillOfQuantityMin extends MagicObject
 	 * @var double
 	 */
 	protected $harga;
+
+	/**
+	 * Acuan Pengawasan ID
+	 * 
+	 * @Column(name="acuan_pengawasan_id", type="bigint(20)", length=20, nullable=true)
+	 * @Label(content="Acuan Pengawasan ID")
+	 * @var integer
+	 */
+	protected $acuanPengawasanId;
 
 	/**
 	 * Sort Order
@@ -155,7 +164,7 @@ class BillOfQuantityMin extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false, extra="on update CURRENT_TIMESTAMP")
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -192,7 +201,7 @@ class BillOfQuantityMin extends MagicObject
 	 * Aktif
 	 * 
 	 * @NotNull
-	 * @Column(name="aktif", type="tinyint(4)", length=4, default_value="1", nullable=false)
+	 * @Column(name="aktif", type="tinyint(1)", length=1, default_value="1", nullable=false)
 	 * @DefaultColumn(value="1")
 	 * @Label(content="Aktif")
 	 * @var integer

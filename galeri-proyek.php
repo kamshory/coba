@@ -563,6 +563,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "supervisor_id",
 			"objectName" => "supervisor",
 			"propertyName" => "nama"
+		),
+		"pembuat" => array(
+			"columnName" => "admin_buat",
+			"entityName" => "User",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pembuat",
+			"propertyName" => "first_name"
+		), 
+		"pengubah" => array(
+			"columnName" => "admin_ubah",
+			"entityName" => "User",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pengubah",
+			"propertyName" => "first_name"
 		)
 		);
 		$galeriProyek->findOneWithPrimaryKeyValue($inputGet->getGaleriProyekId(), $subqueryMap);
@@ -668,12 +684,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $galeriProyek->getIpUbah();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
-						<td><?php echo $galeriProyek->getAdminBuat();?></td>
+						<td><?php echo $appEntityLanguage->getPembuat();?></td>
+						<td><?php echo $supervisor->hasValuePembuat() ? $supervisor->getPembuat()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
-						<td><?php echo $galeriProyek->getAdminUbah();?></td>
+						<td><?php echo $appEntityLanguage->getPengubah();?></td>
+						<td><?php echo $supervisor->hasValuePengubah() ? $supervisor->getPengubah()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>

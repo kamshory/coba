@@ -49,7 +49,7 @@ class HakAkses extends MagicObject
 	 * Kode Modul
 	 * 
 	 * @NotNull
-	 * @Column(name="kode_modul", type="varchar(45)", length=45, nullable=false)
+	 * @Column(name="kode_modul", type="varchar(50)", length=50, nullable=false)
 	 * @Label(content="Kode Modul")
 	 * @var string
 	 */

@@ -356,6 +356,33 @@ class PicoDatabaseUtilMySql //NOSONAR
         return $map;
     }
 
+    public static function showCreateTables($config, $callbackFunction)
+    {
+        $databaseConfigTarget = $config->getDatabaseTarget();
+
+        $databaseTarget = new PicoDatabase($databaseConfigTarget);
+        try
+        {
+            $databaseTarget->connect();
+            $tables = $config->getTable();
+
+            foreach($tables as $tableInfo)
+            {
+                $tableNameTarget = $tableInfo->getTarget();
+                if(self::isNotEmpty($tableNameTarget))
+                {
+                    $sql = "SHOW CREATE TABLE $tableNameTarget";
+                    $result = $databaseTarget->fetch($sql, PDO::FETCH_ASSOC);
+                    call_user_func($callbackFunction, $result['Create Table'], $tableNameTarget);
+                }
+            }
+        }
+        catch(Exception $e)
+        {
+            // do nothing
+        }
+    }
+
     /**
      * Importing data from another database. The destination table and column names can be different from the source table and column names.
      *
@@ -387,7 +414,8 @@ class PicoDatabaseUtilMySql //NOSONAR
                 {
                     foreach($preImportScript as $sql)
                     {
-                        call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                        // $sql, $databaseSource, $databaseTarget, $source, $target
+                        call_user_func($callbackFunction, $sql, $databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget);
                     }
                 }
             }
@@ -410,7 +438,7 @@ class PicoDatabaseUtilMySql //NOSONAR
                 {
                     foreach($postImportScript as $sql)
                     {
-                        call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                        call_user_func($callbackFunction, $sql, $databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget);
                     }
                 }
             }
@@ -460,6 +488,7 @@ class PicoDatabaseUtilMySql //NOSONAR
             $records = array();
             while($data = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT))
             {
+                
                 $data = self::processDataMapping($data, $columns, $tableInfo->getMap());
                 if(count($records) < $maxRecord)
                 {
@@ -470,7 +499,7 @@ class PicoDatabaseUtilMySql //NOSONAR
                     if(isset($callbackFunction) && is_callable($callbackFunction))
                     {
                         $sql = self::insert($tableNameTarget, $records);
-                        call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                        call_user_func($callbackFunction, $sql, $databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget);
                     }
                     // reset buffer
                     $records = array();
@@ -479,7 +508,7 @@ class PicoDatabaseUtilMySql //NOSONAR
             if(!empty($records) && isset($callbackFunction) && is_callable($callbackFunction))
             {
                 $sql = self::insert($tableNameTarget, $records);
-                call_user_func($callbackFunction, $sql, $tableNameSource, $tableNameTarget);
+                call_user_func($callbackFunction, $sql, $databaseSource, $databaseTarget, $tableNameSource, $tableNameTarget);
             }
         }
         catch(Exception $e)
@@ -526,8 +555,11 @@ class PicoDatabaseUtilMySql //NOSONAR
                 $arr = explode(':', $map, 2);
                 $target = trim($arr[0]);
                 $source = trim($arr[1]);
-                $data[$target] = $data[$source];
-                unset($data[$source]);
+                if(isset($data[$source]))
+                {
+                    $data[$target] = $data[$source];
+                    unset($data[$source]);
+                }
             }
         }
         $data = array_intersect_key($data, array_flip(array_keys($columns)));

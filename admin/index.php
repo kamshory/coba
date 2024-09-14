@@ -592,6 +592,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                           </td>
                           <td>
                             <?php
+                            $bobotTotal = 0;
                             $persenTotal = 0;
                             $persenItem = 0;
                             foreach($bh as $boq)
@@ -602,7 +603,13 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                                 $namaBoq = substr($namaBoq, 0, 50);
                               }
                               $percent = $boq->getVolume() > 0 ? (100 * $boq->getVolumeProyek() / $boq->getVolume()) : 0; 
-                              $persenTotal += $percent;
+                              $bobot = $boq->getBobot();
+                              if($bobot == 0)
+                              {
+                                $bobot = 1;
+                              }
+                              $bobotTotal += $bobot;
+                              $persenTotal += ($percent * $bobot);
                               $persenItem++;
                               ?>
                             <div>
@@ -616,7 +623,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                             </div>
                             <?php
                             }
-                            $persenRata = $persenItem > 0 ? $persenTotal/$persenItem : 0; 
+                            $persenRata = $bobotTotal > 0 ? $persenTotal/$bobotTotal : 0; 
                             ?>
                             <hr style="height: 2px; line-height: 2px; margin-bottom:0px">
                             <div>

@@ -64,10 +64,10 @@ class PerjalananDinas extends MagicObject
 	protected $supervisor;
 
 	/**
-	 * Nomor Sppd
+	 * Nomor SPPD
 	 * 
 	 * @Column(name="nomor_sppd", type="varchar(50)", length=50, nullable=true)
-	 * @Label(content="Nomor Sppd")
+	 * @Label(content="Nomor SPPD")
 	 * @var string
 	 */
 	protected $nomorSppd;
@@ -93,7 +93,7 @@ class PerjalananDinas extends MagicObject
 	/**
 	 * Kode Lokasi
 	 * 
-	 * @Column(name="kode_lokasi", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="kode_lokasi", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Kode Lokasi")
 	 * @var string
 	 */
@@ -165,47 +165,11 @@ class PerjalananDinas extends MagicObject
 	/**
 	 * Waktu Dibayar
 	 * 
-	 * @Column(name="waktu_dibayar", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_dibayar", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Dibayar")
 	 * @var string
 	 */
 	protected $waktuDibayar;
-
-	/**
-	 * Waktu Buat
-	 * 
-	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
-	 * @Label(content="Waktu Buat")
-	 * @var string
-	 */
-	protected $waktuBuat;
-
-	/**
-	 * Waktu Ubah
-	 * 
-	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
-	 * @Label(content="Waktu Ubah")
-	 * @var string
-	 */
-	protected $waktuUbah;
-
-	/**
-	 * IP Buat
-	 * 
-	 * @Column(name="ip_buat", type="varchar(45)", length=45, nullable=true, updatable=false)
-	 * @Label(content="IP Buat")
-	 * @var string
-	 */
-	protected $ipBuat;
-
-	/**
-	 * IP Ubah
-	 * 
-	 * @Column(name="ip_ubah", type="varchar(45)", length=45, nullable=true)
-	 * @Label(content="IP Ubah")
-	 * @var string
-	 */
-	protected $ipUbah;
 
 	/**
 	 * Admin Buat
@@ -217,6 +181,15 @@ class PerjalananDinas extends MagicObject
 	protected $adminBuat;
 
 	/**
+	 * Pembuat
+	 * 
+	 * @JoinColumn(name="admin_buat", referenceColumnName="user_id")
+	 * @Label(content="Pembuat")
+	 * @var User
+	 */
+	protected $pembuat;
+
+	/**
 	 * Admin Ubah
 	 * 
 	 * @Column(name="admin_ubah", type="bigint(20)", length=20, nullable=true)
@@ -224,6 +197,51 @@ class PerjalananDinas extends MagicObject
 	 * @var integer
 	 */
 	protected $adminUbah;
+
+	/**
+	 * Pengubah
+	 * 
+	 * @JoinColumn(name="admin_ubah", referenceColumnName="user_id")
+	 * @Label(content="Pengubah")
+	 * @var User
+	 */
+	protected $pengubah;
+
+	/**
+	 * Waktu Buat
+	 * 
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Label(content="Waktu Buat")
+	 * @var string
+	 */
+	protected $waktuBuat;
+
+	/**
+	 * Waktu Ubah
+	 * 
+	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Ubah")
+	 * @var string
+	 */
+	protected $waktuUbah;
+
+	/**
+	 * IP Buat
+	 * 
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @Label(content="IP Buat")
+	 * @var string
+	 */
+	protected $ipBuat;
+
+	/**
+	 * IP Ubah
+	 * 
+	 * @Column(name="ip_ubah", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="IP Ubah")
+	 * @var string
+	 */
+	protected $ipUbah;
 
 	/**
 	 * Aktif

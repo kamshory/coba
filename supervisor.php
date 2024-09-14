@@ -659,7 +659,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"objectName" => "jabatan",
 			"propertyName" => "nama"
 		), 
-		"adminBuat" => array(
+		"pembuat" => array(
 			"columnName" => "admin_buat",
 			"entityName" => "User",
 			"tableName" => "user",
@@ -667,7 +667,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"objectName" => "pembuat",
 			"propertyName" => "first_name"
 		), 
-		"adminUbah" => array(
+		"pengubah" => array(
 			"columnName" => "admin_ubah",
 			"entityName" => "User",
 			"tableName" => "user",
@@ -1023,11 +1023,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $supervisor->getIpTerakhirAktif();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
+						<td><?php echo $appEntityLanguage->getPembuat();?></td>
 						<td><?php echo $supervisor->hasValuePembuat() ? $supervisor->getPembuat()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
+						<td><?php echo $appEntityLanguage->getPengubah();?></td>
 						<td><?php echo $supervisor->hasValuePengubah() ? $supervisor->getPengubah()->getFirstName() : "";?></td>
 					</tr>
 					<tr>

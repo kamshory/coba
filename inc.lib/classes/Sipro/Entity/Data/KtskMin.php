@@ -75,7 +75,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Tempat Lahir
 	 * 
-	 * @Column(name="tempat_lahir", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="tempat_lahir", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Tempat Lahir")
 	 * @var string
 	 */
@@ -111,7 +111,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Password
 	 * 
-	 * @Column(name="password", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="password", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Password")
 	 * @var string
 	 */
@@ -120,7 +120,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Auth
 	 * 
-	 * @Column(name="auth", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="auth", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="Auth")
 	 * @var string
 	 */
@@ -129,7 +129,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
+	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -138,7 +138,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Waktu Ubah
 	 * 
-	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Ubah")
 	 * @var string
 	 */
@@ -147,7 +147,7 @@ class KtskMin extends MagicObject
 	/**
 	 * IP Buat
 	 * 
-	 * @Column(name="ip_buat", type="varchar(45)", length=45, nullable=true, updatable=false)
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Buat")
 	 * @var string
 	 */
@@ -156,7 +156,7 @@ class KtskMin extends MagicObject
 	/**
 	 * IP Ubah
 	 * 
-	 * @Column(name="ip_ubah", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="ip_ubah", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Ubah")
 	 * @var string
 	 */
@@ -183,7 +183,7 @@ class KtskMin extends MagicObject
 	/**
 	 * Waktu Terakhir Aktif
 	 * 
-	 * @Column(name="waktu_terakhir_aktif", type="datetime", length=19, nullable=true)
+	 * @Column(name="waktu_terakhir_aktif", type="timestamp", length=19, nullable=true)
 	 * @Label(content="Waktu Terakhir Aktif")
 	 * @var string
 	 */
@@ -192,7 +192,7 @@ class KtskMin extends MagicObject
 	/**
 	 * IP Terakhir Aktif
 	 * 
-	 * @Column(name="ip_terakhir_aktif", type="varchar(45)", length=45, nullable=true)
+	 * @Column(name="ip_terakhir_aktif", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Terakhir Aktif")
 	 * @var string
 	 */

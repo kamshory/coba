@@ -30,10 +30,8 @@ class Modul extends MagicObject
 	/**
 	 * Kode Modul
 	 * 
-	 * @Id
-	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
-	 * @Column(name="kode_modul", type="varchar(45)", length=45, nullable=false)
+	 * @Column(name="kode_modul", type="varchar(50)", length=50, nullable=false)
 	 * @Label(content="Kode Modul")
 	 * @var string
 	 */
@@ -43,7 +41,7 @@ class Modul extends MagicObject
 	 * Nama
 	 * 
 	 * @NotNull
-	 * @Column(name="nama", type="varchar(45)", length=45, nullable=false)
+	 * @Column(name="nama", type="varchar(50)", length=50, nullable=false)
 	 * @Label(content="Nama")
 	 * @var string
 	 */

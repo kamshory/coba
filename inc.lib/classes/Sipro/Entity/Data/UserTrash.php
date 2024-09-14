@@ -51,7 +51,7 @@ class UserTrash extends MagicObject
 	 * Password
 	 * 
 	 * @NotNull
-	 * @Column(name="password", type="varchar(45)", length=45, nullable=false)
+	 * @Column(name="password", type="varchar(50)", length=50, nullable=false)
 	 * @Label(content="Password")
 	 * @var string
 	 */
@@ -61,7 +61,7 @@ class UserTrash extends MagicObject
 	 * Token
 	 * 
 	 * @NotNull
-	 * @Column(name="token", type="varchar(45)", length=45, nullable=false)
+	 * @Column(name="token", type="varchar(50)", length=50, nullable=false)
 	 * @Label(content="Token")
 	 * @var string
 	 */
@@ -207,7 +207,7 @@ class UserTrash extends MagicObject
 	 * Theme ID
 	 * 
 	 * @NotNull
-	 * @Column(name="theme_id", type="varchar(45)", length=45, default_value="default", nullable=false)
+	 * @Column(name="theme_id", type="varchar(50)", length=50, default_value="default", nullable=false)
 	 * @DefaultColumn(value="default")
 	 * @Label(content="Theme ID")
 	 * @var string
@@ -238,7 +238,7 @@ class UserTrash extends MagicObject
 	 * Last Check
 	 * 
 	 * @NotNull
-	 * @Column(name="last_check", type="datetime", length=19, nullable=false)
+	 * @Column(name="last_check", type="timestamp", length=19, nullable=false)
 	 * @Label(content="Last Check")
 	 * @var string
 	 */
@@ -248,7 +248,7 @@ class UserTrash extends MagicObject
 	 * Last Login
 	 * 
 	 * @NotNull
-	 * @Column(name="last_login", type="datetime", length=19, nullable=false)
+	 * @Column(name="last_login", type="timestamp", length=19, nullable=false)
 	 * @Label(content="Last Login")
 	 * @var string
 	 */

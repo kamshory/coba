@@ -481,6 +481,22 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "supervisor_id",
 			"objectName" => "supervisor",
 			"propertyName" => "nama"
+		),
+		"pembuat" => array(
+			"columnName" => "admin_buat",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pembuat",
+			"propertyName" => "first_name"
+		), 
+		"pengubah" => array(
+			"columnName" => "admin_ubah",
+			"entityName" => "UserMin",
+			"tableName" => "user",
+			"primaryKey" => "user_id",
+			"objectName" => "pengubah",
+			"propertyName" => "first_name"
 		)
 		);
 		$perjalananDinas->findOneWithPrimaryKeyValue($inputGet->getPerjalananDinasId(), $subqueryMap);
@@ -562,6 +578,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $perjalananDinas->getWaktuDibayar();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getPembuat();?></td>
+						<td><?php echo $billOfQuantity->issetPembuat() ? $billOfQuantity->getPembuat()->getFirstName() : "";?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getPengubah();?></td>
+						<td><?php echo $billOfQuantity->issetPengubah() ? $billOfQuantity->getPengubah()->getFirstName() : "";?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
 						<td><?php echo $perjalananDinas->getWaktuBuat();?></td>
 					</tr>
@@ -576,14 +600,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpUbah();?></td>
 						<td><?php echo $perjalananDinas->getIpUbah();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
-						<td><?php echo $perjalananDinas->getAdminBuat();?></td>
-					</tr>
-					<tr>
-						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
-						<td><?php echo $perjalananDinas->getAdminUbah();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
