@@ -126,6 +126,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
 						<td><?php echo $catatanSalahLogin->getWaktuBuat();?></td>
 					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getIpBuat();?></td>
+						<td><?php echo $catatanSalahLogin->getIpBuat();?></td>
+					</tr>
 				</tbody>
 			</table>
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -133,10 +137,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?>
-							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->catatan_salah_login_id, $catatanSalahLogin->getCatatanSalahLoginId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
-							<?php } ?>
-		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 							<input type="hidden" name="catatan_salah_login_id" value="<?php echo $catatanSalahLogin->getCatatanSalahLoginId();?>"/>
 						</td>
@@ -182,7 +182,8 @@ $specMap = array(
 $sortOrderMap = array(
     "grupPengguna" => "grupPengguna",
 	"userId" => "userId",
-	"supervisorId" => "supervisorId"
+	"supervisorId" => "supervisorId",
+	"waktuBuat" => "waktuBuat"
 );
 
 // You can define your own specifications
@@ -356,6 +357,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="grup_pengguna" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGrupPengguna();?></a></td>
 								<td data-col-name="user_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUser();?></a></td>
 								<td data-col-name="supervisor_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisor();?></a></td>
+								<td data-col-name="waktu_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuBuat();?></a></td>
 							</tr>
 						</thead>
 					
@@ -382,6 +384,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="grup_pengguna"><?php echo isset($mapForGrupPengguna) && isset($mapForGrupPengguna[$catatanSalahLogin->getGrupPengguna()]) && isset($mapForGrupPengguna[$catatanSalahLogin->getGrupPengguna()]["label"]) ? $mapForGrupPengguna[$catatanSalahLogin->getGrupPengguna()]["label"] : "";?></td>
 								<td data-col-name="user_id"><?php echo $catatanSalahLogin->issetUser() ? $catatanSalahLogin->getUser()->getFirstName() : "";?></td>
 								<td data-col-name="supervisor_id"><?php echo $catatanSalahLogin->issetSupervisor() ? $catatanSalahLogin->getSupervisor()->getNama() : "";?></td>
+								<td data-col-name="waktu_buat"><?php echo $catatanSalahLogin->getWaktuBuat();?></td>
 							</tr>
 							<?php 
 							}

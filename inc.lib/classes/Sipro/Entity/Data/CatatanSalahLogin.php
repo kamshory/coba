@@ -39,7 +39,7 @@ class CatatanSalahLogin extends MagicObject
 	/**
 	 * User ID
 	 * 
-	 * @Column(name="user_id", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="user_id", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="User ID")
 	 * @var string
 	 */
@@ -57,7 +57,7 @@ class CatatanSalahLogin extends MagicObject
 	/**
 	 * Supervisor ID
 	 * 
-	 * @Column(name="supervisor_id", type="varchar(100)", length=100, nullable=true)
+	 * @Column(name="supervisor_id", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="Supervisor ID")
 	 * @var string
 	 */
@@ -80,5 +80,14 @@ class CatatanSalahLogin extends MagicObject
 	 * @var string
 	 */
 	protected $waktuBuat;
+
+	/**
+	 * IP Buat
+	 * 
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="IP Buat")
+	 * @var string
+	 */
+	protected $ipBuat;
 
 }
