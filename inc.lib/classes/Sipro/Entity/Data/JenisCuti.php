@@ -6,6 +6,7 @@ use MagicObject\MagicObject;
 
 /**
  * JenisCuti is entity of table jenis_cuti. You can join this entity to other entity using annotation JoinColumn. 
+ * Don't forget to add "use" statement if the entity is outside the namespace.
  * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
  * @Entity

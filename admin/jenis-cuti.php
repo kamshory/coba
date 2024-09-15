@@ -1,7 +1,7 @@
 <?php
 
 // This script is generated automatically by AppBuilder
-// Visit https://github.com/Planetbiru/AppBuilder
+// Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
@@ -15,6 +15,7 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
+use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -43,16 +44,16 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$jenisCuti->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisCuti->setKeterangan($inputPost->getKeterangan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisCuti->setLambang($inputPost->getLambang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$jenisCuti->setDibayar($inputPost->getDibayar(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jenisCuti->setBerhubunganProyek($inputPost->getBerhubunganProyek(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$jenisCuti->setDibayar($inputPost->getDibayar(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$jenisCuti->setBerhubunganProyek($inputPost->getBerhubunganProyek(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisCuti->setKuota($inputPost->getKuota(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisCuti->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisCuti->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisCuti->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisCuti->setAdminBuat($currentUser->getUserId());
+	$jenisCuti->setAdminBuat($currentAction->getUserId());
 	$jenisCuti->setWaktuBuat($currentAction->getTime());
 	$jenisCuti->setIpBuat($currentAction->getIp());
-	$jenisCuti->setAdminUbah($currentUser->getUserId());
+	$jenisCuti->setAdminUbah($currentAction->getUserId());
 	$jenisCuti->setWaktuUbah($currentAction->getTime());
 	$jenisCuti->setIpUbah($currentAction->getIp());
 	$jenisCuti->insert();
@@ -65,13 +66,13 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$jenisCuti->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisCuti->setKeterangan($inputPost->getKeterangan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisCuti->setLambang($inputPost->getLambang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$jenisCuti->setDibayar($inputPost->getDibayar(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jenisCuti->setBerhubunganProyek($inputPost->getBerhubunganProyek(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$jenisCuti->setDibayar($inputPost->getDibayar(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
+	$jenisCuti->setBerhubunganProyek($inputPost->getBerhubunganProyek(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisCuti->setKuota($inputPost->getKuota(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisCuti->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisCuti->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisCuti->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisCuti->setAdminUbah($currentUser->getUserId());
+	$jenisCuti->setAdminUbah($currentAction->getUserId());
 	$jenisCuti->setWaktuUbah($currentAction->getTime());
 	$jenisCuti->setIpUbah($currentAction->getIp());
 	$jenisCuti->setJenisCutiId($inputPost->getJenisCutiId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
@@ -86,7 +87,22 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$jenisCuti = new JenisCuti(null, $database);
-			$jenisCuti->setJenisCutiId($rowId)->setAktif(true)->update();
+			try
+			{
+				$jenisCuti->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisCutiId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
+				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
+				->setAktif(true)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -98,7 +114,22 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$jenisCuti = new JenisCuti(null, $database);
-			$jenisCuti->setJenisCutiId($rowId)->setAktif(false)->update();
+			try
+			{
+				$jenisCuti->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisCutiId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
+				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
+				->setAktif(false)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -109,8 +140,18 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	{
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
-			$jenisCuti = new JenisCuti(null, $database);
-			$jenisCuti->deleteOneByJenisCutiId($rowId);
+			try
+			{
+				$jenisCuti = new JenisCuti(null, $database);
+				$jenisCuti->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenis_cuti_id, $rowId))
+				)
+				->delete();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -128,7 +169,11 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 			}
 			$primaryKeyValue = $dataItem->getPrimaryKey();
 			$sortOrder = $dataItem->getSortOrder();
-			$jenisCuti->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisCutiId, $primaryKeyValue)))->setSortOrder($sortOrder)->update();
+			$jenisCuti->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->jenisCutiId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
 		}
 	}
 	$currentModule->redirectToItself();
@@ -152,7 +197,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getKeterangan();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="keterangan" id="keterangan"/>
+							<textarea class="form-control" name="keterangan" id="keterangan" spellcheck="false"></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -221,7 +266,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$jenisCuti = new JenisCuti(null, $database);
 	try{
 		$jenisCuti->findOneByJenisCutiId($inputGet->getJenisCutiId());
-		if($jenisCuti->hasValueJenisCutiId())
+		if($jenisCuti->issetJenisCutiId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisCuti(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -240,7 +285,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getKeterangan();?></td>
 						<td>
-							<input class="form-control" type="text" name="keterangan" id="keterangan" value="<?php echo $jenisCuti->getKeterangan();?>" autocomplete="off"/>
+							<textarea class="form-control" name="keterangan" id="keterangan" spellcheck="false"><?php echo $jenisCuti->getKeterangan();?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -329,7 +374,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	try{
 		$subqueryMap = null;
 		$jenisCuti->findOneWithPrimaryKeyValue($inputGet->getJenisCutiId(), $subqueryMap);
-		if($jenisCuti->hasValueJenisCutiId())
+		if($jenisCuti->issetJenisCutiId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisCuti(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -338,6 +383,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
+		<?php
+		if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($jenisCuti->getWaitingFor()))
+		{
+				?>
+				<div class="alert alert-info"><?php echo UserAction::getWaitingForMessage($appLanguage, $jenisCuti->getWaitingFor());?></div>
+				<?php
+		}
+		?>
+		
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
@@ -384,8 +438,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?><button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jenis_cuti_id, $jenisCuti->getJenisCutiId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button><?php } ?>&#xD;
+							<?php if($userPermission->isAllowedUpdate()){ ?>
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jenis_cuti_id, $jenisCuti->getJenisCutiId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<?php } ?>
+		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
+							<input type="hidden" name="jenis_cuti_id" value="<?php echo $jenisCuti->getJenisCutiId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -417,6 +475,42 @@ require_once $appInclude->mainAppFooter(__DIR__);
 else 
 {
 $appEntityLanguage = new AppEntityLanguage(new JenisCuti(), $appConfig, $currentUser->getLanguageId());
+
+$specMap = array(
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
+	"dibayar" => PicoSpecification::filter("dibayar", "boolean"),
+	"berhubunganProyek" => PicoSpecification::filter("berhubunganProyek", "boolean")
+);
+$sortOrderMap = array(
+	"nama" => "nama",
+	"lambang" => "lambang",
+	"dibayar" => "dibayar",
+	"berhubunganProyek" => "berhubunganProyek",
+	"kuota" => "kuota",
+	"sortOrder" => "sortOrder",
+	"defaultData" => "defaultData",
+	"aktif" => "aktif"
+);
+
+// You can define your own specifications
+// Pay attention to security issues
+$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+
+
+// You can define your own sortable
+// Pay attention to security issues
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
+
+$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
+$dataLoader = new JenisCuti(null, $database);
+
+$subqueryMap = null;
+
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -433,6 +527,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getDibayar();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="dibayar" data-value="<?php echo $inputGet->getDibayar();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getDibayar(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
+								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getDibayar(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getBerhubunganProyek();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="berhubungan_proyek" data-value="<?php echo $inputGet->getBerhubunganProyek();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getBerhubunganProyek(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
+								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getBerhubunganProyek(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
 				<?php if($userPermission->isAllowedCreate()){ ?>
@@ -445,51 +561,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
 			<?php } /*ajaxSupport*/ ?>
-			<?php 	
-			
-			$specMap = array(
-			    "nama" => PicoSpecification::filter("nama", "fulltext")
-			);
-			$sortOrderMap = array(
-			    "nama" => "nama",
-				"lambang" => "lambang",
-				"dibayar" => "dibayar",
-				"berhubunganProyek" => "berhubunganProyek",
-				"kuota" => "kuota",
-				"sortOrder" => "sortOrder",
-				"defaultData" => "defaultData",
-				"aktif" => "aktif"
-			);
-			
-			// You can define your own specifications
-			// Pay attention to security issues
-			$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
-			
-			
-			// You can define your own sortable
-			// Pay attention to security issues
-			$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
-				array(
-					"sortBy" => "sortOrder", 
-					"sortType" => PicoSort::ORDER_TYPE_ASC
-				)
-			));
-			
-			$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
-			$dataLoader = new JenisCuti(null, $database);
-			
-			$subqueryMap = null;
-			$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-			
-			if($pageData->getTotalResult() > 0)
-			{
-				$pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
-				->setNavigation(
-				'<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
-				'<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
-				)
-				->setMargin($appConfig->getData()->getPageMargin())
-				;
+			<?php try{
+				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+				if($pageData->getTotalResult() > 0)
+				{		
+				    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+				    ->setNavigation(
+				    '<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
+				    '<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
+				    )
+				    ->setMargin($appConfig->getData()->getPageMargin())
+				    ;
 			?>
 			<div class="pagination pagination-top">
 			    <div class="pagination-number">
@@ -600,10 +682,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			}
 			else
 			{
-			?>
+			    ?>
 			    <div class="alert alert-info"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			    <?php
+			}
+			?>
+			
 			<?php
 			}
+			catch(Exception $e)
+			{
+			    ?>
+			    <div class="alert alert-danger"><?php echo $appInclude->printException($e);?></div>
+			    <?php
+			} 
 			?>
 			<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>
 		</div>
