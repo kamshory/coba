@@ -444,7 +444,7 @@ $mapForDibaca = array(
 	"1" => array("value" => "1", "label" => "Sudah dibaca", "default" => "false")
 );
 $specMap = array(
-    "pengirimUserId" => PicoSpecification::filter("pengirimUserId", "number"),
+	"pengirimUserId" => PicoSpecification::filter("pengirimUserId", "number"),
 	"pengirimSupervisorId" => PicoSpecification::filter("pengirimSupervisorId", "number"),
 	"penerimaUserId" => PicoSpecification::filter("penerimaUserId", "number"),
 	"penerimaSupervisorId" => PicoSpecification::filter("penerimaSupervisorId", "number"),
@@ -452,7 +452,7 @@ $specMap = array(
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "pengirimUserId" => "pengirimUserId",
+	"pengirimUserId" => "pengirimUserId",
 	"pengirimSupervisorId" => "pengirimSupervisorId",
 	"penerimaUserId" => "penerimaUserId",
 	"penerimaSupervisorId" => "penerimaSupervisorId",

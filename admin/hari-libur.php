@@ -412,13 +412,13 @@ else
 $appEntityLanguage = new AppEntityLanguage(new HariLibur(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext"),
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
 	"jenisHariLiburId" => PicoSpecification::filter("jenisHariLiburId", "number"),
 	"buka" => PicoSpecification::filter("buka", "boolean"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "tanggal" => "tanggal",
+	"tanggal" => "tanggal",
 	"nama" => "nama",
 	"jenisHariLiburId" => "jenisHariLiburId",
 	"buka" => "buka",

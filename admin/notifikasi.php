@@ -245,11 +245,11 @@ $mapForDibaca = array(
 	"1" => array("value" => "1", "label" => "Sudah Dibaca", "default" => "false")
 );
 $specMap = array(
-    "grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
+	"grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
 	"dibaca" => PicoSpecification::filter("dibaca", "number")
 );
 $sortOrderMap = array(
-    "grupPengguna" => "grupPengguna",
+	"grupPengguna" => "grupPengguna",
 	"userId" => "userId",
 	"userId" => "userId",
 	"icon" => "icon",

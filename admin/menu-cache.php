@@ -368,10 +368,10 @@ else
 $appEntityLanguage = new AppEntityLanguage(new MenuCache(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "userLevelId" => PicoSpecification::filter("userLevelId", "number")
+	"userLevelId" => PicoSpecification::filter("userLevelId", "number")
 );
 $sortOrderMap = array(
-    "userLevelId" => "userLevelId",
+	"userLevelId" => "userLevelId",
 	"userType" => "userType",
 	"content" => "content"
 );

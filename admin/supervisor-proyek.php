@@ -501,14 +501,14 @@ $mapForKoordinator = array(
 	"0" => array("value" => "0", "label" => "Bukan", "default" => "false")
 );
 $specMap = array(
-    "proyekId" => PicoSpecification::filter("proyekId", "number"),
+	"proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"koordinator" => PicoSpecification::filter("koordinator", "number"),
 	"berjalan" => PicoSpecification::filter("berjalan", "boolean"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "proyekId" => "proyekId",
+	"proyekId" => "proyekId",
 	"supervisorId" => "supervisorId",
 	"koordinator" => "koordinator",
 	"berjalan" => "berjalan",

@@ -608,7 +608,7 @@ $mapForGenderId = array(
 	"2" => array("value" => "2", "label" => "Perempuan", "default" => "true")
 );
 $specMap = array(
-    "firstName" => PicoSpecification::filter("firstName", "fulltext"),
+	"firstName" => PicoSpecification::filter("firstName", "fulltext"),
 	"username" => PicoSpecification::filter("username", "fulltext"),
 	"genderId" => PicoSpecification::filter("genderId", "number"),
 	"userLevelId" => PicoSpecification::filter("userLevelId", "number"),
@@ -616,7 +616,7 @@ $specMap = array(
 	"active" => PicoSpecification::filter("active", "boolean")
 );
 $sortOrderMap = array(
-    "firstName" => "firstName",
+	"firstName" => "firstName",
 	"lastName" => "lastName",
 	"username" => "username",
 	"phone" => "phone",

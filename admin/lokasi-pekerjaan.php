@@ -458,7 +458,7 @@ $specMap = array(
     
 );
 $sortOrderMap = array(
-    "lokasiPekerjaanId" => "lokasiPekerjaanId",
+	"lokasiPekerjaanId" => "lokasiPekerjaanId",
 	"pekerjaanId" => "pekerjaanId",
 	"bukuHarianId" => "bukuHarianId",
 	"lokasiProyekId" => "lokasiProyekId",

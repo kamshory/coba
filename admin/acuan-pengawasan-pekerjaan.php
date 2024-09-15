@@ -405,12 +405,12 @@ else
 $appEntityLanguage = new AppEntityLanguage(new AcuanPengawasanPekerjaan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "pekerjaanId" => PicoSpecification::filter("pekerjaanId", "number"),
+	"pekerjaanId" => PicoSpecification::filter("pekerjaanId", "number"),
 	"acuanPengawasanId" => PicoSpecification::filter("acuanPengawasanId", "number"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "pekerjaanId" => "pekerjaanId",
+	"pekerjaanId" => "pekerjaanId",
 	"acuanPengawasanId" => "acuanPengawasanId",
 	"aktif" => "aktif"
 );

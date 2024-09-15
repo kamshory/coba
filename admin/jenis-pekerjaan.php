@@ -542,12 +542,12 @@ $mapForKegiatan = array(
 	"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
 );
 $specMap = array(
-    "jenisPekerjaanId" => PicoSpecification::filter("jenisPekerjaanId", "fulltext"),
+	"jenisPekerjaanId" => PicoSpecification::filter("jenisPekerjaanId", "fulltext"),
 	"nama" => PicoSpecification::filter("nama", "fulltext"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "jenisPekerjaanId" => "jenisPekerjaanId",
+	"jenisPekerjaanId" => "jenisPekerjaanId",
 	"nama" => "nama",
 	"tipePondasiId" => "tipePondasiId",
 	"kelasTowerId" => "kelasTowerId",

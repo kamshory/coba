@@ -25,11 +25,11 @@ $inputGet = new InputGet();
 $inputPost = new InputPost();
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext"),
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
     "supervisorId" => PicoSpecification::filter("supervisorId", "number")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
     "kodeLokasi" => "kodeLokasi",
     "proyekId" => "proyekId",
     "supervisorId" => "supervisorId",

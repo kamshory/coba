@@ -175,12 +175,12 @@ $mapForGrupPengguna = array(
 	"user" => array("value" => "user", "label" => "Admin", "default" => "false")
 );
 $specMap = array(
-    "grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
+	"grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
 	"userId" => PicoSpecification::filter("userId", "fulltext"),
 	"supervisorId" => PicoSpecification::filter("supervisorId", "fulltext")
 );
 $sortOrderMap = array(
-    "grupPengguna" => "grupPengguna",
+	"grupPengguna" => "grupPengguna",
 	"userId" => "userId",
 	"supervisorId" => "supervisorId",
 	"waktuBuat" => "waktuBuat"

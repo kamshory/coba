@@ -1359,11 +1359,11 @@ else
 $appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $currentLoggedInSupervisor->getLanguageId());
 $proyekId = $inputGet->getProyekId();
 $specMap = array(
-    "supervisorId" => PicoSpecification::filter("supervisorId", "number"),
+	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"proyekId" => PicoSpecification::filter("proyekId", "number")
 );
 $sortOrderMap = array(
-    "supervisorId" => "supervisorId",
+	"supervisorId" => "supervisorId",
 	"proyekId" => "proyekId",
 	"tanggal" => "tanggal",
 	"latitude" => "latitude",

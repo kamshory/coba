@@ -523,12 +523,12 @@ else
 $appEntityLanguage = new AppEntityLanguage(new KuotaCuti(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "supervisorId" => PicoSpecification::filter("supervisorId", "number"),
+	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"jenisCutiId" => PicoSpecification::filter("jenisCutiId", "number"),
 	"tahun" => PicoSpecification::filter("tahun", "fulltext")
 );
 $sortOrderMap = array(
-    "supervisorId" => "supervisorId",
+	"supervisorId" => "supervisorId",
 	"jenisCutiId" => "jenisCutiId",
 	"tahun" => "tahun",
 	"kuota" => "kuota",

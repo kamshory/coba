@@ -185,11 +185,11 @@ $appEntityLanguage = new AppEntityLanguage(new BukuHarian(), $appConfig, $curren
 $periode = $inputGet->getPeriode(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
 
 $specMap = array(
-    "supervisorId" => PicoSpecification::filter("supervisorId", "number"),
+	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"proyekId" => PicoSpecification::filter("proyekId", "number")
 );
 $sortOrderMap = array(
-    "supervisorId" => "supervisorId",
+	"supervisorId" => "supervisorId",
 	"proyekId" => "proyekId",
 	"tanggal" => "tanggal",
 	"latitude" => "latitude",

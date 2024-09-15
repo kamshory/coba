@@ -802,13 +802,13 @@ else
 $appEntityLanguage = new AppEntityLanguage(new Pekerjaan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "proyekId" => PicoSpecification::filter("proyekId", "number"),
+	"proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"bukuHarianId" => PicoSpecification::filter("bukuHarianId", "number"),
 	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
 	"jenisPekerjaanId" => PicoSpecification::filter("jenisPekerjaanId", "fulltext")
 );
 $sortOrderMap = array(
-    "pekerjaanId" => "pekerjaanId",
+	"pekerjaanId" => "pekerjaanId",
 	"proyekId" => "proyekId",
 	"bukuHarianId" => "bukuHarianId",
 	"supervisorId" => "supervisorId",

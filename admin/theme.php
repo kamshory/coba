@@ -389,7 +389,7 @@ $specMap = array(
     
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",
 	"aktif" => "aktif"

@@ -109,10 +109,10 @@ else
 $appEntityLanguage = new AppEntityLanguage(new KelasTower(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext")
+	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",
 	"aktif" => "aktif"

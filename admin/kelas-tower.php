@@ -402,10 +402,10 @@ else
 $appEntityLanguage = new AppEntityLanguage(new KelasTower(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext")
+	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
-    "kelasTowerId" => "kelasTowerId",
+	"kelasTowerId" => "kelasTowerId",
 	"nama" => "nama",
 	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",

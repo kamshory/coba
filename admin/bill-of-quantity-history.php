@@ -230,14 +230,14 @@ else
 $appEntityLanguage = new AppEntityLanguage(new BillOfQuantityHistory(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "billOfQuantityId" => PicoSpecification::filter("billOfQuantityId", "number"),
+	"billOfQuantityId" => PicoSpecification::filter("billOfQuantityId", "number"),
 	"proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"parentId" => PicoSpecification::filter("parentId", "number"),
 	"level" => PicoSpecification::filter("level", "number"),
 	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
-    "billOfQuantityId" => "billOfQuantityId",
+	"billOfQuantityId" => "billOfQuantityId",
 	"proyekId" => "proyekId",
 	"parentId" => "parentId",
 	"level" => "level",

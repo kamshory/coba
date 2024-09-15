@@ -622,14 +622,14 @@ $mapForJenisKelamin = array(
 	"P" => array("value" => "P", "label" => "Perempuan", "default" => "false")
 );
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext"),
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
 	"nip" => PicoSpecification::filter("nip", "fulltext"),
 	"jabatanId" => PicoSpecification::filter("jabatanId", "number"),
 	"tskId" => PicoSpecification::filter("tskId", "number"),
 	"jenisKelamin" => PicoSpecification::filter("jenisKelamin", "fulltext")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"nip" => "nip",
 	"jabatanId" => "jabatanId",
 	"tskId" => "tskId",

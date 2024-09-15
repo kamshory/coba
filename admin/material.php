@@ -453,11 +453,11 @@ else
 $appEntityLanguage = new AppEntityLanguage(new Material(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext"),
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
 	"supervisorId" => PicoSpecification::filter("supervisorId", "number")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"satuan" => "satuan",
 	"supervisorId" => "supervisorId",
 	"sortOrder" => "sortOrder",

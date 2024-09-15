@@ -702,13 +702,13 @@ else
 $appEntityLanguage = new AppEntityLanguage(new BillOfQuantity(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "proyekId" => PicoSpecification::filter("proyekId", "number"),
+	"proyekId" => PicoSpecification::filter("proyekId", "number"),
 	"level" => PicoSpecification::filter("level", "number"),
 	"parentId" => PicoSpecification::filter("parentId", "number"),
 	"acuanPengawasanId" => PicoSpecification::filter("acuanPengawasanId", "number")
 );
 $sortOrderMap = array(
-    "proyekId" => "proyekId",
+	"proyekId" => "proyekId",
 	"parentId" => "parentId",
 	"acuanPengawasanId" => "acuanPengawasanId",
 	"level" => "level",

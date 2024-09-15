@@ -410,11 +410,11 @@ else
 $appEntityLanguage = new AppEntityLanguage(new GrupModul(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext"),
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
 	"aktif" => PicoSpecification::filter("aktif", "boolean")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"icon" => "icon",
 	"defaultData" => "defaultData",
 	"sortOrder" => "sortOrder",

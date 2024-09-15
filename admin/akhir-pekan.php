@@ -400,10 +400,10 @@ else
 $appEntityLanguage = new AppEntityLanguage(new AkhirPekan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-    "nama" => PicoSpecification::filter("nama", "fulltext")
+	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
-    "nama" => "nama",
+	"nama" => "nama",
 	"kodeHari" => "kodeHari",
 	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",
