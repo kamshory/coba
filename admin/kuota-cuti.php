@@ -169,7 +169,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->supervisorId, Field::of()->nama)
-								->setTextNodeFormat('"%s - %s", nama, jabatan.nama')
+								->setTextNodeFormat('"%s (%s)", nama, jabatan.nama')
 								; ?>
 							</select>
 						</td>
@@ -268,7 +268,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->supervisorId, Field::of()->nama, $kuotaCuti->getSupervisorId())
-								->setTextNodeFormat('"%s - %s", nama, jabatan.nama')
+								->setTextNodeFormat('"%s (%s)", nama, jabatan.nama')
 								; ?>
 							</select>
 						</td>
@@ -661,7 +661,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
 									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->supervisorId, Field::of()->nama, $inputGet->getSupervisorId())
-								->setTextNodeFormat('"%s - %s", nama, jabatan.nama')
+								->setTextNodeFormat('"%s (%s)", nama, jabatan.nama')
 								->setIndent(8)
 								; ?>
 							</select>
