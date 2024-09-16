@@ -180,7 +180,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -192,13 +192,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="default_data" id="default_data"/>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1"/> <?php echo $appEntityLanguage->getDefaultData();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="aktif" id="aktif"/>
+							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1"/> <?php echo $appEntityLanguage->getAktif();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -238,7 +238,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $acuanPengawasan->getNama();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $acuanPengawasan->getNama();?>" autocomplete="off" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -250,13 +250,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<input class="form-control" type="number" step="1" name="default_data" id="default_data" value="<?php echo $acuanPengawasan->getDefaultData();?>" autocomplete="off"/>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1" <?php echo $acuanPengawasan->createCheckedDefaultData();?>/> <?php echo $appEntityLanguage->getDefaultData();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
 						<td>
-							<input class="form-control" type="number" step="1" name="aktif" id="aktif" value="<?php echo $acuanPengawasan->getAktif();?>" autocomplete="off"/>
+							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1" <?php echo $acuanPengawasan->createCheckedAktif();?>/> <?php echo $appEntityLanguage->getAktif();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -334,11 +334,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
-						<td><?php echo $acuanPengawasan->getDefaultData();?></td>
+						<td><?php echo $acuanPengawasan->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
-						<td><?php echo $acuanPengawasan->getAktif();?></td>
+						<td><?php echo $acuanPengawasan->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -520,8 +520,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nama"><?php echo $acuanPengawasan->getNama();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $acuanPengawasan->getSortOrder();?></td>
-								<td data-col-name="default_data"><?php echo $acuanPengawasan->getDefaultData();?></td>
-								<td data-col-name="aktif"><?php echo $acuanPengawasan->getAktif();?></td>
+								<td data-col-name="default_data"><?php echo $acuanPengawasan->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="aktif"><?php echo $acuanPengawasan->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
