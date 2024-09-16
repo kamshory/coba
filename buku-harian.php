@@ -412,13 +412,13 @@ if(isset($_POST['save-work']))
 
 if(isset($_POST['add-work']))
 {
-	$waktu_buat = $currentAction->getTime();
-	$waktu_ubah = $waktu_buat;
-	$ip_buat = $_SERVER['REMOTE_ADDR'];
-	$ip_ubah = $_SERVER['REMOTE_ADDR'];
+	$waktuBuat = $currentAction->getTime();
+	$waktuUbah = $waktuBuat;
+	$ipBuat = $_SERVER['REMOTE_ADDR'];
+	$ipUbah = $_SERVER['REMOTE_ADDR'];
 
-	$buku_harian_id = $inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
-	$proyek_id = $inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$bukuHarianId = $inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$proyekId = $inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 	$jenis_pekerjaan_id = $inputPost->getJenisPekerjaanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 	$tipe_pondasi_id = $inputPost->getTipePondasiId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
 	$kelas_tower_id = $inputPost->getKelasTowerId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
@@ -492,7 +492,7 @@ if(isset($_POST['add-work']))
 					$pemalatanProyek->setPekerjaanId($pekerjaanId);
 					$pemalatanProyek->setPeralatanId($peralatan_id);
 					$pemalatanProyek->setJumlah($jumlah);
-					$pemalatanProyek->setProyekId($proyek_id);
+					$pemalatanProyek->setProyekId($proyekId);
 					$pemalatanProyek->setAktif(true);
 
 					$pemalatanProyek->insert();
@@ -512,13 +512,13 @@ if(isset($_POST['add-work']))
 				if(stripos($val, 'rand_') !== false)
 				{
 					// insert
-					$material_id = $inputPost->get('material_id_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
+					$materialId = $inputPost->get('material_id_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
 					$jumlah = $inputPost->get('jumlah_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
 
 					$materialProyek = new MaterialProyek(null, $database);
 					$materialProyek->setPekerjaanId($pekerjaanId);
-					$materialProyek->setMaterialId($material_id);
-					$materialProyek->setProyekId($proyek_id);
+					$materialProyek->setMaterialId($materialId);
+					$materialProyek->setProyekId($proyekId);
 					$materialProyek->setJumlah($jumlah);
 					$materialProyek->setAktif(true);
 
@@ -540,24 +540,64 @@ if(isset($_POST['add-work']))
 				if(stripos($val, 'rand_') !== false)
 				{
 					// insert
-					$boq_id = $inputPost->get('boq_proyek_id_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
-					$volume = $inputPost->get('volume_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
+					$boqId = $inputPost->get('boq_proyek_id_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
+					$volumeProyek = $inputPost->get('volume_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
 
-					$boqProyek = new MaterialProyek(null, $database);
-					$boqProyek->setProyekId($proyek_id);
-					$boqProyek->setBukuHarianId($buku_harian_id);
-					$boqProyek->setBillOfQuantityId($boq_id);
-					$boqProyek->setJumlah($volume);
-					$boqProyek->setAktif(true);
-					$boqProyek->insert();
+					$boq = new BillOfQuantity(null, $database);
 
-					$arr_material_id[] = $boqProyek->getMaterialProyekId();
+					try
+					{
+						$boq->find($boqId);
+						
+						$boqProyek = new BillOfQuantityProyek(null, $database);
+
+						$boqProyek->setProyekId($proyekId);
+						$boqProyek->setBukuHarianId($bukuHarianId);
+						$boqProyek->setBillOfQuantityId($boqId);
+						$boqProyek->setVolumeProyek($volumeProyek);
+						$boqProyek->setVolume($boq->getVolume());
+						$boqProyek->setAktif(true);
+						$boqProyek->setIpBuat($ipBuat);
+						$boqProyek->setIpUbah($ipUbah);
+						$boqProyek->setWaktuBuat($waktuBuat);
+						$boqProyek->setWaktuUbah($waktuUbah);
+						$boqProyek->setSupervisorBuat($currentLoggedInSupervisor->getSupervisorId());
+						$boqProyek->setSupervisorUbah($currentLoggedInSupervisor->getSupervisorId());
+
+						$persen = $boqProyek->getVolume() > 0 ? 100 * $boqProyek->getVolumeProyek() / $boqProyek->getVolume() : 0;
+						$boqProyek->setPersen($persen);
+
+						echo $boqProyek;
+
+						try
+						{
+							$boqProyek->findOneByBillOfQuantityIdAndBukuHarianIdAndProyekId(
+								$boqProyek->getBillOfQuantityId(),
+								$boqProyek->getBukuHarianId(),
+								$boqProyek->getProyekId()
+							);
+							$boqProyek->update();
+						}
+						catch(Exception $e)
+						{
+							$boqProyek->insert();
+						}
+
+						// update BOQ
+						$boq->setVolumeProyek($volumeProyek)->update();
+
+						$arr_boq_id[] = $boqProyek->getBillOfQuantityProyekId();
+					}
+					catch(Exception $e)
+					{
+
+					}
 				}
 			}
 		}
 	}
 	
-	header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$buku_harian_id");
+	//header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
 	exit();
 }
 
@@ -1085,8 +1125,8 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						<input type="hidden" name="longitude" id="longitude" value="">
 						<input type="hidden" name="altitude" id="altitude" value="">
 						<input type="hidden" name="pekerjaan_id" value="<?php echo $pekerjaanId;?>">
-						<input type="hidden" name="buku_harian_id" value="<?php echo $buku_harian_id;?>">
-						<input type="hidden" name="proyek_id" value="<?php echo $proyek_id;?>">
+						<input type="hidden" name="buku_harian_id" value="<?php echo $bukuHarian->getBukuHarianId();?>">
+						<input type="hidden" name="proyek_id" value="<?php echo $bukuHarian->getProyekId();?>">
 						<input type="hidden" name="option" value="add-work">
 						<div class="button-area">
 							<input type="submit" name="add-work" value="Simpan"  class="btn btn-success">

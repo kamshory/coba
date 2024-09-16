@@ -41,7 +41,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * 
 	 * @JoinColumn(name="proyek_id", referenceColumnName="proyek_id")
 	 * @Label(content="Proyek")
-	 * @var ProyekMin
+	 * @var Proyek
 	 */
 	protected $proyek;
 
@@ -59,7 +59,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * 
 	 * @JoinColumn(name="buku_harian_id", referenceColumnName="buku_harian_id")
 	 * @Label(content="Buku Harian")
-	 * @var BukuHarianMin
+	 * @var BukuHarian
 	 */
 	protected $bukuHarian;
 
@@ -100,6 +100,15 @@ class BillOfQuantityProyek extends MagicObject
 	protected $volumeProyek;
 
 	/**
+	 * Persen
+	 * 
+	 * @Column(name="persen", type="float", nullable=true)
+	 * @Label(content="Persen")
+	 * @var double
+	 */
+	protected $persen;
+
+	/**
 	 * Waktu Buat
 	 * 
 	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
@@ -131,7 +140,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * 
 	 * @JoinColumn(name="supervisor_buat", referenceColumnName="supervisor_id")
 	 * @Label(content="Pembuat")
-	 * @var SupervisorMin
+	 * @var Supervisor
 	 */
 	protected $pembuat;
 
@@ -149,7 +158,7 @@ class BillOfQuantityProyek extends MagicObject
 	 * 
 	 * @JoinColumn(name="supervisor_ubah", referenceColumnName="supervisor_id")
 	 * @Label(content="Pengubah")
-	 * @var SupervisorMin
+	 * @var Supervisor
 	 */
 	protected $pengubah;
 

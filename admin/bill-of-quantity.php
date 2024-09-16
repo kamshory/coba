@@ -715,6 +715,7 @@ $sortOrderMap = array(
 	"nama" => "nama",
 	"satuan" => "satuan",
 	"volume" => "volume",
+	"persen" => "persen",
 	"bobot" => "bobot",
 	"harga" => "harga",
 	"sortOrder" => "sortOrder",
@@ -786,6 +787,8 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getSatuan() => $headerFormat->getSatuan(),
 		$appEntityLanguage->getVolume() => $headerFormat->getVolume(),
+		$appEntityLanguage->getVolumeProyek() => $headerFormat->getVolumeProyek(),
+		$appEntityLanguage->getPersen() => $headerFormat->getPersen(),
 		$appEntityLanguage->getBobot() => $headerFormat->getBobot(),
 		$appEntityLanguage->getHarga() => $headerFormat->getHarga(),
 		$appEntityLanguage->getAcuanPengawasan() => $headerFormat->getAcuanPengawasan(),
@@ -809,6 +812,8 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getNama(),
 			$row->getSatuan(),
 			$row->getVolume(),
+			$row->getVolumeProyek(),
+			$row->getPersen(),
 			$row->getBobot(),
 			$row->getHarga(),
 			$row->issetAcuanPengawasan() ? $row->getAcuanPengawasan()->getNama() : "",
@@ -997,6 +1002,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="parent_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getParent();?></a></td>
 								<td data-col-name="satuan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSatuan();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
+								<td data-col-name="persen" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPersen();?></a></td>
 								<td data-col-name="bobot" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBobot();?></a></td>
 								<td data-col-name="harga" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getHarga();?></a></td>
 								<td data-col-name="acuan_pengawasan_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAcuanPengawasan();?></a></td>
@@ -1044,6 +1050,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="parent_id"><?php echo $billOfQuantity->issetParentBoq() ? $billOfQuantity->getParentBoq()->getNama() : "";?></td>
 								<td data-col-name="satuan"><?php echo $billOfQuantity->getSatuan();?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantity->getVolume();?></td>
+								<td data-col-name="persen"><span class="pie" style="--b:1px; --w:1.1rem; --p:<?php echo $billOfQuantity->getPersen();?>; --c:darkblue;"><?php echo round($billOfQuantity->getPersen());?></span></td>
 								<td data-col-name="bobot"><?php echo $billOfQuantity->getBobot();?></td>
 								<td data-col-name="harga"><?php echo $billOfQuantity->getHarga();?></td>
 								<td data-col-name="acuan_pengawasan_id"><?php echo $billOfQuantity->issetAcuanPengawasan() ? $billOfQuantity->getAcuanPengawasan()->getNama() : "";?></td>

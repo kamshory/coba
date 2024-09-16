@@ -42,14 +42,34 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
-if($inputPost->getUserAction() == UserAction::UPDATE)
+if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$billOfQuantityProyek = new BillOfQuantityProyek(null, $database);
 	$billOfQuantityProyek->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setBukuHarianId($inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$billOfQuantityProyek->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$billOfQuantityProyek->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$billOfQuantityProyek->setVolumeProyek($inputPost->setVolumeProyek(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$billOfQuantityProyek->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantityProyek->setVolumeProyek($inputPost->getVolumeProyek(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantityProyek->setPersen($inputPost->getPersen(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantityProyek->setAdminBuat($currentAction->getUserId());
+	$billOfQuantityProyek->setWaktuBuat($currentAction->getTime());
+	$billOfQuantityProyek->setIpBuat($currentAction->getIp());
+	$billOfQuantityProyek->setAdminUbah($currentAction->getUserId());
+	$billOfQuantityProyek->setWaktuUbah($currentAction->getTime());
+	$billOfQuantityProyek->setIpUbah($currentAction->getIp());
+	$billOfQuantityProyek->insert();
+	$newId = $billOfQuantityProyek->getBillOfQuantityProyekId();
+	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->bill_of_quantity_proyek_id, $newId);
+}
+else if($inputPost->getUserAction() == UserAction::UPDATE)
+{
+	$billOfQuantityProyek = new BillOfQuantityProyek(null, $database);
+	$billOfQuantityProyek->setProyekId($inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$billOfQuantityProyek->setBukuHarianId($inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$billOfQuantityProyek->setBillOfQuantityId($inputPost->getBillOfQuantityId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$billOfQuantityProyek->setVolume($inputPost->getVolume(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantityProyek->setVolumeProyek($inputPost->getVolumeProyek(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$billOfQuantityProyek->setPersen($inputPost->getPersen(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$billOfQuantityProyek->setAdminUbah($currentAction->getUserId());
 	$billOfQuantityProyek->setWaktuUbah($currentAction->getTime());
 	$billOfQuantityProyek->setIpUbah($currentAction->getIp());
@@ -134,7 +154,104 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	}
 	$currentModule->redirectToItself();
 }
-if($inputGet->getUserAction() == UserAction::UPDATE)
+if($inputGet->getUserAction() == UserAction::CREATE)
+{
+$appEntityLanguage = new AppEntityLanguage(new BillOfQuantityProyek(), $appConfig, $currentUser->getLanguageId());
+require_once $appInclude->mainAppHeader(__DIR__);
+?>
+<div class="page page-jambi page-insert">
+	<div class="jambi-wrapper">
+		<form name="createform" id="createform" action="" method="post">
+			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tbody>
+					<tr>
+						<td><?php echo $appEntityLanguage->getProyek();?></td>
+						<td>
+							<select class="form-control" name="proyek_id" id="proyek_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new Proyek(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->proyekId, PicoSort::ORDER_TYPE_DESC)), 
+								Field::of()->proyekId, Field::of()->nama)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getBukuHarian();?></td>
+						<td>
+							<select class="form-control" name="buku_harian_id" id="buku_harian_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BukuHarian(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->bukuHarianId, Field::of()->nama)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getBillOfQuantity();?></td>
+						<td>
+							<select class="form-control" name="bill_of_quantity_id" id="bill_of_quantity_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BillOfQuantityMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->billOfQuantityId, Field::of()->nama)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getVolume();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="volume" id="volume"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getVolumeProyek();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="volume_proyek" id="volume_proyek"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getPersen();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="persen" id="persen"/>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tbody>
+					<tr>
+						<td></td>
+						<td>
+							<button type="submit" class="btn btn-success" name="user_action" value="create"><?php echo $appLanguage->getButtonSave();?></button>
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonCancel();?></button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</div>
+<?php 
+require_once $appInclude->mainAppFooter(__DIR__);
+}
+else if($inputGet->getUserAction() == UserAction::UPDATE)
 {
 	$billOfQuantityProyek = new BillOfQuantityProyek(null, $database);
 	try{
@@ -202,7 +319,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getVolume();?></td>
 						<td>
-							<input class="form-control" type="text" name="volume" id="volume" value="<?php echo $billOfQuantityProyek->getVolume();?>" autocomplete="off"/>
+							<input class="form-control" type="number" step="any" name="volume" id="volume" value="<?php echo $billOfQuantityProyek->getVolume();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getVolumeProyek();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="volume_proyek" id="volume_proyek" value="<?php echo $billOfQuantityProyek->getVolumeProyek();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getPersen();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="persen" id="persen" value="<?php echo $billOfQuantityProyek->getPersen();?>" autocomplete="off"/>
 						</td>
 					</tr>
 				</tbody>
@@ -332,6 +461,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getPersen();?></td>
+						<td><?php echo $billOfQuantityProyek->getPersen();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
 						<td><?php echo $billOfQuantityProyek->getWaktuBuat();?></td>
 					</tr>
@@ -404,6 +537,7 @@ $sortOrderMap = array(
 	"billOfQuantityId" => "billOfQuantityId",
 	"volume" => "volume",
 	"volumeProyek" => "volumeProyek",
+	"persen" => "persen",
 	"supervisorBuat" => "supervisorBuat",
 	"supervisorUbah" => "supervisorUbah"
 );
@@ -472,13 +606,6 @@ $subqueryMap = array(
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
-<script>
-	jQuery(function(){
-		$('[name="proyek_id"], [name="bill_of_quantity_id"]').on('change', function(){
-			$(this).closest('form').submit();
-		})
-	})
-</script>
 <div class="page page-jambi page-list">
 	<div class="jambi-wrapper">
 		<div class="filter-section">
@@ -486,7 +613,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getProyek();?></span>
 					<span class="filter-control">
-							<select name="proyek_id" class="form-control">
+							<select class="form-control" name="proyek_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new ProyekMin(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->aktif, true))
@@ -502,11 +630,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getBillOfQuantity();?></span>
 					<span class="filter-control">
-							<select name="bill_of_quantity_id" class="form-control">
+							<select class="form-control" name="bill_of_quantity_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new BillOfQuantityMin(null, $database), 
 								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->proyekId, $inputGet->getProyekId()))
 									->addAnd(new PicoPredicate(Field::of()->aktif, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
 								PicoSortable::getInstance()
@@ -521,7 +648,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getSupervisorBuat();?></span>
 					<span class="filter-control">
-							<select name="supervisor_buat" class="form-control">
+							<select class="form-control" name="supervisor_buat">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new SupervisorMin(null, $database), 
 								PicoSpecification::getInstance()
@@ -538,7 +665,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getSupervisorUbah();?></span>
 					<span class="filter-control">
-							<select name="supervisor_ubah" class="form-control">
+							<select class="form-control" name="supervisor_ubah">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new SupervisorMin(null, $database), 
 								PicoSpecification::getInstance()
@@ -555,7 +682,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-
+				<?php if($userPermission->isAllowedCreate()){ ?>
+		
+				<span class="filter-group">
+					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+				</span>
+				<?php } ?>
 			</form>
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
@@ -603,6 +735,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="bill_of_quantity_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBillOfQuantity();?></a></td>
 								<td data-col-name="volume" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolume();?></a></td>
 								<td data-col-name="volume_proyek" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getVolumeProyek();?></a></td>
+								<td data-col-name="persen" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPersen();?></a></td>
 								<td data-col-name="supervisor_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorBuat();?></a></td>
 								<td data-col-name="supervisor_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisorUbah();?></a></td>
 							</tr>
@@ -638,6 +771,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="bill_of_quantity_id"><?php echo $billOfQuantityProyek->issetBillOfQuantity() ? $billOfQuantityProyek->getBillOfQuantity()->getNama() : "";?></td>
 								<td data-col-name="volume"><?php echo $billOfQuantityProyek->getVolume();?></td>
 								<td data-col-name="volume_proyek"><?php echo $billOfQuantityProyek->getVolumeProyek();?></td>
+								<td data-col-name="persen"><?php echo $billOfQuantityProyek->getPersen();?></td>
 								<td data-col-name="supervisor_buat"><?php echo $billOfQuantityProyek->issetPembuat() ? $billOfQuantityProyek->getPembuat()->getNama() : "";?></td>
 								<td data-col-name="supervisor_ubah"><?php echo $billOfQuantityProyek->issetPengubah() ? $billOfQuantityProyek->getPengubah()->getNama() : "";?></td>
 							</tr>
