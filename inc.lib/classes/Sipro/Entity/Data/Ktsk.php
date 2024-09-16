@@ -22,7 +22,7 @@ class Ktsk extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.IDENTITY)
 	 * @NotNull
 	 * @Column(name="ktsk_id", type="bigint(20)", length=20, nullable=false, extra="auto_increment")
-	 * @Label(content="KTSK ID")
+	 * @Label(content="Ktsk ID")
 	 * @var integer
 	 */
 	protected $ktskId;
@@ -40,7 +40,7 @@ class Ktsk extends MagicObject
 	 * Nip
 	 * 
 	 * @Column(name="nip", type="varchar(20)", length=20, nullable=true)
-	 * @Label(content="NIP")
+	 * @Label(content="Nip")
 	 * @var string
 	 */
 	protected $nip;
@@ -67,7 +67,7 @@ class Ktsk extends MagicObject
 	 * Tsk ID
 	 * 
 	 * @Column(name="tsk_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="TSK ID")
+	 * @Label(content="Tsk ID")
 	 * @var integer
 	 */
 	protected $tskId;
@@ -76,8 +76,8 @@ class Ktsk extends MagicObject
 	 * Tsk
 	 * 
 	 * @JoinColumn(name="tsk_id", referenceColumnName="tsk_id")
-	 * @Label(content="TSK")
-	 * @var Tsk
+	 * @Label(content="Tsk")
+	 * @var TskMin
 	 */
 	protected $tsk;
 
@@ -94,7 +94,7 @@ class Ktsk extends MagicObject
 	/**
 	 * Tempat Lahir
 	 * 
-	 * @Column(name="tempat_lahir", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="tempat_lahir", type="varchar(45)", length=45, nullable=true)
 	 * @Label(content="Tempat Lahir")
 	 * @var string
 	 */
@@ -130,7 +130,7 @@ class Ktsk extends MagicObject
 	/**
 	 * Password
 	 * 
-	 * @Column(name="password", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="password", type="varchar(45)", length=45, nullable=true)
 	 * @Label(content="Password")
 	 * @var string
 	 */
@@ -139,7 +139,7 @@ class Ktsk extends MagicObject
 	/**
 	 * Auth
 	 * 
-	 * @Column(name="auth", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="auth", type="varchar(45)", length=45, nullable=true)
 	 * @Label(content="Auth")
 	 * @var string
 	 */
@@ -148,7 +148,7 @@ class Ktsk extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -157,7 +157,7 @@ class Ktsk extends MagicObject
 	/**
 	 * Waktu Ubah
 	 * 
-	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Ubah")
 	 * @var string
 	 */
@@ -195,7 +195,7 @@ class Ktsk extends MagicObject
 	 * 
 	 * @JoinColumn(name="admin_buat", referenceColumnName="user_id")
 	 * @Label(content="Pembuat")
-	 * @var User
+	 * @var UserMin
 	 */
 	protected $pembuat;
 
@@ -213,14 +213,14 @@ class Ktsk extends MagicObject
 	 * 
 	 * @JoinColumn(name="admin_ubah", referenceColumnName="user_id")
 	 * @Label(content="Pengubah")
-	 * @var User
+	 * @var UserMin
 	 */
 	protected $pengubah;
 
 	/**
 	 * Waktu Terakhir Aktif
 	 * 
-	 * @Column(name="waktu_terakhir_aktif", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_terakhir_aktif", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Terakhir Aktif")
 	 * @var string
 	 */
@@ -229,7 +229,7 @@ class Ktsk extends MagicObject
 	/**
 	 * IP Terakhir Aktif
 	 * 
-	 * @Column(name="ip_terakhir_aktif", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_terakhir_aktif", type="varchar(45)", length=45, nullable=true)
 	 * @Label(content="IP Terakhir Aktif")
 	 * @var string
 	 */

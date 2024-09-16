@@ -23,8 +23,9 @@ use Sipro\Entity\Data\Ktsk;
 use Sipro\AppIncludeImpl;
 use Sipro\Entity\Data\JabatanMin;
 use Sipro\Entity\Data\TskMin;
-use MagicApp\XLSX\XLSXDocumentWriter;
+use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
+use MagicObject\Util\PicoPasswordUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -53,13 +54,24 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$ktsk->setTanggalLahir($inputPost->getTanggalLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$ktsk->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$ktsk->setTelepon($inputPost->getTelepon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$ktsk->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$ktsk->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$util = new PicoPasswordUtil(PicoPasswordUtil::ALG_SHA1);
+	try
+	{
+		$passwordHash = $util->getHash($password);
+		$passwordHash = $util->getHash($passwordHash);
+		$ktsk->setPassword($passwordHash);
+	}
+	catch(Exception $e)
+	{
+		// do nothing
+	}
+	$ktsk->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$ktsk->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$ktsk->setAdminBuat($currentUser->getUserId());
+	$ktsk->setAdminBuat($currentAction->getUserId());
 	$ktsk->setWaktuBuat($currentAction->getTime());
 	$ktsk->setIpBuat($currentAction->getIp());
-	$ktsk->setAdminUbah($currentUser->getUserId());
+	$ktsk->setAdminUbah($currentAction->getUserId());
 	$ktsk->setWaktuUbah($currentAction->getTime());
 	$ktsk->setIpUbah($currentAction->getIp());
 	$ktsk->insert();
@@ -78,10 +90,21 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$ktsk->setTanggalLahir($inputPost->getTanggalLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$ktsk->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$ktsk->setTelepon($inputPost->getTelepon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$ktsk->setPassword($inputPost->getPassword(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$ktsk->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
+	$util = new PicoPasswordUtil(PicoPasswordUtil::ALG_SHA1);
+	try
+	{
+		$passwordHash = $util->getHash($password);
+		$passwordHash = $util->getHash($passwordHash);
+		$ktsk->setPassword($passwordHash);
+	}
+	catch(Exception $e)
+	{
+		// do nothing
+	}
+	$ktsk->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$ktsk->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$ktsk->setAdminUbah($currentUser->getUserId());
+	$ktsk->setAdminUbah($currentAction->getUserId());
 	$ktsk->setWaktuUbah($currentAction->getTime());
 	$ktsk->setIpUbah($currentAction->getIp());
 	$ktsk->setKtskId($inputPost->getKtskId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
@@ -99,15 +122,18 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 			try
 			{
 				$ktsk->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->ktsk_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->ktskId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(true)
 				->update();
 			}
 			catch(Exception $e)
 			{
-				// Do something here when record is not found
+				// Do something here to handle exception
 			}
 		}
 	}
@@ -123,15 +149,18 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 			try
 			{
 				$ktsk->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->ktsk_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->ktskId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(false)
 				->update();
 			}
 			catch(Exception $e)
 			{
-				// Do something here when record is not found
+				// Do something here to handle exception
 			}
 		}
 	}
@@ -143,8 +172,18 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	{
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
-			$ktsk = new Ktsk(null, $database);
-			$ktsk->deleteOneByKtskId($rowId);
+			try
+			{
+				$ktsk = new Ktsk(null, $database);
+				$ktsk->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->ktsk_id, $rowId))
+				)
+				->delete();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -230,7 +269,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getEmail();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="email" id="email"/>
+							<input autocomplete="off" class="form-control" type="email" name="email" id="email" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -281,7 +320,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$ktsk = new Ktsk(null, $database);
 	try{
 		$ktsk->findOneByKtskId($inputGet->getKtskId());
-		if($ktsk->hasValueKtskId())
+		if($ktsk->issetKtskId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Ktsk(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -362,7 +401,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getEmail();?></td>
 						<td>
-							<input class="form-control" type="text" name="email" id="email" value="<?php echo $ktsk->getEmail();?>" autocomplete="off"/>
+							<input class="form-control" type="email" name="email" id="email" value="<?php echo $ktsk->getEmail();?>" autocomplete="off" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -374,7 +413,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input class="form-control" type="password" name="password" id="password" value="<?php echo $ktsk->getPassword();?>" autocomplete="off"/>
+							<input class="form-control" type="password" name="password" id="password" value="" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -450,7 +489,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminBuat" => array(
 			"columnName" => "admin_buat",
-			"entityName" => "User",
+			"entityName" => "UserMin",
 			"tableName" => "user",
 			"primaryKey" => "user_id",
 			"objectName" => "pembuat",
@@ -458,7 +497,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		), 
 		"adminUbah" => array(
 			"columnName" => "admin_ubah",
-			"entityName" => "User",
+			"entityName" => "UserMin",
 			"tableName" => "user",
 			"primaryKey" => "user_id",
 			"objectName" => "pengubah",
@@ -466,7 +505,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		)
 		);
 		$ktsk->findOneWithPrimaryKeyValue($inputGet->getKtskId(), $subqueryMap);
-		if($ktsk->hasValueKtskId())
+		if($ktsk->issetKtskId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Ktsk(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -500,11 +539,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getJabatan();?></td>
-						<td><?php echo $ktsk->hasValueJabatan() ? $ktsk->getJabatan()->getNama() : "";?></td>
+						<td><?php echo $ktsk->issetJabatan() ? $ktsk->getJabatan()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTsk();?></td>
-						<td><?php echo $ktsk->hasValueTsk() ? $ktsk->getTsk()->getNama() : "";?></td>
+						<td><?php echo $ktsk->issetTsk() ? $ktsk->getTsk()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getJenisKelamin();?></td>
@@ -544,11 +583,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
-						<td><?php echo $ktsk->hasValuePembuat() ? $ktsk->getPembuat()->getFirstName() : "";?></td>
+						<td><?php echo $ktsk->issetPembuat() ? $ktsk->getPembuat()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
-						<td><?php echo $ktsk->hasValuePengubah() ? $ktsk->getPengubah()->getFirstName() : "";?></td>
+						<td><?php echo $ktsk->issetPengubah() ? $ktsk->getPengubah()->getFirstName() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuTerakhirAktif();?></td>
@@ -573,14 +612,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($ktsk->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($ktsk->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($ktsk->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<?php if($userPermission->isAllowedUpdate()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->ktsk_id, $ktsk->getKtskId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
@@ -623,7 +655,6 @@ $mapForJenisKelamin = array(
 );
 $specMap = array(
 	"nama" => PicoSpecification::filter("nama", "fulltext"),
-	"nip" => PicoSpecification::filter("nip", "fulltext"),
 	"jabatanId" => PicoSpecification::filter("jabatanId", "number"),
 	"tskId" => PicoSpecification::filter("tskId", "number"),
 	"jenisKelamin" => PicoSpecification::filter("jenisKelamin", "fulltext")
@@ -676,7 +707,7 @@ $subqueryMap = array(
 ), 
 "adminBuat" => array(
 	"columnName" => "admin_buat",
-	"entityName" => "User",
+	"entityName" => "UserMin",
 	"tableName" => "user",
 	"primaryKey" => "user_id",
 	"objectName" => "pembuat",
@@ -684,7 +715,7 @@ $subqueryMap = array(
 ), 
 "adminUbah" => array(
 	"columnName" => "admin_ubah",
-	"entityName" => "User",
+	"entityName" => "UserMin",
 	"tableName" => "user",
 	"primaryKey" => "user_id",
 	"objectName" => "pengubah",
@@ -694,7 +725,7 @@ $subqueryMap = array(
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
-	$exporter = new XLSXDocumentWriter($appLanguage);
+	$exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
 	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
 	$sheetName = "Sheet 1";
 
@@ -712,7 +743,6 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getTanggalLahir() => $headerFormat->getTanggalLahir(),
 		$appEntityLanguage->getEmail() => $headerFormat->getEmail(),
 		$appEntityLanguage->getTelepon() => $headerFormat->getTelepon(),
-		$appEntityLanguage->getAuth() => $headerFormat->getAuth(),
 		$appEntityLanguage->getWaktuBuat() => $headerFormat->getWaktuBuat(),
 		$appEntityLanguage->getWaktuUbah() => $headerFormat->getWaktuUbah(),
 		$appEntityLanguage->getIpBuat() => $headerFormat->getIpBuat(),
@@ -725,26 +755,25 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
 	), 
 	function($index, $row, $appLanguage){
-        global $mapForJenisKelamin;
+		global $mapForJenisKelamin;
 		return array(
 			sprintf("%d", $index + 1),
 			$row->getKtskId(),
 			$row->getNama(),
 			$row->getNip(),
-			$row->hasValueJabatan() ? $row->getJabatan()->getNama() : "",
-			$row->hasValueTsk() ? $row->getTsk()->getNama() : "",
+			$row->issetJabatan() ? $row->getJabatan()->getNama() : "",
+			$row->issetTsk() ? $row->getTsk()->getNama() : "",
 			isset($mapForJenisKelamin) && isset($mapForJenisKelamin[$row->getJenisKelamin()]) && isset($mapForJenisKelamin[$row->getJenisKelamin()]["label"]) ? $mapForJenisKelamin[$row->getJenisKelamin()]["label"] : "",
 			$row->getTempatLahir(),
 			$row->getTanggalLahir(),
 			$row->getEmail(),
 			$row->getTelepon(),
-			$row->getAuth(),
 			$row->getWaktuBuat(),
 			$row->getWaktuUbah(),
 			$row->getIpBuat(),
 			$row->getIpUbah(),
-			$row->hasValuePembuat() ? $row->getPembuat()->getFirstName() : "",
-			$row->hasValuePengubah() ? $row->getPengubah()->getFirstName() : "",
+			$row->issetPembuat() ? $row->getPembuat()->getFirstName() : "",
+			$row->issetPengubah() ? $row->getPengubah()->getFirstName() : "",
 			$row->getWaktuTerakhirAktif(),
 			$row->getIpTerakhirAktif(),
 			$row->optionBlokir($appLanguage->getYes(), $appLanguage->getNo()),
@@ -769,16 +798,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNip();?></span>
-					<span class="filter-control">
-						<input type="text" name="nip" class="form-control" value="<?php echo $inputGet->getNip();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getJabatan();?></span>
 					<span class="filter-control">
-							<select name="jabatan_id" class="form-control">
+							<select class="form-control" name="jabatan_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JabatanMin(null, $database), 
 								PicoSpecification::getInstance()
@@ -796,7 +818,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getTsk();?></span>
 					<span class="filter-control">
-							<select name="tsk_id" class="form-control">
+							<select class="form-control" name="tsk_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<?php echo AppFormBuilder::getInstance()->createSelectOption(new TskMin(null, $database), 
 								PicoSpecification::getInstance()
@@ -814,7 +836,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getJenisKelamin();?></span>
 					<span class="filter-control">
-							<select name="jenis_kelamin" class="form-control" data-value="<?php echo $inputGet->getJenisKelamin();?>">
+							<select class="form-control" name="jenis_kelamin" data-value="<?php echo $inputGet->getJenisKelamin();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="L" <?php echo AppFormBuilder::selected($inputGet->getJenisKelamin(), 'L');?>>Laki-Laki</option>
 								<option value="P" <?php echo AppFormBuilder::selected($inputGet->getJenisKelamin(), 'P');?>>Perempuan</option>
@@ -918,8 +940,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nama"><?php echo $ktsk->getNama();?></td>
 								<td data-col-name="nip"><?php echo $ktsk->getNip();?></td>
-								<td data-col-name="jabatan_id"><?php echo $ktsk->hasValueJabatan() ? $ktsk->getJabatan()->getNama() : "";?></td>
-								<td data-col-name="tsk_id"><?php echo $ktsk->hasValueTsk() ? $ktsk->getTsk()->getNama() : "";?></td>
+								<td data-col-name="jabatan_id"><?php echo $ktsk->issetJabatan() ? $ktsk->getJabatan()->getNama() : "";?></td>
+								<td data-col-name="tsk_id"><?php echo $ktsk->issetTsk() ? $ktsk->getTsk()->getNama() : "";?></td>
 								<td data-col-name="jenis_kelamin"><?php echo isset($mapForJenisKelamin) && isset($mapForJenisKelamin[$ktsk->getJenisKelamin()]) && isset($mapForJenisKelamin[$ktsk->getJenisKelamin()]["label"]) ? $mapForJenisKelamin[$ktsk->getJenisKelamin()]["label"] : "";?></td>
 								<td data-col-name="email"><?php echo $ktsk->getEmail();?></td>
 								<td data-col-name="telepon"><?php echo $ktsk->getTelepon();?></td>
