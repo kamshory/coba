@@ -21,8 +21,6 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\AkhirPekan;
 use Sipro\AppIncludeImpl;
-use MagicApp\XLSX\XLSXDocumentWriter;
-use MagicApp\XLSX\XLSXDataFormat;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -47,10 +45,10 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$akhirPekan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$akhirPekan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$akhirPekan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$akhirPekan->setAdminBuat($currentUser->getUserId());
+	$akhirPekan->setAdminBuat($currentAction->getUserId());
 	$akhirPekan->setWaktuBuat($currentAction->getTime());
 	$akhirPekan->setIpBuat($currentAction->getIp());
-	$akhirPekan->setAdminUbah($currentUser->getUserId());
+	$akhirPekan->setAdminUbah($currentAction->getUserId());
 	$akhirPekan->setWaktuUbah($currentAction->getTime());
 	$akhirPekan->setIpUbah($currentAction->getIp());
 	$akhirPekan->insert();
@@ -65,7 +63,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$akhirPekan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$akhirPekan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$akhirPekan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$akhirPekan->setAdminUbah($currentUser->getUserId());
+	$akhirPekan->setAdminUbah($currentAction->getUserId());
 	$akhirPekan->setWaktuUbah($currentAction->getTime());
 	$akhirPekan->setIpUbah($currentAction->getIp());
 	$akhirPekan->setAkhirPekanId($inputPost->getAkhirPekanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
@@ -86,6 +84,9 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->akhirPekanId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(true)
 				->update();
 			}
@@ -110,6 +111,9 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->akhirPekanId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(false)
 				->update();
 			}
@@ -130,7 +134,10 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			try
 			{
 				$akhirPekan = new AkhirPekan(null, $database);
-				$akhirPekan->deleteOneByAkhirPekanId($rowId);
+				$akhirPekan->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->akhir_pekan_id, $rowId))
+				)
+				->delete();
 			}
 			catch(Exception $e)
 			{
@@ -153,7 +160,11 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 			}
 			$primaryKeyValue = $dataItem->getPrimaryKey();
 			$sortOrder = $dataItem->getSortOrder();
-			$akhirPekan->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->akhirPekanId, $primaryKeyValue)))->setSortOrder($sortOrder)->update();
+			$akhirPekan->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->akhirPekanId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
 		}
 	}
 	$currentModule->redirectToItself();
@@ -222,7 +233,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$akhirPekan = new AkhirPekan(null, $database);
 	try{
 		$akhirPekan->findOneByAkhirPekanId($inputGet->getAkhirPekanId());
-		if($akhirPekan->hasValueAkhirPekanId())
+		if($akhirPekan->issetAkhirPekanId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new AkhirPekan(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -306,7 +317,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	try{
 		$subqueryMap = null;
 		$akhirPekan->findOneWithPrimaryKeyValue($inputGet->getAkhirPekanId(), $subqueryMap);
-		if($akhirPekan->hasValueAkhirPekanId())
+		if($akhirPekan->issetAkhirPekanId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new AkhirPekan(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -354,14 +365,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($akhirPekan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($akhirPekan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($akhirPekan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<?php if($userPermission->isAllowedUpdate()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->akhir_pekan_id, $akhirPekan->getAkhirPekanId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
@@ -400,7 +404,8 @@ else
 $appEntityLanguage = new AppEntityLanguage(new AkhirPekan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"nama" => PicoSpecification::filter("nama", "fulltext")
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
+	"kodeHari" => PicoSpecification::filter("kodeHari", "fulltext")
 );
 $sortOrderMap = array(
 	"nama" => "nama",
@@ -429,37 +434,6 @@ $dataLoader = new AkhirPekan(null, $database);
 
 $subqueryMap = null;
 
-if($inputGet->getUserAction() == UserAction::EXPORT)
-{
-	$exporter = new XLSXDocumentWriter($appLanguage);
-	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
-	$sheetName = "Sheet 1";
-
-	$headerFormat = new XLSXDataFormat($dataLoader, 3);
-	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
-	$exporter->write($pageData, $fileName, $sheetName, array(
-		$appLanguage->getNumero() => $headerFormat->asNumber(),
-		$appEntityLanguage->getAkhirPekanId() => $headerFormat->getAkhirPekanId(),
-		$appEntityLanguage->getNama() => $headerFormat->getNama(),
-		$appEntityLanguage->getKodeHari() => $headerFormat->getKodeHari(),
-		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
-		$appEntityLanguage->getDefaultData() => $headerFormat->asString(),
-		$appEntityLanguage->getAktif() => $headerFormat->asString()
-	), 
-	function($index, $row, $appLanguage){
-        
-		return array(
-			sprintf("%d", $index + 1),
-			$row->getAkhirPekanId(),
-			$row->getNama(),
-			$row->getKodeHari(),
-			$row->getSortOrder(),
-			$row->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo()),
-			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
-		);
-	});
-	exit();
-}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -476,14 +450,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getKodeHari();?></span>
+					<span class="filter-control">
+						<input type="text" name="kode_hari" class="form-control" value="<?php echo $inputGet->getKodeHari();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
-				<?php if($userPermission->isAllowedDetail()){ ?>
-		
-				<span class="filter-group">
-					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
-				</span>
-				<?php } ?>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
