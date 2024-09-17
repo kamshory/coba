@@ -8,6 +8,7 @@ use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
+use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\PicoFilterConstant;
@@ -194,13 +195,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getJenisPekerjaanId();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="jenis_pekerjaan_id" id="jenis_pekerjaan_id"/>
+							<input autocomplete="off" class="form-control" type="text" name="jenis_pekerjaan_id" id="jenis_pekerjaan_id" required="required"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -298,13 +299,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getJenisPekerjaanId();?></td>
 						<td>
-							<input class="form-control" type="text" name="app_builder_new_pk_jenis_pekerjaan_id" id="jenis_pekerjaan_id" value="<?php echo $jenisPekerjaan->getJenisPekerjaanId();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="app_builder_new_pk_jenis_pekerjaan_id" id="jenis_pekerjaan_id" value="<?php echo $jenisPekerjaan->getJenisPekerjaanId();?>" autocomplete="off" required="required"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisPekerjaan->getNama();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisPekerjaan->getNama();?>" autocomplete="off" required="required"/>
 						</td>
 					</tr>
 					<tr>
@@ -565,7 +566,12 @@ $specification = PicoSpecification::fromUserInput($inputGet, $specMap);
 
 // You can define your own sortable
 // Pay attention to security issues
-$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
 
 $pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
 $dataLoader = new JenisPekerjaan(null, $database);
@@ -597,7 +603,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
 					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
+							<select class="form-control" name="aktif" data-value="<?php echo $inputGet->getAktif();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
 								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>

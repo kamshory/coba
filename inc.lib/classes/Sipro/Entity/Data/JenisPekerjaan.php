@@ -22,7 +22,7 @@ class JenisPekerjaan extends MagicObject
 	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
 	 * @Column(name="jenis_pekerjaan_id", type="char(3)", length=3, nullable=false)
-	 * @Label(content="Kode")
+	 * @Label(content="Jenis Pekerjaan ID")
 	 * @var string
 	 */
 	protected $jenisPekerjaanId;
@@ -39,27 +39,26 @@ class JenisPekerjaan extends MagicObject
 	/**
 	 * Tipe Pondasi ID
 	 * 
-	 * @Column(name="tipe_pondasi_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="Tipe Pondasi")
-	 * @var integer
+	 * @Column(name="tipe_pondasi_id", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Tipe Pondasi ID")
+	 * @var boolean
 	 */
 	protected $tipePondasiId;
 
 	/**
 	 * Kelas Tower ID
 	 * 
-	 * @Column(name="kelas_tower_id", type="bigint(20)", length=20, nullable=true)
-	 * @Label(content="Kelas Tower")
-	 * @var integer
+	 * @Column(name="kelas_tower_id", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Kelas Tower ID")
+	 * @var boolean
 	 */
 	protected $kelasTowerId;
 
 	/**
 	 * Lokasi Proyek ID
 	 * 
-	 * @Column(name="lokasi_proyek_id", type="tinyint(1)", length=1, default_value="1", nullable=true)
-	 * @DefaultColumn(value="1")
-	 * @Label(content="Lokasi Proyek")
+	 * @Column(name="lokasi_proyek_id", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Lokasi Proyek ID")
 	 * @var boolean
 	 */
 	protected $lokasiProyekId;
@@ -67,8 +66,7 @@ class JenisPekerjaan extends MagicObject
 	/**
 	 * Kegiatan
 	 * 
-	 * @Column(name="kegiatan", type="tinyint(1)", length=1, default_value="1", nullable=true)
-	 * @DefaultColumn(value="1")
+	 * @Column(name="kegiatan", type="tinyint(1)", length=1, nullable=true)
 	 * @Label(content="Kegiatan")
 	 * @var boolean
 	 */
