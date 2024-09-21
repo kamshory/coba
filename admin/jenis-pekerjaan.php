@@ -56,9 +56,16 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$jenisPekerjaan->setAdminUbah($currentAction->getUserId());
 	$jenisPekerjaan->setWaktuUbah($currentAction->getTime());
 	$jenisPekerjaan->setIpUbah($currentAction->getIp());
-	$jenisPekerjaan->insert();
-	$newId = $jenisPekerjaan->getJenisPekerjaanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_pekerjaan_id, $newId);
+	try
+	{
+		$jenisPekerjaan->insert();
+		$newId = $jenisPekerjaan->getJenisPekerjaanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_pekerjaan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -75,14 +82,21 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$jenisPekerjaan->setAdminUbah($currentAction->getUserId());
 	$jenisPekerjaan->setWaktuUbah($currentAction->getTime());
 	$jenisPekerjaan->setIpUbah($currentAction->getIp());
-	$jenisPekerjaan->update();
+	try
+	{
+		$jenisPekerjaan->update();
 
-	// update primary key value
-	$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisPekerjaanId, $inputPost->getJenisPekerjaanId()));
-	$jenisPekerjaan = new JenisPekerjaan(null, $database);
-	$jenisPekerjaan->where($specification)->setJenisPekerjaanId($inputPost->getAppBuilderNewPkJenisPekerjaanId())->update();
-	$newId = $inputPost->getAppBuilderNewPkJenisPekerjaanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_pekerjaan_id, $newId);
+		// update primary key value
+		$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisPekerjaanId, $inputPost->getJenisPekerjaanId()));
+		$jenisPekerjaan = new JenisPekerjaan(null, $database);
+		$jenisPekerjaan->where($specification)->setJenisPekerjaanId($inputPost->getAppBuilderNewPkJenisPekerjaanId())->update();
+		$newId = $inputPost->getAppBuilderNewPkJenisPekerjaanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_pekerjaan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -207,41 +221,25 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTipePondasiId();?></td>
 						<td>
-							<select class="form-control" name="tipe_pondasi_id" id="tipe_pondasi_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1">Tampilkan</option>
-								<option value="0">Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="tipe_pondasi_id" id="tipe_pondasi_id" value="1"/> <?php echo $appEntityLanguage->getTipePondasiId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKelasTowerId();?></td>
 						<td>
-							<select class="form-control" name="kelas_tower_id" id="kelas_tower_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1">Tampilkan</option>
-								<option value="0">Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="kelas_tower_id" id="kelas_tower_id" value="1"/> <?php echo $appEntityLanguage->getKelasTowerId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLokasiProyekId();?></td>
 						<td>
-							<select class="form-control" name="lokasi_proyek_id" id="lokasi_proyek_id">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1">Tampilkan</option>
-								<option value="0">Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="lokasi_proyek_id" id="lokasi_proyek_id" value="1"/> <?php echo $appEntityLanguage->getLokasiProyekId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKegiatan();?></td>
 						<td>
-							<select class="form-control" name="kegiatan" id="kegiatan">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1">Tampilkan</option>
-								<option value="0">Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="kegiatan" id="kegiatan" value="1"/> <?php echo $appEntityLanguage->getKegiatan();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -311,41 +309,25 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTipePondasiId();?></td>
 						<td>
-							<select class="form-control" name="tipe_pondasi_id" id="tipe_pondasi_id" data-value="<?php echo $jenisPekerjaan->getTipePondasiId();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1" <?php echo AppFormBuilder::selected($jenisPekerjaan->getTipePondasiId(), '1');?>>Tampilkan</option>
-								<option value="0" <?php echo AppFormBuilder::selected($jenisPekerjaan->getTipePondasiId(), '0');?>>Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="tipe_pondasi_id" id="tipe_pondasi_id" value="1" <?php echo $jenisPekerjaan->createCheckedTipePondasiId();?>/> <?php echo $appEntityLanguage->getTipePondasiId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKelasTowerId();?></td>
 						<td>
-							<select class="form-control" name="kelas_tower_id" id="kelas_tower_id" data-value="<?php echo $jenisPekerjaan->getKelasTowerId();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1" <?php echo AppFormBuilder::selected($jenisPekerjaan->getKelasTowerId(), '1');?>>Tampilkan</option>
-								<option value="0" <?php echo AppFormBuilder::selected($jenisPekerjaan->getKelasTowerId(), '0');?>>Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="kelas_tower_id" id="kelas_tower_id" value="1" <?php echo $jenisPekerjaan->createCheckedKelasTowerId();?>/> <?php echo $appEntityLanguage->getKelasTowerId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLokasiProyekId();?></td>
 						<td>
-							<select class="form-control" name="lokasi_proyek_id" id="lokasi_proyek_id" data-value="<?php echo $jenisPekerjaan->getLokasiProyekId();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1" <?php echo AppFormBuilder::selected($jenisPekerjaan->getLokasiProyekId(), '1');?>>Tampilkan</option>
-								<option value="0" <?php echo AppFormBuilder::selected($jenisPekerjaan->getLokasiProyekId(), '0');?>>Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="lokasi_proyek_id" id="lokasi_proyek_id" value="1" <?php echo $jenisPekerjaan->createCheckedLokasiProyekId();?>/> <?php echo $appEntityLanguage->getLokasiProyekId();?></label>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKegiatan();?></td>
 						<td>
-							<select class="form-control" name="kegiatan" id="kegiatan" data-value="<?php echo $jenisPekerjaan->getKegiatan();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="1" <?php echo AppFormBuilder::selected($jenisPekerjaan->getKegiatan(), '1');?>>Tampilkan</option>
-								<option value="0" <?php echo AppFormBuilder::selected($jenisPekerjaan->getKegiatan(), '0');?>>Tidak</option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="kegiatan" id="kegiatan" value="1" <?php echo $jenisPekerjaan->createCheckedKegiatan();?>/> <?php echo $appEntityLanguage->getKegiatan();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -415,22 +397,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 $appEntityLanguage = new AppEntityLanguage(new JenisPekerjaan(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 			// define map here
-			$mapForTipePondasiId = array(
-				"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-				"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-			);
-			$mapForKelasTowerId = array(
-				"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-				"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-			);
-			$mapForLokasiProyekId = array(
-				"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-				"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-			);
-			$mapForKegiatan = array(
-				"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-				"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-			);
+			
 ?>
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
@@ -456,19 +423,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getTipePondasiId();?></td>
-						<td><?php echo isset($mapForTipePondasiId) && isset($mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]) && isset($mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]["label"]) ? $mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]["label"] : "";?></td>
+						<td><?php echo $jenisPekerjaan->optionTipePondasiId($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKelasTowerId();?></td>
-						<td><?php echo isset($mapForKelasTowerId) && isset($mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]) && isset($mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]["label"]) ? $mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]["label"] : "";?></td>
+						<td><?php echo $jenisPekerjaan->optionKelasTowerId($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getLokasiProyekId();?></td>
-						<td><?php echo isset($mapForLokasiProyekId) && isset($mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]) && isset($mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]["label"]) ? $mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]["label"] : "";?></td>
+						<td><?php echo $jenisPekerjaan->optionLokasiProyekId($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKegiatan();?></td>
-						<td><?php echo isset($mapForKegiatan) && isset($mapForKegiatan[$jenisPekerjaan->getKegiatan()]) && isset($mapForKegiatan[$jenisPekerjaan->getKegiatan()]["label"]) ? $mapForKegiatan[$jenisPekerjaan->getKegiatan()]["label"] : "";?></td>
+						<td><?php echo $jenisPekerjaan->optionKegiatan($appLanguage->getYes(), $appLanguage->getNo());?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -526,22 +493,7 @@ require_once $appInclude->mainAppFooter(__DIR__);
 else 
 {
 $appEntityLanguage = new AppEntityLanguage(new JenisPekerjaan(), $appConfig, $currentUser->getLanguageId());
-$mapForTipePondasiId = array(
-	"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-	"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-);
-$mapForKelasTowerId = array(
-	"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-	"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-);
-$mapForLokasiProyekId = array(
-	"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-	"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-);
-$mapForKegiatan = array(
-	"1" => array("value" => "1", "label" => "Tampilkan", "default" => "false"),
-	"0" => array("value" => "0", "label" => "Tidak", "default" => "false")
-);
+
 $specMap = array(
 	"jenisPekerjaanId" => PicoSpecification::filter("jenisPekerjaanId", "fulltext"),
 	"nama" => PicoSpecification::filter("nama", "fulltext"),
@@ -707,10 +659,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="jenis_pekerjaan_id"><?php echo $jenisPekerjaan->getJenisPekerjaanId();?></td>
 								<td data-col-name="nama"><?php echo $jenisPekerjaan->getNama();?></td>
-								<td data-col-name="tipe_pondasi_id"><?php echo isset($mapForTipePondasiId) && isset($mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]) && isset($mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]["label"]) ? $mapForTipePondasiId[$jenisPekerjaan->getTipePondasiId()]["label"] : "";?></td>
-								<td data-col-name="kelas_tower_id"><?php echo isset($mapForKelasTowerId) && isset($mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]) && isset($mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]["label"]) ? $mapForKelasTowerId[$jenisPekerjaan->getKelasTowerId()]["label"] : "";?></td>
-								<td data-col-name="lokasi_proyek_id"><?php echo isset($mapForLokasiProyekId) && isset($mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]) && isset($mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]["label"]) ? $mapForLokasiProyekId[$jenisPekerjaan->getLokasiProyekId()]["label"] : "";?></td>
-								<td data-col-name="kegiatan"><?php echo isset($mapForKegiatan) && isset($mapForKegiatan[$jenisPekerjaan->getKegiatan()]) && isset($mapForKegiatan[$jenisPekerjaan->getKegiatan()]["label"]) ? $mapForKegiatan[$jenisPekerjaan->getKegiatan()]["label"] : "";?></td>
+								<td data-col-name="tipe_pondasi_id"><?php echo $jenisPekerjaan->optionTipePondasiId($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="kelas_tower_id"><?php echo $jenisPekerjaan->optionKelasTowerId($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="lokasi_proyek_id"><?php echo $jenisPekerjaan->optionLokasiProyekId($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="kegiatan"><?php echo $jenisPekerjaan->optionKegiatan($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $jenisPekerjaan->getSortOrder();?></td>
 								<td data-col-name="default_data"><?php echo $jenisPekerjaan->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $jenisPekerjaan->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>

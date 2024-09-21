@@ -15,7 +15,6 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
-use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -41,34 +40,54 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
+	$jenisPerjalananDinas->setJenisPerjalananDinasId($inputPost->getJenisPerjalananDinasId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisPerjalananDinas->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisPerjalananDinas->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisPerjalananDinas->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisPerjalananDinas->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisPerjalananDinas->setAdminBuat($currentUser->getUserId());
+	$jenisPerjalananDinas->setAdminBuat($currentAction->getUserId());
 	$jenisPerjalananDinas->setWaktuBuat($currentAction->getTime());
 	$jenisPerjalananDinas->setIpBuat($currentAction->getIp());
-	$jenisPerjalananDinas->setAdminUbah($currentUser->getUserId());
+	$jenisPerjalananDinas->setAdminUbah($currentAction->getUserId());
 	$jenisPerjalananDinas->setWaktuUbah($currentAction->getTime());
 	$jenisPerjalananDinas->setIpUbah($currentAction->getIp());
-	$jenisPerjalananDinas->insert();
-	$newId = $jenisPerjalananDinas->getJenisPerjalananDinasId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_perjalanan_dinas_id, $newId);
+	try
+	{
+		$jenisPerjalananDinas->insert();
+		$newId = $jenisPerjalananDinas->getJenisPerjalananDinasId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_perjalanan_dinas_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
+	$jenisPerjalananDinas->setJenisPerjalananDinasId($inputPost->getJenisPerjalananDinasId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisPerjalananDinas->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jenisPerjalananDinas->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisPerjalananDinas->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisPerjalananDinas->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisPerjalananDinas->setAdminUbah($currentUser->getUserId());
+	$jenisPerjalananDinas->setAdminUbah($currentAction->getUserId());
 	$jenisPerjalananDinas->setWaktuUbah($currentAction->getTime());
 	$jenisPerjalananDinas->setIpUbah($currentAction->getIp());
-	$jenisPerjalananDinas->setJenisPerjalananDinasId($inputPost->getJenisPerjalananDinasId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jenisPerjalananDinas->update();
-	$newId = $jenisPerjalananDinas->getJenisPerjalananDinasId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_perjalanan_dinas_id, $newId);
+	try
+	{
+		$jenisPerjalananDinas->update();
+
+		// update primary key value
+		$specification = PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisPerjalananDinasId, $inputPost->getJenisPerjalananDinasId()));
+		$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
+		$jenisPerjalananDinas->where($specification)->setJenisPerjalananDinasId($inputPost->getAppBuilderNewPkJenisPerjalananDinasId())->update();
+		$newId = $inputPost->getAppBuilderNewPkJenisPerjalananDinasId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_perjalanan_dinas_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -80,15 +99,18 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 			try
 			{
 				$jenisPerjalananDinas->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenis_perjalanan_dinas_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisPerjalananDinasId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(true)
 				->update();
 			}
 			catch(Exception $e)
 			{
-				// Do something here when record is not found
+				// Do something here to handle exception
 			}
 		}
 	}
@@ -104,15 +126,18 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 			try
 			{
 				$jenisPerjalananDinas->where(PicoSpecification::getInstance()
-					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenis_perjalanan_dinas_id, $rowId))
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisPerjalananDinasId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(false)
 				->update();
 			}
 			catch(Exception $e)
 			{
-				// Do something here when record is not found
+				// Do something here to handle exception
 			}
 		}
 	}
@@ -124,8 +149,18 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	{
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
-			$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
-			$jenisPerjalananDinas->deleteOneByJenisPerjalananDinasId($rowId);
+			try
+			{
+				$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
+				$jenisPerjalananDinas->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenis_perjalanan_dinas_id, $rowId))
+				)
+				->delete();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -143,7 +178,11 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 			}
 			$primaryKeyValue = $dataItem->getPrimaryKey();
 			$sortOrder = $dataItem->getSortOrder();
-			$jenisPerjalananDinas->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisPerjalananDinasId, $primaryKeyValue)))->setSortOrder($sortOrder)->update();
+			$jenisPerjalananDinas->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->jenisPerjalananDinasId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
 		}
 	}
 	$currentModule->redirectToItself();
@@ -159,9 +198,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getJenisPerjalananDinasId();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="1" name="jenis_perjalanan_dinas_id" id="jenis_perjalanan_dinas_id"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
 						</td>
 					</tr>
 					<tr>
@@ -173,13 +218,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1"/> <?php echo $appEntityLanguage->getDefaultData();?></label>
+							<input autocomplete="off" class="form-control" type="number" step="1" name="default_data" id="default_data"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1"/> <?php echo $appEntityLanguage->getAktif();?></label>
+							<input autocomplete="off" class="form-control" type="number" step="1" name="aktif" id="aktif"/>
 						</td>
 					</tr>
 				</tbody>
@@ -206,7 +251,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$jenisPerjalananDinas = new JenisPerjalananDinas(null, $database);
 	try{
 		$jenisPerjalananDinas->findOneByJenisPerjalananDinasId($inputGet->getJenisPerjalananDinasId());
-		if($jenisPerjalananDinas->hasValueJenisPerjalananDinasId())
+		if($jenisPerjalananDinas->issetJenisPerjalananDinasId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisPerjalananDinas(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -217,9 +262,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getJenisPerjalananDinasId();?></td>
+						<td>
+							<input class="form-control" type="number" step="1" name="app_builder_new_pk_jenis_perjalanan_dinas_id" id="jenis_perjalanan_dinas_id" value="<?php echo $jenisPerjalananDinas->getJenisPerjalananDinasId();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisPerjalananDinas->getNama();?>" autocomplete="off" required="required"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisPerjalananDinas->getNama();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -231,13 +282,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1" <?php echo $jenisPerjalananDinas->createCheckedDefaultData();?>/> <?php echo $appEntityLanguage->getDefaultData();?></label>
+							<input class="form-control" type="number" step="1" name="default_data" id="default_data" value="<?php echo $jenisPerjalananDinas->getDefaultData();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
 						<td>
-							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1" <?php echo $jenisPerjalananDinas->createCheckedAktif();?>/> <?php echo $appEntityLanguage->getAktif();?></label>
+							<input class="form-control" type="number" step="1" name="aktif" id="aktif" value="<?php echo $jenisPerjalananDinas->getAktif();?>" autocomplete="off"/>
 						</td>
 					</tr>
 				</tbody>
@@ -284,7 +335,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	try{
 		$subqueryMap = null;
 		$jenisPerjalananDinas->findOneWithPrimaryKeyValue($inputGet->getJenisPerjalananDinasId(), $subqueryMap);
-		if($jenisPerjalananDinas->hasValueJenisPerjalananDinasId())
+		if($jenisPerjalananDinas->issetJenisPerjalananDinasId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisPerjalananDinas(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -306,6 +357,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
 					<tr>
+						<td><?php echo $appEntityLanguage->getJenisPerjalananDinasId();?></td>
+						<td><?php echo $jenisPerjalananDinas->getJenisPerjalananDinasId();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td><?php echo $jenisPerjalananDinas->getNama();?></td>
 					</tr>
@@ -315,11 +370,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
-						<td><?php echo $jenisPerjalananDinas->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><?php echo $jenisPerjalananDinas->getDefaultData();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getAktif();?></td>
-						<td><?php echo $jenisPerjalananDinas->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
+						<td><?php echo $jenisPerjalananDinas->getAktif();?></td>
 					</tr>
 				</tbody>
 			</table>
@@ -328,14 +383,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($jenisPerjalananDinas->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($jenisPerjalananDinas->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($jenisPerjalananDinas->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<?php if($userPermission->isAllowedUpdate()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jenis_perjalanan_dinas_id, $jenisPerjalananDinas->getJenisPerjalananDinasId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
@@ -372,6 +420,32 @@ require_once $appInclude->mainAppFooter(__DIR__);
 else 
 {
 $appEntityLanguage = new AppEntityLanguage(new JenisPerjalananDinas(), $appConfig, $currentUser->getLanguageId());
+
+$specMap = array(
+	
+);
+$sortOrderMap = array(
+	"jenisPerjalananDinasId" => "jenisPerjalananDinasId",
+	"nama" => "nama",
+	"sortOrder" => "sortOrder",
+	"defaultData" => "defaultData",
+	"aktif" => "aktif"
+);
+
+// You can define your own specifications
+// Pay attention to security issues
+$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+
+
+// You can define your own sortable
+// Pay attention to security issues
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, null);
+
+$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
+$dataLoader = new JenisPerjalananDinas(null, $database);
+
+$subqueryMap = null;
+
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -380,24 +454,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
-					<span class="filter-control">
-						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
-					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
@@ -411,38 +467,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
 			<?php } /*ajaxSupport*/ ?>
-			<?php 	
-			
-			$specMap = array(
-			    "nama" => PicoSpecification::filter("nama", "fulltext"),
-				"aktif" => PicoSpecification::filter("aktif", "boolean")
-			);
-			$sortOrderMap = array(
-			    "nama" => "nama",
-				"sortOrder" => "sortOrder",
-				"defaultData" => "defaultData",
-				"aktif" => "aktif"
-			);
-			
-			// You can define your own specifications
-			// Pay attention to security issues
-			$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
-			
-			
-			// You can define your own sortable
-			// Pay attention to security issues
-			$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
-				array(
-					"sortBy" => "sortOrder", 
-					"sortType" => PicoSort::ORDER_TYPE_ASC
-				)
-			));
-			
-			$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
-			$dataLoader = new JenisPerjalananDinas(null, $database);
-			
-			$subqueryMap = null;
-			try{
+			<?php try{
 				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
 				if($pageData->getTotalResult() > 0)
 				{		
@@ -483,6 +508,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
+								<td data-col-name="jenis_perjalanan_dinas_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getJenisPerjalananDinasId();?></a></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
@@ -518,10 +544,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
+								<td data-col-name="jenis_perjalanan_dinas_id"><?php echo $jenisPerjalananDinas->getJenisPerjalananDinasId();?></td>
 								<td data-col-name="nama"><?php echo $jenisPerjalananDinas->getNama();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $jenisPerjalananDinas->getSortOrder();?></td>
-								<td data-col-name="default_data"><?php echo $jenisPerjalananDinas->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="aktif"><?php echo $jenisPerjalananDinas->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
+								<td data-col-name="default_data"><?php echo $jenisPerjalananDinas->getDefaultData();?></td>
+								<td data-col-name="aktif"><?php echo $jenisPerjalananDinas->getAktif();?></td>
 							</tr>
 							<?php 
 							}

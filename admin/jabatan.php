@@ -4,7 +4,6 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
-use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -15,14 +14,13 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
-use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\Jabatan;
 use Sipro\AppIncludeImpl;
-use MagicApp\XLSX\XLSXDocumentWriter;
+use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -47,15 +45,22 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$jabatan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jabatan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jabatan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jabatan->setAdminBuat($currentUser->getUserId());
+	$jabatan->setAdminBuat($currentAction->getUserId());
 	$jabatan->setWaktuBuat($currentAction->getTime());
 	$jabatan->setIpBuat($currentAction->getIp());
-	$jabatan->setAdminUbah($currentUser->getUserId());
+	$jabatan->setAdminUbah($currentAction->getUserId());
 	$jabatan->setWaktuUbah($currentAction->getTime());
 	$jabatan->setIpUbah($currentAction->getIp());
-	$jabatan->insert();
-	$newId = $jabatan->getJabatanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jabatan_id, $newId);
+	try
+	{
+		$jabatan->insert();
+		$newId = $jabatan->getJabatanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jabatan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -64,13 +69,20 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$jabatan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jabatan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jabatan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jabatan->setAdminUbah($currentUser->getUserId());
+	$jabatan->setAdminUbah($currentAction->getUserId());
 	$jabatan->setWaktuUbah($currentAction->getTime());
 	$jabatan->setIpUbah($currentAction->getIp());
 	$jabatan->setJabatanId($inputPost->getJabatanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jabatan->update();
-	$newId = $jabatan->getJabatanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jabatan_id, $newId);
+	try
+	{
+		$jabatan->update();
+		$newId = $jabatan->getJabatanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jabatan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -85,6 +97,9 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jabatanId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(true)
 				->update();
 			}
@@ -109,6 +124,9 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jabatanId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(false)
 				->update();
 			}
@@ -129,30 +147,15 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			try
 			{
 				$jabatan = new Jabatan(null, $database);
-				$jabatan->deleteOneByJabatanId($rowId);
+				$jabatan->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jabatan_id, $rowId))
+				)
+				->delete();
 			}
 			catch(Exception $e)
 			{
 				// Do something here to handle exception
 			}
-		}
-	}
-	$currentModule->redirectToItself();
-}
-else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
-{
-	$jabatan = new Jabatan(null, $database);
-	if($inputPost->getNewOrder() != null && $inputPost->countableNewOrder())
-	{
-		foreach($inputPost->getNewOrder() as $dataItem)
-		{
-			if(is_string($dataItem))
-			{
-				$dataItem = new SetterGetter(json_decode($dataItem));
-			}
-			$primaryKeyValue = $dataItem->getPrimaryKey();
-			$sortOrder = $dataItem->getSortOrder();
-			$jabatan->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jabatanId, $primaryKeyValue)))->setSortOrder($sortOrder)->update();
 		}
 	}
 	$currentModule->redirectToItself();
@@ -170,7 +173,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
 						</td>
 					</tr>
 					<tr>
@@ -182,11 +185,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<select class="form-control" name="default_data" id="default_data">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes"><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no"><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1"/> <?php echo $appEntityLanguage->getDefaultData();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -219,7 +218,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$jabatan = new Jabatan(null, $database);
 	try{
 		$jabatan->findOneByJabatanId($inputGet->getJabatanId());
-		if($jabatan->hasValueJabatanId())
+		if($jabatan->issetJabatanId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Jabatan(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -232,7 +231,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jabatan->getNama();?>" autocomplete="off" required="required"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jabatan->getNama();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -244,11 +243,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
 						<td>
-							<select class="form-control" name="default_data" id="default_data" data-value="<?php echo $jabatan->getDefaultData();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($jabatan->getDefaultData(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($jabatan->getDefaultData(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
+							<label><input class="form-check-input" type="checkbox" name="default_data" id="default_data" value="1" <?php echo $jabatan->createCheckedDefaultData();?>/> <?php echo $appEntityLanguage->getDefaultData();?></label>
 						</td>
 					</tr>
 					<tr>
@@ -301,7 +296,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	try{
 		$subqueryMap = null;
 		$jabatan->findOneWithPrimaryKeyValue($inputGet->getJabatanId(), $subqueryMap);
-		if($jabatan->hasValueJabatanId())
+		if($jabatan->issetJabatanId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Jabatan(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -345,14 +340,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($jabatan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($jabatan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($jabatan->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<?php if($userPermission->isAllowedUpdate()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jabatan_id, $jabatan->getJabatanId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
@@ -391,9 +379,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new Jabatan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"nama" => PicoSpecification::filter("nama", "fulltext"),
-	"defaultData" => PicoSpecification::filter("defaultData", "boolean"),
-	"aktif" => PicoSpecification::filter("aktif", "boolean")
+	
 );
 $sortOrderMap = array(
 	"nama" => "nama",
@@ -423,8 +409,8 @@ $subqueryMap = null;
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
-	$exporter = new XLSXDocumentWriter($appLanguage);
-	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
 	$sheetName = "Sheet 1";
 
 	$headerFormat = new XLSXDataFormat($dataLoader, 3);
@@ -438,7 +424,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
 	), 
 	function($index, $row, $appLanguage){
-        
+		
 		return array(
 			sprintf("%d", $index + 1),
 			$row->getJabatanId(),
@@ -458,35 +444,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
-					<span class="filter-control">
-						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getDefaultData();?></span>
-					<span class="filter-control">
-							<select name="default_data" class="form-control" data-value="<?php echo $inputGet->getDefaultData();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getDefaultData(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getDefaultData(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
-					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
@@ -528,9 +485,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
-								<?php if($userPermission->isAllowedSortOrder()){ ?>
-								<td class="data-sort data-sort-header"></td>
-								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="jabatan_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-jabatan-id"/>
@@ -554,7 +508,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							</tr>
 						</thead>
 					
-						<tbody class="data-table-manual-sort" data-offset="<?php echo $pageData->getDataOffset();?>">
+						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
 							<?php 
 							$dataIndex = 0;
 							while($jabatan = $pageData->fetch())
@@ -562,10 +516,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 							?>
 		
-							<tr data-primary-key="<?php echo $jabatan->getJabatanId();?>" data-sort-order="<?php echo $jabatan->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
-								<?php if($userPermission->isAllowedSortOrder()){ ?>
-								<td class="data-sort data-sort-body data-sort-handler"></td>
-								<?php } ?>
+							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="jabatan_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-jabatan-id" name="checked_row_id[]" value="<?php echo $jabatan->getJabatanId();?>"/>
@@ -583,7 +534,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nama"><?php echo $jabatan->getNama();?></td>
-								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $jabatan->getSortOrder();?></td>
+								<td data-col-name="sort_order"><?php echo $jabatan->getSortOrder();?></td>
 								<td data-col-name="default_data"><?php echo $jabatan->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $jabatan->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
@@ -602,9 +553,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
-						<?php } ?>
-						<?php if($userPermission->isAllowedSortOrder()){ ?>
-						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

@@ -1,7 +1,7 @@
 <?php
 
 // This script is generated automatically by AppBuilder
-// Visit https://github.com/Planetbiru/AppBuilder
+// Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
@@ -15,7 +15,6 @@ use MagicObject\Request\PicoFilterConstant;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use MagicApp\AppEntityLanguage;
-use MagicApp\AppFormBuilder;
 use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
@@ -45,15 +44,22 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$jenisHariLibur->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisHariLibur->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisHariLibur->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisHariLibur->setAdminBuat($currentUser->getUserId());
+	$jenisHariLibur->setAdminBuat($currentAction->getUserId());
 	$jenisHariLibur->setWaktuBuat($currentAction->getTime());
 	$jenisHariLibur->setIpBuat($currentAction->getIp());
-	$jenisHariLibur->setAdminUbah($currentUser->getUserId());
+	$jenisHariLibur->setAdminUbah($currentAction->getUserId());
 	$jenisHariLibur->setWaktuUbah($currentAction->getTime());
 	$jenisHariLibur->setIpUbah($currentAction->getIp());
-	$jenisHariLibur->insert();
-	$newId = $jenisHariLibur->getJenisHariLiburId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_hari_libur_id, $newId);
+	try
+	{
+		$jenisHariLibur->insert();
+		$newId = $jenisHariLibur->getJenisHariLiburId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_hari_libur_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -62,13 +68,20 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$jenisHariLibur->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jenisHariLibur->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jenisHariLibur->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$jenisHariLibur->setAdminUbah($currentUser->getUserId());
+	$jenisHariLibur->setAdminUbah($currentAction->getUserId());
 	$jenisHariLibur->setWaktuUbah($currentAction->getTime());
 	$jenisHariLibur->setIpUbah($currentAction->getIp());
 	$jenisHariLibur->setJenisHariLiburId($inputPost->getJenisHariLiburId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jenisHariLibur->update();
-	$newId = $jenisHariLibur->getJenisHariLiburId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_hari_libur_id, $newId);
+	try
+	{
+		$jenisHariLibur->update();
+		$newId = $jenisHariLibur->getJenisHariLiburId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_hari_libur_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -77,7 +90,22 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$jenisHariLibur = new JenisHariLibur(null, $database);
-			$jenisHariLibur->setJenisHariLiburId($rowId)->setAktif(true)->update();
+			try
+			{
+				$jenisHariLibur->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisHariLiburId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
+				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
+				->setAktif(true)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -89,7 +117,22 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
 			$jenisHariLibur = new JenisHariLibur(null, $database);
-			$jenisHariLibur->setJenisHariLiburId($rowId)->setAktif(false)->update();
+			try
+			{
+				$jenisHariLibur->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenisHariLiburId, $rowId))
+					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
+				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
+				->setAktif(false)
+				->update();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -100,8 +143,18 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	{
 		foreach($inputPost->getCheckedRowId() as $rowId)
 		{
-			$jenisHariLibur = new JenisHariLibur(null, $database);
-			$jenisHariLibur->deleteOneByJenisHariLiburId($rowId);
+			try
+			{
+				$jenisHariLibur = new JenisHariLibur(null, $database);
+				$jenisHariLibur->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->jenis_hari_libur_id, $rowId))
+				)
+				->delete();
+			}
+			catch(Exception $e)
+			{
+				// Do something here to handle exception
+			}
 		}
 	}
 	$currentModule->redirectToItself();
@@ -119,7 +172,11 @@ else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
 			}
 			$primaryKeyValue = $dataItem->getPrimaryKey();
 			$sortOrder = $dataItem->getSortOrder();
-			$jenisHariLibur->where(PicoSpecification::getInstance()->addAnd(new PicoPredicate(Field::of()->jenisHariLiburId, $primaryKeyValue)))->setSortOrder($sortOrder)->update();
+			$jenisHariLibur->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->jenisHariLiburId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
 		}
 	}
 	$currentModule->redirectToItself();
@@ -137,7 +194,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
 						</td>
 					</tr>
 					<tr>
@@ -182,7 +239,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$jenisHariLibur = new JenisHariLibur(null, $database);
 	try{
 		$jenisHariLibur->findOneByJenisHariLiburId($inputGet->getJenisHariLiburId());
-		if($jenisHariLibur->hasValueJenisHariLiburId())
+		if($jenisHariLibur->issetJenisHariLiburId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisHariLibur(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -195,7 +252,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisHariLibur->getNama();?>" autocomplete="off" required="required"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jenisHariLibur->getNama();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -260,7 +317,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 	try{
 		$subqueryMap = null;
 		$jenisHariLibur->findOneWithPrimaryKeyValue($inputGet->getJenisHariLiburId(), $subqueryMap);
-		if($jenisHariLibur->hasValueJenisHariLiburId())
+		if($jenisHariLibur->issetJenisHariLiburId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new JenisHariLibur(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -269,6 +326,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 ?>
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
+		<?php
+		if(UserAction::isRequireNextAction($inputGet) && UserAction::isRequireApproval($jenisHariLibur->getWaitingFor()))
+		{
+				?>
+				<div class="alert alert-info"><?php echo UserAction::getWaitingForMessage($appLanguage, $jenisHariLibur->getWaitingFor());?></div>
+				<?php
+		}
+		?>
+		
 		<form name="detailform" id="detailform" action="" method="post">
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
 				<tbody>
@@ -295,8 +361,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($userPermission->isAllowedUpdate()){ ?><button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jenis_hari_libur_id, $jenisHariLibur->getJenisHariLiburId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button><?php } ?>&#xD;
+							<?php if($userPermission->isAllowedUpdate()){ ?>
+							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->jenis_hari_libur_id, $jenisHariLibur->getJenisHariLiburId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
+							<?php } ?>
+		
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
+							<input type="hidden" name="jenis_hari_libur_id" value="<?php echo $jenisHariLibur->getJenisHariLiburId();?>"/>
 						</td>
 					</tr>
 				</tbody>
@@ -328,6 +398,36 @@ require_once $appInclude->mainAppFooter(__DIR__);
 else 
 {
 $appEntityLanguage = new AppEntityLanguage(new JenisHariLibur(), $appConfig, $currentUser->getLanguageId());
+
+$specMap = array(
+	
+);
+$sortOrderMap = array(
+	"nama" => "nama",
+	"sortOrder" => "sortOrder",
+	"defaultData" => "defaultData",
+	"aktif" => "aktif"
+);
+
+// You can define your own specifications
+// Pay attention to security issues
+$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
+
+
+// You can define your own sortable
+// Pay attention to security issues
+$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
+	array(
+		"sortBy" => "sortOrder", 
+		"sortType" => PicoSort::ORDER_TYPE_ASC
+	)
+));
+
+$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
+$dataLoader = new JenisHariLibur(null, $database);
+
+$subqueryMap = null;
+
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -336,24 +436,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
-					<span class="filter-control">
-						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
-					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
@@ -367,48 +449,17 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		</div>
 		<div class="data-section" data-ajax-support="true" data-ajax-name="main-data">
 			<?php } /*ajaxSupport*/ ?>
-			<?php 	
-			
-			$specMap = array(
-			    "nama" => PicoSpecification::filter("nama", "fulltext"),
-				"aktif" => PicoSpecification::filter("aktif", "boolean")
-			);
-			$sortOrderMap = array(
-			    "nama" => "nama",
-				"sortOrder" => "sortOrder",
-				"defaultData" => "defaultData",
-				"aktif" => "aktif"
-			);
-			
-			// You can define your own specifications
-			// Pay attention to security issues
-			$specification = PicoSpecification::fromUserInput($inputGet, $specMap);
-			
-			
-			// You can define your own sortable
-			// Pay attention to security issues
-			$sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
-				array(
-					"sortBy" => "sortOrder", 
-					"sortType" => PicoSort::ORDER_TYPE_ASC
-				)
-			));
-			
-			$pageable = new PicoPageable(new PicoPage($inputGet->getPage(), $appConfig->getData()->getPageSize()), $sortable);
-			$dataLoader = new JenisHariLibur(null, $database);
-			
-			$subqueryMap = null;
-			$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
-			
-			if($pageData->getTotalResult() > 0)
-			{
-				$pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
-				->setNavigation(
-				'<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
-				'<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
-				)
-				->setMargin($appConfig->getData()->getPageMargin())
-				;
+			<?php try{
+				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
+				if($pageData->getTotalResult() > 0)
+				{		
+				    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+				    ->setNavigation(
+				    '<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
+				    '<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
+				    )
+				    ->setMargin($appConfig->getData()->getPageMargin())
+				    ;
 			?>
 			<div class="pagination pagination-top">
 			    <div class="pagination-number">
@@ -511,10 +562,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			}
 			else
 			{
-			?>
+			    ?>
 			    <div class="alert alert-info"><?php echo $appLanguage->getMessageDataNotFound();?></div>
+			    <?php
+			}
+			?>
+			
 			<?php
 			}
+			catch(Exception $e)
+			{
+			    ?>
+			    <div class="alert alert-danger"><?php echo $appInclude->printException($e);?></div>
+			    <?php
+			} 
 			?>
 			<?php /*ajaxSupport*/ if(!$currentAction->isRequestViaAjax()){ ?>
 		</div>

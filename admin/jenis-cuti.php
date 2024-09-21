@@ -56,9 +56,16 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$jenisCuti->setAdminUbah($currentAction->getUserId());
 	$jenisCuti->setWaktuUbah($currentAction->getTime());
 	$jenisCuti->setIpUbah($currentAction->getIp());
-	$jenisCuti->insert();
-	$newId = $jenisCuti->getJenisCutiId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_cuti_id, $newId);
+	try
+	{
+		$jenisCuti->insert();
+		$newId = $jenisCuti->getJenisCutiId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_cuti_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -76,9 +83,16 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$jenisCuti->setWaktuUbah($currentAction->getTime());
 	$jenisCuti->setIpUbah($currentAction->getIp());
 	$jenisCuti->setJenisCutiId($inputPost->getJenisCutiId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$jenisCuti->update();
-	$newId = $jenisCuti->getJenisCutiId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_cuti_id, $newId);
+	try
+	{
+		$jenisCuti->update();
+		$newId = $jenisCuti->getJenisCutiId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->jenis_cuti_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {

@@ -21,8 +21,8 @@ use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\HariLibur;
 use Sipro\AppIncludeImpl;
-use Sipro\Entity\Data\JenisHariLibur;
-use MagicApp\XLSX\XLSXDocumentWriter;
+use Sipro\Entity\Data\JenisHariLiburMin;
+use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -46,17 +46,24 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$hariLibur->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$hariLibur->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$hariLibur->setJenisHariLiburId($inputPost->getJenisHariLiburId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$hariLibur->setBuka($inputPost->getBuka(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$hariLibur->setBuka($inputPost->getBuka(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$hariLibur->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$hariLibur->setAdminBuat($currentUser->getUserId());
+	$hariLibur->setAdminBuat($currentAction->getUserId());
 	$hariLibur->setWaktuBuat($currentAction->getTime());
 	$hariLibur->setIpBuat($currentAction->getIp());
-	$hariLibur->setAdminUbah($currentUser->getUserId());
+	$hariLibur->setAdminUbah($currentAction->getUserId());
 	$hariLibur->setWaktuUbah($currentAction->getTime());
 	$hariLibur->setIpUbah($currentAction->getIp());
-	$hariLibur->insert();
-	$newId = $hariLibur->getHariLiburId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->hari_libur_id, $newId);
+	try
+	{
+		$hariLibur->insert();
+		$newId = $hariLibur->getHariLiburId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->hari_libur_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -64,15 +71,22 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$hariLibur->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$hariLibur->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$hariLibur->setJenisHariLiburId($inputPost->getJenisHariLiburId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$hariLibur->setBuka($inputPost->getBuka(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$hariLibur->setBuka($inputPost->getBuka(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$hariLibur->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$hariLibur->setAdminUbah($currentUser->getUserId());
+	$hariLibur->setAdminUbah($currentAction->getUserId());
 	$hariLibur->setWaktuUbah($currentAction->getTime());
 	$hariLibur->setIpUbah($currentAction->getIp());
 	$hariLibur->setHariLiburId($inputPost->getHariLiburId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$hariLibur->update();
-	$newId = $hariLibur->getHariLiburId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->hari_libur_id, $newId);
+	try
+	{
+		$hariLibur->update();
+		$newId = $hariLibur->getHariLiburId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->hari_libur_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -87,6 +101,9 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->hariLiburId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(true)
 				->update();
 			}
@@ -111,6 +128,9 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->hariLiburId, $rowId))
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
+				->setAdminUbah($currentAction->getUserId())
+				->setWaktuUbah($currentAction->getTime())
+				->setIpUbah($currentAction->getIp())
 				->setAktif(false)
 				->update();
 			}
@@ -131,7 +151,10 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			try
 			{
 				$hariLibur = new HariLibur(null, $database);
-				$hariLibur->deleteOneByHariLiburId($rowId);
+				$hariLibur->where(PicoSpecification::getInstance()
+					->addAnd(PicoPredicate::getInstance()->equals(Field::of()->hari_libur_id, $rowId))
+				)
+				->delete();
 			}
 			catch(Exception $e)
 			{
@@ -154,13 +177,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTanggal();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="date" name="tanggal" id="tanggal" required="required"/>
+							<input autocomplete="off" class="form-control" type="date" name="tanggal" id="tanggal"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama" required="required"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
 						</td>
 					</tr>
 					<tr>
@@ -168,12 +191,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="jenis_hari_libur_id" id="jenis_hari_libur_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JenisHariLibur(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JenisHariLiburMin(null, $database), 
 								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true)), 
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->jenisHariLiburId, Field::of()->nama)
 								; ?>
 							</select>
@@ -215,7 +239,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$hariLibur = new HariLibur(null, $database);
 	try{
 		$hariLibur->findOneByHariLiburId($inputGet->getHariLiburId());
-		if($hariLibur->hasValueHariLiburId())
+		if($hariLibur->issetHariLiburId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new HariLibur(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -228,13 +252,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTanggal();?></td>
 						<td>
-							<input class="form-control" type="date" name="tanggal" id="tanggal" value="<?php echo $hariLibur->getTanggal();?>" autocomplete="off" required="required"/>
+							<input class="form-control" type="date" name="tanggal" id="tanggal" value="<?php echo $hariLibur->getTanggal();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $hariLibur->getNama();?>" autocomplete="off" required="required"/>
+							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $hariLibur->getNama();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -242,12 +266,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<select class="form-control" name="jenis_hari_libur_id" id="jenis_hari_libur_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JenisHariLibur(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JenisHariLiburMin(null, $database), 
 								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true)), 
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
 								PicoSortable::getInstance()
 									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
 								Field::of()->jenisHariLiburId, Field::of()->nama, $hariLibur->getJenisHariLiburId())
 								; ?>
 							</select>
@@ -310,7 +335,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		$subqueryMap = array(
 		"jenisHariLiburId" => array(
 			"columnName" => "jenis_hari_libur_id",
-			"entityName" => "JenisHariLibur",
+			"entityName" => "JenisHariLiburMin",
 			"tableName" => "jenis_hari_libur",
 			"primaryKey" => "jenis_hari_libur_id",
 			"objectName" => "jenis_hari_libur",
@@ -318,7 +343,7 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 		)
 		);
 		$hariLibur->findOneWithPrimaryKeyValue($inputGet->getHariLiburId(), $subqueryMap);
-		if($hariLibur->hasValueHariLiburId())
+		if($hariLibur->issetHariLiburId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new HariLibur(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -349,7 +374,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getJenisHariLibur();?></td>
-						<td><?php echo $hariLibur->hasValueJenisHariLibur() ? $hariLibur->getJenisHariLibur()->getNama() : "";?></td>
+						<td><?php echo $hariLibur->issetJenisHariLibur() ? $hariLibur->getJenisHariLibur()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getBuka();?></td>
@@ -366,14 +391,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td></td>
 						<td>
-							<?php if($inputGet->getNextAction() == UserAction::APPROVAL && UserAction::isRequireApproval($hariLibur->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::APPROVE && UserAction::isRequireApproval($hariLibur->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-success" name="user_action" value="<?php echo UserAction::APPROVE;?>"><?php echo $appLanguage->getButtonApprove();?></button>
-							<?php } else if($inputGet->getNextAction() == UserAction::REJECT && UserAction::isRequireApproval($hariLibur->getWaitingFor()) && $userPermission->isAllowedApprove()){ ?>
-							<button type="submit" class="btn btn-warning" name="user_action" value="<?php echo UserAction::REJECT;?>"><?php echo $appLanguage->getButtonReject();?></button>
-							<?php } else if($userPermission->isAllowedUpdate()){ ?>
+							<?php if($userPermission->isAllowedUpdate()){ ?>
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->hari_libur_id, $hariLibur->getHariLiburId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 							<?php } ?>
 		
@@ -412,10 +430,7 @@ else
 $appEntityLanguage = new AppEntityLanguage(new HariLibur(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	"nama" => PicoSpecification::filter("nama", "fulltext"),
-	"jenisHariLiburId" => PicoSpecification::filter("jenisHariLiburId", "number"),
-	"buka" => PicoSpecification::filter("buka", "boolean"),
-	"aktif" => PicoSpecification::filter("aktif", "boolean")
+	"buka" => PicoSpecification::filter("buka", "boolean")
 );
 $sortOrderMap = array(
 	"tanggal" => "tanggal",
@@ -445,7 +460,7 @@ $dataLoader = new HariLibur(null, $database);
 $subqueryMap = array(
 "jenisHariLiburId" => array(
 	"columnName" => "jenis_hari_libur_id",
-	"entityName" => "JenisHariLibur",
+	"entityName" => "JenisHariLiburMin",
 	"tableName" => "jenis_hari_libur",
 	"primaryKey" => "jenis_hari_libur_id",
 	"objectName" => "jenis_hari_libur",
@@ -455,15 +470,14 @@ $subqueryMap = array(
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
-	$exporter = new XLSXDocumentWriter($appLanguage);
-	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
 	$sheetName = "Sheet 1";
 
 	$headerFormat = new XLSXDataFormat($dataLoader, 3);
 	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
 	$exporter->write($pageData, $fileName, $sheetName, array(
 		$appLanguage->getNumero() => $headerFormat->asNumber(),
-		$appEntityLanguage->getHariLiburId() => $headerFormat->getHariLiburId(),
 		$appEntityLanguage->getTanggal() => $headerFormat->getTanggal(),
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getJenisHariLibur() => $headerFormat->asString(),
@@ -471,13 +485,12 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
 	), 
 	function($index, $row, $appLanguage){
-        
+		
 		return array(
 			sprintf("%d", $index + 1),
-			$row->getHariLiburId(),
 			$row->getTanggal(),
 			$row->getNama(),
-			$row->hasValueJenisHariLibur() ? $row->getJenisHariLibur()->getNama() : "",
+			$row->issetJenisHariLibur() ? $row->getJenisHariLibur()->getNama() : "",
 			$row->optionBuka($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
 		);
@@ -493,47 +506,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
-					<span class="filter-control">
-						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getJenisHariLibur();?></span>
-					<span class="filter-control">
-							<select name="jenis_hari_libur_id" class="form-control">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JenisHariLibur(null, $database), 
-								PicoSpecification::getInstance()
-									->addAnd(new PicoPredicate(Field::of()->aktif, true)), 
-								PicoSortable::getInstance()
-									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
-									->add(new PicoSort(Field::of()->name, PicoSort::ORDER_TYPE_ASC)), 
-								Field::of()->jenisHariLiburId, Field::of()->nama, $inputGet->getJenisHariLiburId())
-								; ?>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getBuka();?></span>
 					<span class="filter-control">
-							<select name="buka" class="form-control" data-value="<?php echo $inputGet->getBuka();?>">
+							<select class="form-control" name="buka" data-value="<?php echo $inputGet->getBuka();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getBuka(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
 								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getBuka(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
-					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
 							</select>
 					</span>
 				</span>
@@ -630,7 +608,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="tanggal"><?php echo $hariLibur->getTanggal();?></td>
 								<td data-col-name="nama"><?php echo $hariLibur->getNama();?></td>
-								<td data-col-name="jenis_hari_libur_id"><?php echo $hariLibur->hasValueJenisHariLibur() ? $hariLibur->getJenisHariLibur()->getNama() : "";?></td>
+								<td data-col-name="jenis_hari_libur_id"><?php echo $hariLibur->issetJenisHariLibur() ? $hariLibur->getJenisHariLibur()->getNama() : "";?></td>
 								<td data-col-name="buka"><?php echo $hariLibur->optionBuka($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $hariLibur->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
