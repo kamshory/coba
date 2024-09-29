@@ -115,7 +115,7 @@ class ProyekMin extends MagicObject
 	 * @var integer
 	 */
 	protected $galeri;
-
+	
 	/**
 	 * Tanggal Mulai
 	 * 
@@ -133,6 +133,15 @@ class ProyekMin extends MagicObject
 	 * @var string
 	 */
 	protected $tanggalSelesai;
+
+	/**
+	 * Persen
+	 * 
+	 * @Column(name="persen", type="float", nullable=true)
+	 * @Label(content="Persen")
+	 * @var double
+	 */
+	protected $persen;
 
 	/**
 	 * Waktu Buat

@@ -141,8 +141,8 @@ class BoqUtil
         {
             $disabled = $this->getAttibuteDisabled($boq);
             $selected = isset($value) && $boq->getBillOfQuantityId() == $value ? ' selected="selected"' : '';
-            $minVal = intval($boq->getVolumeProyek());
-            $maxVal = intval($boq->getVolume());
+            $minVal = floatval($boq->getVolumeProyek());
+            $maxVal = floatval($boq->getVolume());
 
             $mixmaxStr = $minmax && $boq->getVolume() > 0 ? " ($minVal - $maxVal)" : "";
 

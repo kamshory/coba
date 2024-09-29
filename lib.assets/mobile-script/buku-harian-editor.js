@@ -49,7 +49,7 @@ $(document).ready(function(e) {
 
     $(document).on('change', '#bill_of_quantity_id', function(e)
     {
-        let select = $('.resource-bill-of-quantity');
+        
         var s_bill_of_quantity_id = $(this).val();
         var proyek_id = $(this).find('option:selected').attr('data-proyek-id');
         $.ajax({
@@ -59,6 +59,7 @@ $(document).ready(function(e) {
             'data':{proyek_id:proyek_id, parent_id:s_bill_of_quantity_id},
             success: function(data)
             {
+                let select = $('.resource-bill-of-quantity');
                 select.empty();
                 select.append(data);
             }

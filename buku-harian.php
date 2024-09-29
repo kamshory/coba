@@ -530,6 +530,33 @@ if(isset($_POST['add-work']))
 		}
 	}
 	
+	header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
+	exit();
+}
+
+
+if(isset($_POST['add-boq']))
+{
+	$waktuBuat = $currentAction->getTime();
+	$waktuUbah = $waktuBuat;
+	$ipBuat = $_SERVER['REMOTE_ADDR'];
+	$ipUbah = $_SERVER['REMOTE_ADDR'];
+
+	$bukuHarianId = $inputPost->getBukuHarianId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$proyekId = $inputPost->getProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$jenis_pekerjaan_id = $inputPost->getJenisPekerjaanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$tipe_pondasi_id = $inputPost->getTipePondasiId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$kelas_tower_id = $inputPost->getKelasTowerId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$lokasi_proyek_id = $inputPost->getLokasiProyekId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	$kegiatan = $inputPost->getKegiatan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+	$acuan_pengawasan = $inputPost->getAcuanPengawasan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);
+	$latitude = $inputPost->getLatitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	$longitude = $inputPost->getLongitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	$altitude = $inputPost->getAltitude(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true);
+	$jumlah_pekerja = $inputPost->getJumlahPekerjaan(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT, false, false, true);
+	
+	$arr_peralatan_id = array();
+	
 	if(isset($_POST['boq_proyek_id']))
 	{
 		$boq_proyek_id = $_POST['boq_proyek_id'];
@@ -541,13 +568,25 @@ if(isset($_POST['add-work']))
 				{
 					// insert
 					$boqId = $inputPost->get('boq_proyek_id_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
-					$volumeProyek = $inputPost->get('volume_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_UINT));
+					$volumeProyek = $inputPost->get('volume_'.$val, array(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT));
 
 					$boq = new BillOfQuantity(null, $database);
 
 					try
 					{
 						$boq->find($boqId);
+
+						$boqMin = $boq->getVolumeProyek();
+						$boqMax = $boq->getVolume();
+
+						if($volumeProyek < $boqMin)
+						{
+							$volumeProyek = $boqMin;
+						}
+						if($volumeProyek > $boqMax)
+						{
+							$volumeProyek = $boqMax;
+						}	
 						
 						$boqProyek = new BillOfQuantityProyek(null, $database);
 
@@ -566,23 +605,9 @@ if(isset($_POST['add-work']))
 
 						$persen = $boqProyek->getVolume() > 0 ? 100 * $boqProyek->getVolumeProyek() / $boqProyek->getVolume() : 0;
 						$boqProyek->setPersen($persen);
-
-						echo $boqProyek;
-
-						try
-						{
-							$boqProyek->findOneByBillOfQuantityIdAndBukuHarianIdAndProyekId(
-								$boqProyek->getBillOfQuantityId(),
-								$boqProyek->getBukuHarianId(),
-								$boqProyek->getProyekId()
-							);
-							$boqProyek->update();
-						}
-						catch(Exception $e)
-						{
-							$boqProyek->insert();
-						}
-
+						
+						$boqProyek->insert();
+						
 						// update BOQ
 						$boq->setVolumeProyek($volumeProyek)->update();
 
@@ -597,9 +622,10 @@ if(isset($_POST['add-work']))
 		}
 	}
 	
-	//header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
+	header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
 	exit();
 }
+
 
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
@@ -844,7 +870,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 require_once __DIR__ . "/inc.app/footer-supervisor.php";
 	}
 }
-else if($inputGet->getUserAction() == 'add-work' && $inputGet->getBukuHarianId() != 0)
+else if(($inputGet->getUserAction() == 'add-work' || $inputGet->getUserAction() == 'add-boq') && $inputGet->getBukuHarianId() != 0)
 {
 	$bukuHarian = new BukuHarian(null, $database);
 	try{
@@ -963,7 +989,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 					</div>
 				</div>
 
+				
 				<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
+				<?php
+				if($inputGet->getUserAction() == 'add-work')
+				{
+				?>
 					<tr>
 					<td>Pekerjaan</td>
 					<td>
@@ -1082,6 +1113,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						</div>
 					</td>
 					</tr>
+					<?php
+				}
+				else if($inputGet->getUserAction() == 'add-boq')
+				{
+				?>
+
 					<tr>
 					<td>Bill of Quality</td>
 					<td>
@@ -1127,15 +1164,17 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 						<input type="hidden" name="pekerjaan_id" value="<?php echo $pekerjaanId;?>">
 						<input type="hidden" name="buku_harian_id" value="<?php echo $bukuHarian->getBukuHarianId();?>">
 						<input type="hidden" name="proyek_id" value="<?php echo $bukuHarian->getProyekId();?>">
-						<input type="hidden" name="option" value="add-work">
 						<div class="button-area">
-							<input type="submit" name="add-work" value="Simpan"  class="btn btn-success">
+							<input type="submit" name="<?php echo $inputGet->getUserAction(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true);?>" value="Simpan"  class="btn btn-success">
 							<input type="button" name="back" value="Batal" onclick="history.go(-1)" class="btn btn-primary">
 							<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 						</div>
 
 						</td>
 					</tr>
+					<?php
+				}
+					?>
 				</table>
 
 				<?php
@@ -1364,6 +1403,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 			?>
 			<div class="button-area">
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-work', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getAddWork();?></button>
+				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('add-boq', Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getAddBillOfQuantity();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::UPDATE, Field::of()->buku_harian_id, $bukuHarian->getBukuHarianId());?>';"><?php echo $appLanguage->getButtonUpdate();?></button>
 				<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl();?>';"><?php echo $appLanguage->getButtonBackToList();?></button>
 				<input type="hidden" name="buku_harian_id" value="<?php echo $bukuHarian->getBukuHarianId();?>"/>

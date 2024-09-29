@@ -126,7 +126,16 @@ class ProyekApv extends MagicObject
 	 * @var KtskMin
 	 */
 	protected $ktsk;
-
+	
+	/**
+	 * Galeri
+	 * 
+	 * @Column(name="galeri", type="bigint(20)", length=20, nullable=true)
+	 * @Label(content="Galeri")
+	 * @var integer
+	 */
+	protected $galeri;
+	
 	/**
 	 * Tanggal Mulai
 	 * 
@@ -144,6 +153,15 @@ class ProyekApv extends MagicObject
 	 * @var string
 	 */
 	protected $tanggalSelesai;
+
+	/**
+	 * Persen
+	 * 
+	 * @Column(name="persen", type="float", nullable=true)
+	 * @Label(content="Persen")
+	 * @var double
+	 */
+	protected $persen;
 
 	/**
 	 * Waktu Buat

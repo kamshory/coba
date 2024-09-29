@@ -8,6 +8,7 @@ use MagicObject\Request\InputPost;
 use MagicApp\PicoModule;
 use MagicApp\AppEntityLanguage;
 use MagicApp\Field;
+use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -142,22 +143,178 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
           </div>
           <!-- /.row-->
 
+          <?php
+          $hari = $appConfig->getHariProyek();
+          
+          $proyekDipilih = array();
+          
+          // dapatkan proyek dengan buku harian 3 hari ke belakang
+          $specsBukuHarian = PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("-$hari days"))))
+            ->addAnd(PicoPredicate::getInstance()->lessThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("1 days"))))
+          ;
+          $sortsBukuHarian = PicoSortable::getInstance()
+            ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
+          ;
+          $finderBukuHarian = new BukuHarian(null, $database);
+          $daftarProyek = array();
+          $daftarNamaSupervisor = array();
+          try
+          {
+            $pageDataBukuHarian = $finderBukuHarian->findAll($specsBukuHarian, null, $sortsBukuHarian);
+            foreach($pageDataBukuHarian->getResult() as $bukuHarian)
+            {
+              $proyekDipilih[$bukuHarian->getProyekId()] = array('proyek_id'=>$bukuHarian->getProyekId(), 'nama'=>$bukuHarian->issetProyek() ? $bukuHarian->getProyek()->getNama() : '');
+              $daftarProyek[] = intval($bukuHarian->getProyekId());
+              $proyekId = $bukuHarian->getProyekId();
+              if($bukuHarian->hasValueSupervisor())
+              {
+                if(!isset($daftarNamaSupervisor[$proyekId]))
+                {
+                  $daftarNamaSupervisor[$proyekId] = array();
+                }
+                $daftarNamaSupervisor[$proyekId][] = $bukuHarian->getSupervisor()->getNama();
+                $daftarNamaSupervisor[$proyekId] = array_unique($daftarNamaSupervisor[$proyekId]);
+
+              }
+              
+            }
+          }
+          catch(Exception $e)
+          {
+            // do nothing
+          }
+
+          $daftarProyek = array_unique($daftarProyek);
+          
+
+          $specsBOQ = PicoSpecification::getInstance()
+            ->addAnd(PicoPredicate::getInstance()->in(Field::of()->proyekId, $daftarProyek))
+            ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->aktif, true))
+            ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, null))
+            ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, 0))
+          ;
+
+          $sortsBOQ = PicoSortable::getInstance()
+            ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
+          ;
+
+          $finderBOQ = new BillOfQuantity(null, $database);
+
+          $listProyek = array();
+          try
+          {
+            $pageDataBOQ = $finderBOQ->findAll($specsBOQ, null, $sortsBukuHarian);
+            $listBOQ = $pageDataBOQ->getResult();
+            foreach($listBOQ as $idx=>$boq)
+            {
+              if(!isset($listProyek[$boq->getProyekId()]))
+              {
+                $listProyek[$boq->getProyekId()] = array();
+              }
+              $listProyek[$boq->getProyekId()][] = $boq;
+            }
+          }
+          catch(Exception $e)
+          {
+            // do nothing
+          }
+
+
+          ?>
+
 
           <div class="card mb-4">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h4 class="card-title mb-0">Traffic</h4>
-                  <div class="small text-body-secondary">January - July 2023</div>
+                  <h4 class="card-title mb-0">Progres Proyek</h4>
+                  <div class="small text-body-secondary"><span id="min-date"></span> - <span id="max-date"></span></div>
                 </div>
                 <div class="btn-toolbar d-none d-md-block" role="toolbar" aria-label="Toolbar with buttons">
                   <div class="btn-group btn-group-toggle mx-3" data-coreui-toggle="buttons">
-                    <input class="btn-check" id="option1" type="radio" name="options" autocomplete="off">
-                    <label class="btn btn-outline-secondary"> Day</label>
-                    <input class="btn-check" id="option2" type="radio" name="options" autocomplete="off" checked="">
-                    <label class="btn btn-outline-secondary active"> Month</label>
-                    <input class="btn-check" id="option3" type="radio" name="options" autocomplete="off">
-                    <label class="btn btn-outline-secondary"> Year</label>
+                  <style>
+                    #proyek_id{
+                      max-width: 200px;
+                    }
+                  </style>
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelector('#proyek_id').addEventListener('change', function(e){
+                      if(e.target.value != '')
+                      {
+                        fetch('../lib.mobile-tools/ajax-progress-proyek.php?proyek_id='+e.target.value, {
+                          method: 'GET',
+                          headers: {
+                              'Content-Type': 'application/json'
+                          }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok ' + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                          createChart(data);
+                          document.querySelector('#min-date').innerHTML = data.minDate;
+                          document.querySelector('#max-date').innerHTML = data.maxDate;
+                        })
+                        .catch(error => {
+                            console.error('There has been a problem with your fetch operation:', error);
+                        });
+                      }
+                    })
+                  });
+
+
+                    var chart;
+                    var ctx;
+                    function createChart(config)
+                    {
+                      ctx = document.getElementById('main-chart2').getContext('2d');
+                      Chart.register({
+                          id: 'moment',
+                          beforeInit: function(chart) {
+                              chart.data.labels = chart.data.labels.map(function(label) {
+                              return moment(label).format('YYYY-MM-DD HH:mm:ss');
+                              });
+                          }
+                      });
+
+                      
+                      if(chart)
+                      {
+                          chart.destroy();
+                      }
+
+                      config.options.plugins.tooltip = {
+                        callbacks: {
+                          label: function(tooltipItem) {
+                            let label = tooltipItem.dataset.label;
+                            let value = tooltipItem.raw.y.toFixed(2);
+                            return ` ${label}: ${value}%`;
+                          }
+                        }
+                      };
+                      chart = new Chart(ctx, config);
+                  }
+
+                  </script>
+                  <form action="">
+                  <select class="form-control" id="proyek_id">
+                  <option value="">- Pilih Proyek -</option>
+                  <?php
+                      
+                  foreach($proyekDipilih as $proyekObj)
+                  {
+                      ?>
+                      <option value="<?php echo $proyekObj['proyek_id'];?>"><?php echo $proyekObj['nama'];?></option>
+                      <?php
+                  }
+                  ?>
+              </select>
+              </form>
                   </div>
                   <button class="btn btn-primary" type="button">
                     <svg class="icon">
@@ -166,8 +323,8 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                   </button>
                 </div>
               </div>
-              <div class="c-chart-wrapper" style="height:300px;margin-top:40px;">
-                <canvas class="chart" id="main-chart" height="300" style="display: block; box-sizing: border-box; height: 300px; width: 1238px;" width="1238"></canvas>
+              <div class="c-chart-wrapper" style="height:400px;margin-top:40px;">
+                <canvas class="chart" id="main-chart2" height="400" style="display: block; box-sizing: border-box; height: 400px; width: 1238px;" width="1238"></canvas>
               </div>
             </div>
             <div class="card-footer">
@@ -491,77 +648,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                   </div>
                   <!-- /.row--><br>
 
-                  <?php
-                  $hari = 14;
                   
-                  
-                  // dapatkan proyek dengan buku harian 3 hari ke belakang
-                  $specsBukuHarian = PicoSpecification::getInstance()
-                    ->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("-$hari days"))))
-                    ->addAnd(PicoPredicate::getInstance()->lessThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("1 days"))))
-                  ;
-                  $sortsBukuHarian = PicoSortable::getInstance()
-                    ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
-                  ;
-                  $finderBukuHarian = new BukuHarian(null, $database);
-                  $daftarProyek = array();
-                  $daftarNamaSupervisor = array();
-                  try
-                  {
-                    $pageDataBukuHarian = $finderBukuHarian->findAll($specsBukuHarian, null, $sortsBukuHarian);
-                    foreach($pageDataBukuHarian->getResult() as $bukuHarian)
-                    {
-                      $daftarProyek[] = intval($bukuHarian->getProyekId());
-                      if($bukuHarian->hasValueSupervisor())
-                      {
-                        $daftarNamaSupervisor[] = $bukuHarian->getSupervisor()->getNama();
-                      }
-                      
-                    }
-                  }
-                  catch(Exception $e)
-                  {
-                    // do nothing
-                  }
-
-                  $daftarProyek = array_unique($daftarProyek);
-                  $daftarNamaSupervisor = array_unique($daftarNamaSupervisor);
-                  
-
-                  $specsBOQ = PicoSpecification::getInstance()
-                    ->addAnd(PicoPredicate::getInstance()->in(Field::of()->proyekId, $daftarProyek))
-                    ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->aktif, true))
-                    ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, null))
-                    ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, 0))
-                  ;
-
-                  $sortsBOQ = PicoSortable::getInstance()
-                    ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
-                  ;
-
-                  $finderBOQ = new BillOfQuantity(null, $database);
-
-                  $listProyek = array();
-                  try
-                  {
-                    $pageDataBOQ = $finderBOQ->findAll($specsBOQ, null, $sortsBukuHarian);
-                    $listBOQ = $pageDataBOQ->getResult();
-                    foreach($listBOQ as $idx=>$boq)
-                    {
-                      if(!isset($listProyek[$boq->getProyekId()]))
-                      {
-                        $listProyek[$boq->getProyekId()] = array();
-                      }
-                      $listProyek[$boq->getProyekId()][] = $boq;
-                    }
-                  }
-                  catch(Exception $e)
-                  {
-                    // do nothing
-                  }
-
-
-                  ?>
 
 
                   <div class="table-responsive">
@@ -578,6 +665,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                         <?php
                         foreach($listProyek as $bh)
                         {
+                          $proyekId = $bh[0]->getProyekId();
                           $namaProyek = $bh[0]->hasValueProyek() ? $bh[0]->getProyek()->getNama() : "";
                           $waktuBuatProyek = $bh[0]->hasValueProyek() ? $bh[0]->getProyek()->getWaktuBuat() : "";
                           if(strlen($namaProyek) > 50)
@@ -638,7 +726,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                           </td>
 
                           <td>
-                            <div class="small text-body-secondary"><?php echo implode("<br>\r\n", $daftarNamaSupervisor);?></div>
+                            <div class="small text-body-secondary"><?php echo implode("<br>\r\n", $daftarNamaSupervisor[$proyekId]);?></div>
                           </td>
                           <td>
                             <div class="dropdown">
@@ -672,6 +760,12 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
+
+    <script src='lib.assets/chart/chart.js'></script>
+    <script src='lib.assets/chart/date-fns.js'></script>
+    <script src='lib.assets/chart/chartjs-adapter-date-fns.js'></script>
+    <script src='lib.assets/chart/moment.min.js'></script>
+
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/utils/js/index.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/main.js"></script>
         

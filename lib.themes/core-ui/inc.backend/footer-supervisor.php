@@ -6,6 +6,7 @@
         <div class="ms-auto">Powered by <a href="https://planetbiru.com">Planetbiru Studio</a></div>
       </footer>
     </div>
+    </div>
     <!-- CoreUI and necessary plugins-->
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/coreui/js/coreui.bundle.min.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/simplebar/js/simplebar.min.js"></script>
