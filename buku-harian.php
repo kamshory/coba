@@ -30,8 +30,11 @@ use Sipro\Entity\Data\LokasiProyek;
 use Sipro\Entity\Data\MaterialProyek;
 use Sipro\Entity\Data\Pekerjaan;
 use Sipro\Entity\Data\PeralatanProyek;
+use Sipro\Entity\Data\ProgresProyek;
+use Sipro\Entity\Data\Proyek;
 use Sipro\Entity\Data\SupervisorProyek;
 use Sipro\Entity\Data\TipePondasi;
+use Sipro\Util\BoqUtil;
 use Sipro\Util\CalendarUtil;
 use Sipro\Util\CommonUtil;
 use Sipro\Util\DateUtil;
@@ -621,8 +624,38 @@ if(isset($_POST['add-boq']))
 			}
 		}
 	}
+
+	// update rata-rata
+	$boqFinder = new BillOfQuantity(null, $database);
+	try
+	{
+		$boqData = $boqFinder->findByProyekId($proyekId);
+		$boqResult = $boqData->getResult();
+		$persen = BoqUtil::getAveragePercent($boqResult);
+		if($persen > 0)
+		{
+			$progresProyek = new ProgresProyek(null, $database);
+			$progresProyek->setProyekId($proyekId);
+			$progresProyek->setPersen($persen);
+			$progresProyek->setAktif(true);
+			$progresProyek->setIpBuat($ipBuat);
+			$progresProyek->setIpUbah($ipUbah);
+			$progresProyek->setWaktuBuat($waktuBuat);
+			$progresProyek->setWaktuUbah($waktuUbah);
+			$progresProyek->setSupervisorBuat($currentLoggedInSupervisor->getSupervisorId());
+			$progresProyek->setSupervisorUbah($currentLoggedInSupervisor->getSupervisorId());
+			$progresProyek->insert();
+
+			$proyek = new Proyek(null, $database);
+			$proyek->setProyekId($proyekId)->setPersen($persen)->update();
+		}
+	}
+	catch(Exception $e)
+	{
+		
+	}
 	
-	header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
+	//header("Location: ".basename($_SERVER['PHP_SELF'])."?option=detail&buku_harian_id=$bukuHarianId");
 	exit();
 }
 

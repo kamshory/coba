@@ -57,6 +57,40 @@ class BoqUtil
     }
 
     /**
+     * Calculate percent
+     *
+     * @param BillOfQuantity[] $boqs
+     * @return float
+     */
+    public static function getAveragePercent($boqs)
+    {
+        $persenRata = 0;
+        if(isset($boqs) && is_array($boqs))
+        {
+            $bobotTotal = 0;
+            $persenTotal = 0;
+            $persenItem = 0;
+            foreach($boqs as $boq)
+            {
+                if($boq->getVolume() > 0)
+                {
+                    $percent = $boq->getVolume() > 0 ? (100 * $boq->getVolumeProyek() / $boq->getVolume()) : 0; 
+                    $bobot = $boq->getBobot();
+                    if($bobot == 0)
+                    {
+                        $bobot = 1;
+                    }
+                    $bobotTotal += $bobot;
+                    $persenTotal += ($percent * $bobot);
+                    $persenItem++;
+                }
+            }
+            $persenRata = $bobotTotal > 0 ? $persenTotal/$bobotTotal : 0; 
+        }
+        return $persenRata;
+    }
+
+    /**
      * Create temporary data
      * @return void
      */

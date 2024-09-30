@@ -7,12 +7,35 @@ use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
+use Sipro\Entity\Data\BillOfQuantity;
 use Sipro\Entity\Data\BillOfQuantityProyek;
+use Sipro\Entity\Data\Proyek;
+use Sipro\Util\BoqUtil;
 
 require_once __DIR__ . "/inc.app/auth-supervisor.php";
 
 $boqProyek = new BillOfQuantityProyek(null, $database);
 $proyekId = 168;
+
+
+$boqFinder = new BillOfQuantity(null, $database);
+	try
+	{
+		$boqData = $boqFinder->findByProyekId($proyekId);
+		$boqResult = $boqData->getResult();
+		$persen = BoqUtil::getAveragePercent($boqResult);
+		if($persen > 0)
+		{
+			$proyek = new Proyek(null, $database);
+			$proyek->setProyekId($proyekId)->setPersen($persen)->update();
+		}
+	}
+	catch(Exception $e)
+	{
+		
+	}
+  exit();
+
 $proyek = null;
 try
 {

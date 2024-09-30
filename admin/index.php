@@ -164,7 +164,11 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
             $pageDataBukuHarian = $finderBukuHarian->findAll($specsBukuHarian, null, $sortsBukuHarian);
             foreach($pageDataBukuHarian->getResult() as $bukuHarian)
             {
-              $proyekDipilih[$bukuHarian->getProyekId()] = array('proyek_id'=>$bukuHarian->getProyekId(), 'nama'=>$bukuHarian->issetProyek() ? $bukuHarian->getProyek()->getNama() : '');
+              $proyekDipilih[$bukuHarian->getProyekId()] = array(
+                'proyek_id'=>$bukuHarian->getProyekId(), 
+                'nama'=>$bukuHarian->issetProyek() ? $bukuHarian->getProyek()->getNama() : '',
+                'persen'=>$bukuHarian->issetProyek() ? floatval($bukuHarian->getProyek()->getPersen()) : 0
+              );
               $daftarProyek[] = intval($bukuHarian->getProyekId());
               $proyekId = $bukuHarian->getProyekId();
               if($bukuHarian->hasValueSupervisor())
@@ -228,10 +232,10 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h4 class="card-title mb-0">Progres Proyek</h4>
+                  <h4 class="card-title mb-0 text-nowrap text-truncate d-inline-block">Progres Proyek</h4>
                   <div class="small text-body-secondary"><span id="min-date"></span> - <span id="max-date"></span></div>
                 </div>
-                <div class="btn-toolbar d-none d-md-block" role="toolbar" aria-label="Toolbar with buttons">
+                <div class="btn-toolbar d-md-block" role="toolbar" aria-label="Toolbar with buttons">
                   <div class="btn-group btn-group-toggle mx-3" data-coreui-toggle="buttons">
                   <style>
                     #proyek_id{
@@ -316,11 +320,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
               </select>
               </form>
                   </div>
-                  <button class="btn btn-primary" type="button">
-                    <svg class="icon">
-                      <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-cloud-download"></use>
-                    </svg>
-                  </button>
+
                 </div>
               </div>
               <div class="c-chart-wrapper" style="height:400px;margin-top:40px;">
@@ -328,42 +328,43 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
               </div>
             </div>
             <div class="card-footer">
-              <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 row-cols-xl-5 g-4 mb-2 text-center">
+            <?php
+              $proyekDipilihVal = array_values($proyekDipilih);
+              $nproyek = count($proyekDipilihVal);
+
+              if($nproyek >= 4)
+              {
+                $class = "row-cols-1 row-cols-sm-2 row-cols-lg-4 row-cols-xl-4";
+              }
+              else if($nproyek == 3)
+              {
+                $class = "row-cols-1 row-cols-sm-3 row-cols-lg-3 row-cols-xl-3";
+              }
+              else if($nproyek == 2)
+              {
+                $class = "row-cols-1 row-cols-sm-2 row-cols-lg-2 row-cols-xl-2";
+              }
+              else if($nproyek == 1)
+              {
+                $class = "row-cols-1 row-cols-sm-1 row-cols-lg-1 row-cols-xl-1";
+              }
+              ?>
+
+              <div class="row <?php echo $class;?> mb-2 text-center">
+                <?php
+                for($i = $nproyek - 1, $j = 0; $i >= 0 && $j < 4; $i--, $j++)
+                {
+                ?>
                 <div class="col">
-                  <div class="text-body-secondary">Visits</div>
-                  <div class="fw-semibold text-truncate">29.703 Users (40%)</div>
+                  <div class="text-body-secondary text-nowrap text-truncate d-inline-block" style="width: 100%;"><?php echo $proyekDipilihVal[$i]['nama'];?></div>
+                  <div class="fw-semibold text-truncate">Progress <?php echo number_format($proyekDipilihVal[$i]['persen'], 2);?>%</div>
                   <div class="progress progress-thin mt-2">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $proyekDipilihVal[$i]['persen'];?>%" aria-valuenow="<?php echo $proyekDipilihVal[$i]['persen'];?>" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
-                <div class="col">
-                  <div class="text-body-secondary">Unique</div>
-                  <div class="fw-semibold text-truncate">24.093 Users (20%)</div>
-                  <div class="progress progress-thin mt-2">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="text-body-secondary">Pageviews</div>
-                  <div class="fw-semibold text-truncate">78.706 Views (60%)</div>
-                  <div class="progress progress-thin mt-2">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="text-body-secondary">New Users</div>
-                  <div class="fw-semibold text-truncate">22.123 Users (80%)</div>
-                  <div class="progress progress-thin mt-2">
-                    <div class="progress-bar bg-danger" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-                <div class="col d-none d-xl-block">
-                  <div class="text-body-secondary">Bounce Rate</div>
-                  <div class="fw-semibold text-truncate">40.15%</div>
-                  <div class="progress progress-thin mt-2">
-                    <div class="progress-bar" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
+                <?php
+                }
+                ?>
               </div>
             </div>
           </div>
