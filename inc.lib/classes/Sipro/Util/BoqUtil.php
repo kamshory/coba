@@ -65,7 +65,7 @@ class BoqUtil
     public static function getAveragePercent($boqs)
     {
         $persenRata = 0;
-        if(isset($boqs) && is_array($boqs))
+        if(self::isArray($boqs))
         {
             $bobotTotal = 0;
             $persenTotal = 0;
@@ -74,12 +74,9 @@ class BoqUtil
             {
                 if($boq->getVolume() > 0)
                 {
-                    $percent = $boq->getVolume() > 0 ? (100 * $boq->getVolumeProyek() / $boq->getVolume()) : 0; 
-                    $bobot = $boq->getBobot();
-                    if($bobot == 0)
-                    {
-                        $bobot = 1;
-                    }
+                    $percent = self::percent($boq); 
+                    $bobot = self::bobot($boq->getBobot());
+                    
                     $bobotTotal += $bobot;
                     $persenTotal += ($percent * $bobot);
                     $persenItem++;
@@ -88,6 +85,43 @@ class BoqUtil
             $persenRata = $bobotTotal > 0 ? $persenTotal/$bobotTotal : 0; 
         }
         return $persenRata;
+    }
+    
+    /**
+     * Get bobot
+     *
+     * @param float $bobot
+     * @return float
+     */
+    public static function bobot($bobot)
+    {
+        if($bobot == 0)
+        {
+            $bobot = 1;
+        }
+        return $bobot;
+    }
+    
+    /**
+     * Get percent
+     *
+     * @param BillOfQuantity $boq
+     * @return float
+     */
+    public static function percent($boq)
+    {
+        return $boq->getVolume() > 0 ? (100 * $boq->getVolumeProyek() / $boq->getVolume()) : 0;
+    }
+    
+    /**
+     * Check if input is array
+     *
+     * @param BillOfQuantity[] $boqs
+     * @return boolean
+     */
+    public static function isArray($boqs)
+    {
+        return isset($boqs) && is_array($boqs);
     }
 
     /**

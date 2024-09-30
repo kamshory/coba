@@ -11,7 +11,6 @@ use MagicObject\Database\PicoPageData;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
-use PDO;
 use Sipro\Entity\Data\AcuanPengawasan;
 use Sipro\Entity\Data\AkhirPekan;
 use Sipro\Entity\Data\HariLibur;
