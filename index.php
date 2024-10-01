@@ -5,7 +5,6 @@
 
 use MagicApp\Field;
 use MagicApp\PicoModule;
-use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -27,111 +26,6 @@ $currentModule = new PicoModule($appConfig, $database, null, "/", "index", "Hala
 
 require_once __DIR__ . "/inc.app/header-supervisor.php";
 ?> 
-    <div class="container">
-    <div class="row g-4 mb-4">
-      <div class="col-sm-6 col-xl-3">
-        <div class="card text-white bg-primary">
-          <div class="card-body pb-0 d-flex justify-content-between align-items-start">
-            <div>
-              <div class="fs-4 fw-semibold">26K <span class="fs-6 fw-normal">(-12.4%
-                  <svg class="icon">
-                    <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-arrow-bottom"></use>
-                  </svg>)</span></div>
-              <div>Users</div>
-            </div>
-            <div class="dropdown">
-              <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <svg class="icon">
-                  <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-options"></use>
-                </svg>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
-            </div>
-          </div>
-          <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
-            <canvas class="chart" id="card-chart1" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 266px;" width="266"></canvas>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-->
-      <div class="col-sm-6 col-xl-3">
-        <div class="card text-white bg-info">
-          <div class="card-body pb-0 d-flex justify-content-between align-items-start">
-            <div>
-              <div class="fs-4 fw-semibold">$6.200 <span class="fs-6 fw-normal">(40.9%
-                  <svg class="icon">
-                    <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-arrow-top"></use>
-                  </svg>)</span></div>
-              <div>Income</div>
-            </div>
-            <div class="dropdown">
-              <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <svg class="icon">
-                  <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-options"></use>
-                </svg>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
-            </div>
-          </div>
-          <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
-            <canvas class="chart" id="card-chart2" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 266px;" width="266"></canvas>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-->
-      <div class="col-sm-6 col-xl-3">
-        <div class="card text-white bg-warning">
-          <div class="card-body pb-0 d-flex justify-content-between align-items-start">
-            <div>
-              <div class="fs-4 fw-semibold">2.49% <span class="fs-6 fw-normal">(84.7%
-                  <svg class="icon">
-                    <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-arrow-top"></use>
-                  </svg>)</span></div>
-              <div>Conversion Rate</div>
-            </div>
-            <div class="dropdown">
-              <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <svg class="icon">
-                  <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-options"></use>
-                </svg>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
-            </div>
-          </div>
-          <div class="c-chart-wrapper mt-3" style="height:70px;">
-            <canvas class="chart" id="card-chart3" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 298px;" width="298"></canvas>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-->
-      <div class="col-sm-6 col-xl-3">
-        <div class="card text-white bg-danger">
-          <div class="card-body pb-0 d-flex justify-content-between align-items-start">
-            <div>
-              <div class="fs-4 fw-semibold">44K <span class="fs-6 fw-normal">(-23.6%
-                  <svg class="icon">
-                    <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-arrow-bottom"></use>
-                  </svg>)</span></div>
-              <div>Sessions</div>
-            </div>
-            <div class="dropdown">
-              <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <svg class="icon">
-                  <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-options"></use>
-                </svg>
-              </button>
-              <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
-            </div>
-          </div>
-          <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
-            <canvas class="chart" id="card-chart4" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 266px;" width="266"></canvas>
-          </div>
-        </div>
-      </div>
-      <!-- /.col-->
-    </div>
-    <!-- /.row-->
-
 
     <?php
     $hari = $appConfig->getHariProyek();
@@ -214,8 +108,62 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
       // do nothing
     }
 
+    $proyekDipilihVal = array_values($proyekDipilih);
+    $nproyek = count($proyekDipilihVal);
+
+    if($nproyek >= 4)
+    {
+      $class = "col-sm-12 col-xl-3";
+    }
+    else if($nproyek == 3)
+    {
+      $class = "col-sm-12 col-xl-4";
+    }
+    else if($nproyek == 2)
+    {
+      $class = "col-sm-12 col-xl-6";
+    }
+    else if($nproyek == 1)
+    {
+      $class = "col-sm-12 col-xl-12";
+    }
 
     ?>
+
+    <div class="container">
+    <div class="row g-4 mb-4 progres-proyek-container">
+      
+    <?php
+      for($i = $nproyek - 1, $j = 0; $i >= 0 && $j < 4; $i--, $j++)
+      {
+      ?>
+      <div data-index="1" data-proyek-id="<?php echo $proyekDipilihVal[$i]['proyek_id'];?>" class="progres-proyek col-sm-12 col-xl-3">
+        <div class="card text-white bg-info pb-3">
+          <div class="card-body pb-0 d-flex justify-content-between align-items-start position-relative w-100 box-sizing-border-box">
+            <div class="position-relative w-100 box-sizing-border-box">
+              <div class="position-relative w-100 box-sizing-border-box fs-5 fw-semibold proyek-persen">Progres <?php echo $proyekDipilihVal[$i]['persen'];?>%</div>
+              <div class="position-relative w-100 box-sizing-border-box proyek-nama text-nowrap text-truncate d-inline-block"><?php echo $proyekDipilihVal[$i]['nama'];?></div>
+            </div>
+          </div>
+          <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+            <canvas class="chart" id="card-chart-<?php echo $j;?>" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 266px;" width="266"></canvas>
+          </div>
+          <div class="px-3">
+            <div class="progress progress-thin">
+              <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $proyekDipilihVal[$i]['persen'];?>%" aria-valuenow="<?php echo $proyekDipilihVal[$i]['persen'];?>" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.col-->
+       <?php
+      }
+      ?>
+      
+
+    </div>
+
+    <!-- /.row-->
 
     <div class="card mb-4">
       <div class="card-body">
@@ -236,7 +184,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
               document.querySelector('#proyek_id').addEventListener('change', function(e){
                 if(e.target.value != '')
                 {
-                  fetch('lib.mobile-tools/ajax-progress-proyek.php?proyek_id='+e.target.value, {
+                  fetch('lib.mobile-tools/ajax-proyek-boq.php?proyek_id='+e.target.value, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -257,7 +205,31 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
                       console.error('There has been a problem with your fetch operation:', error);
                   });
                 }
+              });
+              let proyeks = [];
+              $('.progres-proyek').each(function(){
+                proyeks.push('proyeks[]='+$(this).attr('data-proyek-id'));
+              });
+
+
+              fetch('lib.mobile-tools/ajax-proyek-progres.php?'+proyeks.join('&'), {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
               })
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error('Network response was not ok ' + response.statusText);
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                console.log(data)
+              })
+              .catch(error => {
+                  console.error('There has been a problem with your fetch operation:', error);
+              });
             });
           
               var chart;
@@ -314,264 +286,18 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
           <canvas class="chart" id="main-chart2" height="400" style="display: block; box-sizing: border-box; height: 400px; width: 1238px;" width="1238"></canvas>
         </div>
       </div>
-      <div class="card-footer">
-        <?php
-        $proyekDipilihVal = array_values($proyekDipilih);
-        $nproyek = count($proyekDipilihVal);
-
-        if($nproyek >= 4)
-        {
-          $class = "row-cols-1 row-cols-sm-2 row-cols-lg-4 row-cols-xl-4";
-        }
-        else if($nproyek == 3)
-        {
-          $class = "row-cols-1 row-cols-sm-3 row-cols-lg-3 row-cols-xl-3";
-        }
-        else if($nproyek == 2)
-        {
-          $class = "row-cols-1 row-cols-sm-2 row-cols-lg-2 row-cols-xl-2";
-        }
-        else if($nproyek == 1)
-        {
-          $class = "row-cols-1 row-cols-sm-1 row-cols-lg-1 row-cols-xl-1";
-        }
-        ?>
-
-        <div class="row <?php echo $class;?> mb-2 text-center">
-          <?php
-          for($i = $nproyek - 1, $j = 0; $i >= 0 && $j < 4; $i--, $j++)
-          {
-          ?>
-          <div class="col">
-            <div class="text-body-secondary text-nowrap text-truncate d-inline-block" style="width: 100%;"><?php echo $proyekDipilihVal[$i]['nama'];?></div>
-            <div class="fw-semibold text-truncate">Progress <?php echo number_format($proyekDipilihVal[$i]['persen'], 2);?>%</div>
-            <div class="progress progress-thin mt-2">
-              <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $proyekDipilihVal[$i]['persen'];?>%" aria-valuenow="<?php echo $proyekDipilihVal[$i]['persen'];?>" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-          </div>
-          <?php
-          }
-          ?>
-        </div>
-      </div>
     </div>
     <!-- /.card-->
-    
     
     <!-- /.row-->
     <div class="row">
       <div class="col-md-12">
         <div class="card mb-4">
-          <div class="card-header">Traffic &amp; Sales</div>
+          <div class="card-header">Progress Pekerjaan Proyek</div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-sm-6">
-                <div class="row">
-                  <div class="col-6">
-                    <div class="border-start border-start-4 border-start-info px-3 mb-3">
-                      <div class="small text-body-secondary text-truncate">New Clients</div>
-                      <div class="fs-5 fw-semibold">9.123</div>
-                    </div>
-                  </div>
-                  <!-- /.col-->
-                  <div class="col-6">
-                    <div class="border-start border-start-4 border-start-danger px-3 mb-3">
-                      <div class="small text-body-secondary text-truncate">Recuring Clients</div>
-                      <div class="fs-5 fw-semibold">22.643</div>
-                    </div>
-                  </div>
-                  <!-- /.col-->
-                </div>
-                <!-- /.row-->
-                <hr class="mt-0">
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Monday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 34%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Tuesday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Wednesday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 12%" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Thursday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 91%" aria-valuenow="91" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Friday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 22%" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 73%" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Saturday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 53%" aria-valuenow="53" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-4">
-                  <div class="progress-group-prepend"><span class="text-body-secondary small">Sunday</span></div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-info" role="progressbar" style="width: 9%" aria-valuenow="9" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-danger" role="progressbar" style="width: 69%" aria-valuenow="69" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- /.col-->
-              <div class="col-sm-6">
-                <div class="row">
-                  <div class="col-6">
-                    <div class="border-start border-start-4 border-start-warning px-3 mb-3">
-                      <div class="small text-body-secondary text-truncate">Pageviews</div>
-                      <div class="fs-5 fw-semibold">78.623</div>
-                    </div>
-                  </div>
-                  <!-- /.col-->
-                  <div class="col-6">
-                    <div class="border-start border-start-4 border-start-success px-3 mb-3">
-                      <div class="small text-body-secondary text-truncate">Organic</div>
-                      <div class="fs-5 fw-semibold">49.123</div>
-                    </div>
-                  </div>
-                  <!-- /.col-->
-                </div>
-                <!-- /.row-->
-                <hr class="mt-0">
-                <div class="progress-group">
-                  <div class="progress-group-header">
-                    <svg class="icon icon-lg me-2">
-                      <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-user"></use>
-                    </svg>
-                    <div>Male</div>
-                    <div class="ms-auto fw-semibold">43%</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group mb-5">
-                  <div class="progress-group-header">
-                    <svg class="icon icon-lg me-2">
-                      <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-user-female"></use>
-                    </svg>
-                    <div>Female</div>
-                    <div class="ms-auto fw-semibold">37%</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group">
-                  <div class="progress-group-header">
-
-                    <div>Organic Search</div>
-                    <div class="ms-auto fw-semibold me-2">191.235</div>
-                    <div class="text-body-secondary small">(56%)</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group">
-                  <div class="progress-group-header">
-
-                    <div>Facebook</div>
-                    <div class="ms-auto fw-semibold me-2">51.223</div>
-                    <div class="text-body-secondary small">(15%)</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group">
-                  <div class="progress-group-header">
-
-                    <div>Twitter</div>
-                    <div class="ms-auto fw-semibold me-2">37.564</div>
-                    <div class="text-body-secondary small">(11%)</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 11%" aria-valuenow="11" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="progress-group">
-                  <div class="progress-group-header">
-
-                    <div>LinkedIn</div>
-                    <div class="ms-auto fw-semibold me-2">27.319</div>
-                    <div class="text-body-secondary small">(8%)</div>
-                  </div>
-                  <div class="progress-group-bars">
-                    <div class="progress progress-thin">
-                      <div class="progress-bar bg-success" role="progressbar" style="width: 8%" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- /.col-->
-            </div>
-            <!-- /.row--><br>
-            
-            
             
             <?php
             $hari = $appConfig->getHariProyek();
-            
             
             // dapatkan proyek dengan buku harian 3 hari ke belakang
             $specsBukuHarian = PicoSpecification::getInstance()
@@ -599,9 +325,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
                   }
                   $daftarNamaSupervisor[$proyekId][] = $bukuHarian->getSupervisor()->getNama();
                   $daftarNamaSupervisor[$proyekId] = array_unique($daftarNamaSupervisor[$proyekId]);
-
                 }
-                
               }
             }
             catch(Exception $e)
@@ -610,7 +334,6 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
             }
 
             $daftarProyek = array_unique($daftarProyek);
-            
 
             $specsBOQ = PicoSpecification::getInstance()
               ->addAnd(PicoPredicate::getInstance()->in(Field::of()->proyekId, $daftarProyek))
@@ -644,9 +367,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
               // do nothing
             }
 
-
             ?>
-
 
             <div class="table-responsive">
               <table class="table border mb-0">
@@ -746,7 +467,6 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
               </table>
             </div>
 
-
           </div>
         </div>
       </div>
@@ -758,12 +478,10 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
-
-    <script src='lib.assets/chart/chart.js'></script>
-    <script src='lib.assets/chart/date-fns.js'></script>
-    <script src='lib.assets/chart/chartjs-adapter-date-fns.js'></script>
-    <script src='lib.assets/chart/moment.min.js'></script>
-
+    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/chart.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/date-fns.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/chartjs-adapter-date-fns.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/moment.min.js'></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/utils/js/index.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/main.js"></script>
         

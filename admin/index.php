@@ -247,7 +247,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                     document.querySelector('#proyek_id').addEventListener('change', function(e){
                       if(e.target.value != '')
                       {
-                        fetch('../lib.mobile-tools/ajax-progress-proyek.php?proyek_id='+e.target.value, {
+                        fetch('../lib.mobile-tools/ajax-proyek-boq.php?proyek_id='+e.target.value, {
                           method: 'GET',
                           headers: {
                               'Content-Type': 'application/json'
