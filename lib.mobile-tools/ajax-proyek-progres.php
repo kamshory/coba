@@ -16,7 +16,7 @@ $template = '{
   "data": {
     "labels": ["January", "February", "March", "April", "May", "June", "July"],
     "datasets": [{
-      "label": "Progres",
+      "label": "Progres Proyek",
       "backgroundColor": "rgba(255,255,255,.55)",
       "borderColor": "rgba(180,180,180,.85)",
       "pointBackgroundColor": "coreui.Utils.getStyle(\'--cui-primary\')",
@@ -44,8 +44,8 @@ $template = '{
         }
       },
       "y": {
-        "min": 0,
-        "max": 100,
+        "min": -8,
+        "max": 108,
         "display": false,
         "grid": {
           "display": false
@@ -70,17 +70,11 @@ $template = '{
 }
 ';
 
+$dateFormat = 'j M Y H:i';
+
 
 $config = [];
-$config[0] = new MagicObject();
-$config[1] = new MagicObject();
-$config[2] = new MagicObject();
-$config[3] = new MagicObject();
 
-$config[0]->loadJsonString($template, false, true, true);
-$config[1]->loadJsonString($template, false, true, true);
-$config[2]->loadJsonString($template, false, true, true);
-$config[3]->loadJsonString($template, false, true, true);
 $inputGet = new InputGet();
 if($inputGet->countableProyeks())
 {
@@ -88,7 +82,8 @@ if($inputGet->countableProyeks())
     $i = 0;
     foreach($proyeks as $proyekId)
     {
-        
+        $config[$i] = new MagicObject();
+        $config[$i]->loadJsonString($template, false, true, true);
         $keys = [];
         $values = [];
         try
@@ -105,7 +100,7 @@ if($inputGet->countableProyeks())
 
             foreach($rows as $row)
             {
-                $keys[] = DateUtil::translateDate($appLanguage, date('j M Y H:i', strtotime($row->getWaktuBuat())));
+                $keys[] = DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($row->getWaktuBuat())));
                 $values[] = $row->getPersen();           
             }
         }
@@ -113,8 +108,11 @@ if($inputGet->countableProyeks())
         {
             $proyek = new Proyek(null, $database);
             $proyek->find($proyekId);
-            $keys = [DateUtil::translateDate($appLanguage, date('j M Y H:i', strtotime($proyek->getWaktuUbah())))];
-            $values = [$proyek->getPersen()];
+            $keys = [
+              DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuBuat()))),
+              DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuUbah())))
+            ];
+            $values = [0, $proyek->getPersen()];
 
         }
         $config[$i]->getData()->setLabels($keys);

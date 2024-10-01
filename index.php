@@ -180,6 +180,9 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
               }
             </style>
             <script>
+              
+
+              
               document.addEventListener('DOMContentLoaded', function() {
               document.querySelector('#proyek_id').addEventListener('change', function(e){
                 if(e.target.value != '')
@@ -225,7 +228,26 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
                   return response.json();
               })
               .then(data => {
-                console.log(data)
+                let cardChart = {};
+                for(let i in data)
+                {
+                 let config = data[i];
+                 config.options.plugins.tooltip = {
+                  callbacks: {
+                    label: function(tooltipItem) {
+                      let label = tooltipItem.dataset.label;
+                      let value = tooltipItem.raw.toFixed(2);
+                      return ` ${label}: ${value}%`;
+                    }
+                  }
+                };
+                
+                if(chart)
+                {
+                    chart.destroy();
+                }
+                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config);
+                }
               })
               .catch(error => {
                   console.error('There has been a problem with your fetch operation:', error);
@@ -478,12 +500,35 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
     <link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
-    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/chart.js'></script>
-    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/date-fns.js'></script>
-    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/chartjs-adapter-date-fns.js'></script>
-    <script src='<?php echo $baseAssetsUrl;?><?php echo $themePath;?>lib.assets/chart/moment.min.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js'></script>
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/utils/js/index.js"></script>
-    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>js/main.js"></script>
+    
+    <script>
+      Chart.defaults.pointHitDetectionRadius = 1;
+      Chart.defaults.plugins.tooltip.enabled = false;
+      Chart.defaults.plugins.tooltip.mode = 'index';
+      Chart.defaults.plugins.tooltip.position = 'nearest';
+      Chart.defaults.plugins.tooltip.external = coreui.ChartJS.customTooltips;
+      Chart.defaults.defaultFontColor = coreui.Utils.getStyle('--cui-body-color');
+      document.documentElement.addEventListener('ColorSchemeChange', () => {
+        cardChart1.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--cui-primary');
+        cardChart2.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--cui-info');
+        mainChart.options.scales.x.grid.color = coreui.Utils.getStyle('--cui-border-color-translucent');
+        mainChart.options.scales.x.ticks.color = coreui.Utils.getStyle('--cui-body-color');
+        mainChart.options.scales.y.border.color = coreui.Utils.getStyle('--cui-border-color-translucent');
+        mainChart.options.scales.y.grid.color = coreui.Utils.getStyle('--cui-border-color-translucent');
+        mainChart.options.scales.y.ticks.color = coreui.Utils.getStyle('--cui-body-color');
+        cardChart1.update();
+        cardChart2.update();
+        mainChart.update();
+      });
+      const random = (min, max) =>
+      // eslint-disable-next-line no-mixed-operators
+      Math.floor(Math.random() * (max - min + 1) + min);
+    </script>
         
     <?php
 require_once __DIR__ . "/inc.app/footer-supervisor.php";
