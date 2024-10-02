@@ -337,8 +337,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 
 	<script>
 		let nilai = <?php echo $kurvaS->getNilai();?>;
-		labels = nilai.labels;
-		data = nilai.data;
+		if(typeof nilai.labels != 'undefined')
+		{
+			labels = nilai.labels;
+		}
+		if(typeof nilai.data != 'undefined')
+		{
+			data = nilai.data;
+		}
 		document.addEventListener('DOMContentLoaded', function() {
 			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
@@ -489,6 +495,41 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			// define map here
 			
 ?>
+
+	<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.js"></script>
+
+
+	<input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?php echo $kurvaS->getTanggalMulai();?>"/>
+	<input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?php echo $kurvaS->getTanggalSelesai();?>"/>
+
+
+	<script>
+		let nilai = <?php echo $kurvaS->getNilai();?>;
+		if(typeof nilai.labels != 'undefined')
+		{
+			labels = nilai.labels;
+		}
+		if(typeof nilai.data != 'undefined')
+		{
+			data = nilai.data;
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
+				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+			});
+			createChart();
+		});
+
+	</script>
+
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
 		<?php
@@ -521,7 +562,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
-						<td><?php echo $kurvaS->getNilai();?></td>
+						<td><canvas id="kurvaCanvas" width="100%" height="400"></canvas></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
@@ -812,7 +853,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="tanggal_mulai" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggalMulai();?></a></td>
 								<td data-col-name="tanggal_selesai" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggalSelesai();?></a></td>
-								<td data-col-name="nilai" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNilai();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
@@ -851,7 +891,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="nama"><?php echo $kurvaS->getNama();?></td>
 								<td data-col-name="tanggal_mulai"><?php echo $kurvaS->getTanggalMulai();?></td>
 								<td data-col-name="tanggal_selesai"><?php echo $kurvaS->getTanggalSelesai();?></td>
-								<td data-col-name="nilai"><?php echo $kurvaS->getNilai();?></td>
 								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $kurvaS->getSortOrder();?></td>
 								<td data-col-name="default_data"><?php echo $kurvaS->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $kurvaS->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
