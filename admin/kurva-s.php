@@ -208,12 +208,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
 	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
 
 	<script>
 		
 		document.addEventListener('DOMContentLoaded', function() {
-			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
 			});
 			createChart();
@@ -271,9 +271,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
 						<td>
-							<div>
+							<div style="position: relative;">
 								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
-								
 							</div>
 							<div style="padding: 10px 0;"></div>
 								<input type="hidden" name="nilai" id="nilai" value="{}">
@@ -341,7 +340,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
 	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
 
 	<script>
 		let nilai = <?php echo $kurvaS->getNilai();?>;
@@ -354,7 +353,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			data = nilai.data;
 		}
 		document.addEventListener('DOMContentLoaded', function() {
-			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
 			});
 			createChart();
@@ -404,7 +403,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
 						<td>
-							<div>
+							<div style="position: relative;">
 								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
 							</div>
 							<div style="padding: 10px 0;"></div>
@@ -520,7 +519,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
     <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
 	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
 
 
 	<input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?php echo $kurvaS->getTanggalMulai();?>"/>
@@ -538,7 +537,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			data = nilai.data;
 		}
 		document.addEventListener('DOMContentLoaded', function() {
-			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', false, function(lbl, dt){
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
 			});			
 			createChart();
@@ -578,7 +577,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
-						<td><canvas id="kurvaCanvas" width="100%" height="400"></canvas></td>
+						<td>
+							<div style="position: relative;">
+								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>

@@ -22,7 +22,7 @@ let elemMaxDate = null;
 let clbkFunc = function(){
 };
 
-function initChart(elem, elemStart, elemEnd, clbk) {
+function initChart(elem, elemStart, elemEnd, enableEdit, clbk) {
     clbkFunc = clbk;
     elemMinDate = elemStart;
     elemMaxDate = elemEnd;
@@ -50,90 +50,95 @@ function initChart(elem, elemStart, elemEnd, clbk) {
 
     minDate = new Date(v1 + 'T00:00:00').getTime();
     maxDate = new Date(v2 + 'T23:59:59').getTime();
-    chartCanvas.addEventListener('click', function (event) {
-        if (!editorLocked) {
-            let rect = chartCanvas.getBoundingClientRect();
-            let x = event.clientX - rect.left;
-            let y = event.clientY - rect.top;
-            let xScale = sChart.scales.x;
-            let xValue = xScale.getValueForPixel(x);
 
-            let lastLabel = labels.length > 0 ? labels[labels.length - 1] : 0;
-            // hilangkan jam untuk keseragaman data
-            xValue = fixHour(xValue);
 
-            let yScale = sChart.scales.y;
-            let yValue = yScale.getValueForPixel(y);
+    if(enableEdit)
+    {
+        chartCanvas.addEventListener('click', function (event) {
+            if (!editorLocked) {
+                let rect = chartCanvas.getBoundingClientRect();
+                let x = event.clientX - rect.left;
+                let y = event.clientY - rect.top;
+                let xScale = sChart.scales.x;
+                let xValue = xScale.getValueForPixel(x);
 
-            if (xValue > lastLabel && yValue <= chartConfig.options.scales.y.max) {
-                yValue = snapValue(yValue, snapY);
-                labels.push(xValue);
-                data.push(yValue);
+                let lastLabel = labels.length > 0 ? labels[labels.length - 1] : 0;
+                // hilangkan jam untuk keseragaman data
+                xValue = fixHour(xValue);
+
+                let yScale = sChart.scales.y;
+                let yValue = yScale.getValueForPixel(y);
+
+                if (xValue > lastLabel && yValue <= chartConfig.options.scales.y.max) {
+                    yValue = snapValue(yValue, snapY);
+                    labels.push(xValue);
+                    data.push(yValue);
+                    sChart.update();
+                    clbkFunc(labels, data);
+                }
+            }
+        });
+
+        chartCanvas.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+            // Menghapus data terakhir
+            if (labels.length > 0 && data.length > 0) {
+                labels.pop();
+                data.pop();
                 sChart.update();
                 clbkFunc(labels, data);
             }
-        }
-    });
+        });
 
-    chartCanvas.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        // Menghapus data terakhir
-        if (labels.length > 0 && data.length > 0) {
-            labels.pop();
-            data.pop();
-            sChart.update();
-            clbkFunc(labels, data);
-        }
-    });
+        chartCanvas.addEventListener('mousedown', function (event) {
+            let points = sChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+            if (points.length) {
+                draggingPoint = points[0];
+            }
+        });
 
-    chartCanvas.addEventListener('mousedown', function (event) {
-        let points = sChart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
-        if (points.length) {
-            draggingPoint = points[0];
-        }
-    });
+        chartCanvas.addEventListener('mousemove', function (event) {
+            if (draggingPoint) {
+                editorLocked = true;
+                let yScale = sChart.scales.y;
+                let canvasPosition = Chart.helpers.getRelativePosition(event, sChart);
+                let yValue = yScale.getValueForPixel(canvasPosition.y);
+                yValue = snapValue(yValue, snapY);
+                // Update point value
+                sChart.data.datasets[draggingPoint.datasetIndex].data[draggingPoint.index] = Math.max(0, Math.min(100, yValue));
+                sChart.update();
+                clbkFunc(labels, data);
+            }
+        });
 
-    chartCanvas.addEventListener('mousemove', function (event) {
-        if (draggingPoint) {
-            editorLocked = true;
-            let yScale = sChart.scales.y;
-            let canvasPosition = Chart.helpers.getRelativePosition(event, sChart);
-            let yValue = yScale.getValueForPixel(canvasPosition.y);
-            yValue = snapValue(yValue, snapY);
-            // Update point value
-            sChart.data.datasets[draggingPoint.datasetIndex].data[draggingPoint.index] = Math.max(0, Math.min(100, yValue));
-            sChart.update();
-            clbkFunc(labels, data);
-        }
-    });
+        chartCanvas.addEventListener('mouseup', function () {
+            draggingPoint = null;
+            setTimeout(function () {
+                editorLocked = false;
+            }, 2);
+        });
 
-    chartCanvas.addEventListener('mouseup', function () {
-        draggingPoint = null;
-        setTimeout(function () {
-            editorLocked = false;
-        }, 2);
-    });
+        chartCanvas.addEventListener('mouseout', function () {
+            draggingPoint = null;
+        });
 
-    chartCanvas.addEventListener('mouseout', function () {
-        draggingPoint = null;
-    });
-
-    $(document).on('blur', elemMinDate, function(){
-        let e = $(this);
-        setTimeout(function () {
-            let val = e.val();
-            minDate = new Date(val + 'T00:00:00').getTime();
-            createChart();
-        }, 10);
-    })
-    $(document).on('blur', elemMaxDate, function(){
-        let e = $(this);
-        setTimeout(function () {
-            let val = e.val();
-            maxDate = new Date(val + 'T23:59:59').getTime();
-            createChart();
-        }, 10);
-    })
+        $(document).on('blur', elemMinDate, function(){
+            let e = $(this);
+            setTimeout(function () {
+                let val = e.val();
+                minDate = new Date(val + 'T00:00:00').getTime();
+                createChart();
+            }, 10);
+        });
+        $(document).on('blur', elemMaxDate, function(){
+            let e = $(this);
+            setTimeout(function () {
+                let val = e.val();
+                maxDate = new Date(val + 'T23:59:59').getTime();
+                createChart();
+            }, 10);
+        });
+    }
 
 }
 
