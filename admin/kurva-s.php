@@ -273,7 +273,15 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<div>
 								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
+								
+							</div>
+							<div style="padding: 10px 0;"></div>
 								<input type="hidden" name="nilai" id="nilai" value="{}">
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveUp()"><?php echo $appLanguage->getMoveUp();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveDown()"><?php echo $appLanguage->getMoveDown();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveLeft()"><?php echo $appLanguage->getMoveLeft();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveRight()"><?php echo $appLanguage->getMoveRight();?></button>
+								
 							</div>
 						</td>
 					</tr>
@@ -350,6 +358,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
 			});
 			createChart();
+			$('#nilai').val(JSON.stringify(nilai));
 		});
 
 	</script>
@@ -397,7 +406,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td>
 							<div>
 								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
+							</div>
+							<div style="padding: 10px 0;"></div>
 								<input type="hidden" name="nilai" id="nilai" value="{}">
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveUp()"><?php echo $appLanguage->getMoveUp();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveDown()"><?php echo $appLanguage->getMoveDown();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveLeft()"><?php echo $appLanguage->getMoveLeft();?></button>
+								<button type="button" class="btn btn-tn btn-primary" onclick="moveRight()"><?php echo $appLanguage->getMoveRight();?></button>
+								
 							</div>
 						</td>
 					</tr>
@@ -524,7 +540,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		document.addEventListener('DOMContentLoaded', function() {
 			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', function(lbl, dt){
 				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
-			});
+			});			
 			createChart();
 		});
 

@@ -10,27 +10,22 @@ Chart.defaults.defaultFontColor = 'rgba(75, 192, 192, 1)';
 
 let chartCanvas;
 let ctx;
-
 let minDate;
 let maxDate;
-
 let sChart;
-
 let draggingPoint = null;
 let editorLocked = false;
-
-let snapY = 1;
+let snapY = 0.25;
 let chartConfig = {};
 let elemMinDate = null;
 let elemMaxDate = null;
 let clbkFunc = function(){
-
 };
+
 function initChart(elem, elemStart, elemEnd, clbk) {
     clbkFunc = clbk;
     elemMinDate = elemStart;
     elemMaxDate = elemEnd;
-
     chartCanvas = document.querySelector(elem, elemStart, elemEnd);
     ctx = chartCanvas.getContext('2d');
     let v1 = document.querySelector(elemStart).value;
@@ -43,7 +38,6 @@ function initChart(elem, elemStart, elemEnd, clbk) {
             document.querySelector(elemStart).value = v1;
         }, 10
         );
-
     }
 
     if (v2 == '') {
@@ -61,27 +55,20 @@ function initChart(elem, elemStart, elemEnd, clbk) {
             let rect = chartCanvas.getBoundingClientRect();
             let x = event.clientX - rect.left;
             let y = event.clientY - rect.top;
-
-            let dateRange = maxDate - minDate;
-
             let xScale = sChart.scales.x;
             let xValue = xScale.getValueForPixel(x);
 
-            let date = new Date(xValue); // Konversi ke milidetik
-            let formattedDate = date.toLocaleString('en-US'); // Format tanggal dan waktu
-
+            let lastLabel = labels.length > 0 ? labels[labels.length - 1] : 0;
             // hilangkan jam untuk keseragaman data
             xValue = fixHour(xValue);
 
             let yScale = sChart.scales.y;
             let yValue = yScale.getValueForPixel(y);
-            if (yValue <= chartConfig.options.scales.y.max) {
 
+            if (xValue > lastLabel && yValue <= chartConfig.options.scales.y.max) {
                 yValue = snapValue(yValue, snapY);
-
                 labels.push(xValue);
                 data.push(yValue);
-
                 sChart.update();
                 clbkFunc(labels, data);
             }
@@ -104,7 +91,6 @@ function initChart(elem, elemStart, elemEnd, clbk) {
         if (points.length) {
             draggingPoint = points[0];
         }
-
     });
 
     chartCanvas.addEventListener('mousemove', function (event) {
