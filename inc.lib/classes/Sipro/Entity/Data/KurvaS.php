@@ -82,13 +82,13 @@ class KurvaS extends MagicObject
 	protected $nilai;
 
 	/**
-	 * Sort Order
+	 * Amandemen
 	 * 
-	 * @Column(name="sort_order", type="int(11)", length=11, nullable=true)
-	 * @Label(content="Sort Order")
+	 * @Column(name="amandemen", type="int(11)", length=11, nullable=true)
+	 * @Label(content="Amandemen")
 	 * @var integer
 	 */
-	protected $sortOrder;
+	protected $amandemen;
 
 	/**
 	 * Default Data

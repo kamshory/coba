@@ -4,6 +4,7 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
+use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -49,7 +50,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$kurvaS->setTanggalMulai($inputPost->getTanggalMulai(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kurvaS->setTanggalSelesai($inputPost->getTanggalSelesai(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kurvaS->setNilai($inputPost->getNilai(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
-	$kurvaS->setAmandemen($inputPost->getAmandemen(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$kurvaS->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kurvaS->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$kurvaS->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$kurvaS->setAdminBuat($currentAction->getUserId());
@@ -77,7 +78,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$kurvaS->setTanggalMulai($inputPost->getTanggalMulai(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kurvaS->setTanggalSelesai($inputPost->getTanggalSelesai(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kurvaS->setNilai($inputPost->getNilai(PicoFilterConstant::FILTER_DEFAULT, false, false, true));
-	$kurvaS->setAmandemen($inputPost->getAmandemen(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$kurvaS->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kurvaS->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$kurvaS->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$kurvaS->setAdminUbah($currentAction->getUserId());
@@ -171,37 +172,61 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	}
 	$currentModule->redirectToItself();
 }
+else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
+{
+	$kurvaS = new KurvaS(null, $database);
+	if($inputPost->getNewOrder() != null && $inputPost->countableNewOrder())
+	{
+		foreach($inputPost->getNewOrder() as $dataItem)
+		{
+			if(is_string($dataItem))
+			{
+				$dataItem = new SetterGetter(json_decode($dataItem));
+			}
+			$primaryKeyValue = $dataItem->getPrimaryKey();
+			$sortOrder = $dataItem->getSortOrder();
+			$kurvaS->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->kurvaSId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
+		}
+	}
+	$currentModule->redirectToItself();
+}
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
 $appEntityLanguage = new AppEntityLanguage(new KurvaS(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
-<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
-<script>
-	let nilai = <?php echo $kurvaS->getNilai();?>;
-	if(typeof nilai.labels != 'undefined')
-	{
-		labels = nilai.labels;
-	}
-	if(typeof nilai.data != 'undefined')
-	{
-		data = nilai.data;
-	}
-	document.addEventListener('DOMContentLoaded', function() {
-		initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
-			$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+
+	<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
+
+	<script>	
+		document.addEventListener('DOMContentLoaded', function() {
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
+				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+			});
+			createChart();
 		});
-		createChart();
-	});
-</script>
+	</script>
+
+    <style>
+        canvas {
+            border: 1px solid #999999;
+			width: 100%;
+			height: 400px;
+        }
+    </style>
+	
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
 		<form name="createform" id="createform" action="" method="post">
@@ -242,12 +267,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAmandemen();?></td>
-						<td>
-							<input autocomplete="off" class="form-control" type="number" step="1" name="amandemen" id="amandemen"/>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
 						<td>
 							<div style="position: relative;">
@@ -260,6 +279,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<button type="button" class="btn btn-tn btn-primary" onclick="moveLeft()"><?php echo $appLanguage->getMoveLeft();?></button>
 								<button type="button" class="btn btn-tn btn-primary" onclick="moveRight()"><?php echo $appLanguage->getMoveRight();?></button>
 							</div>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="1" name="sort_order" id="sort_order"/>
 						</td>
 					</tr>
 					<tr>
@@ -303,33 +328,35 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 $appEntityLanguage = new AppEntityLanguage(new KurvaS(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
 ?>
-<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
-<script>
-	let nilai = <?php echo $kurvaS->getNilai();?>;
-	if(typeof nilai.labels != 'undefined')
-	{
-		labels = nilai.labels;
-	}
-	if(typeof nilai.data != 'undefined')
-	{
-		data = nilai.data;
-	}
-	document.addEventListener('DOMContentLoaded', function() {
-		initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
-			$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+
+	<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
+	<script>
+		let nilai = <?php echo $kurvaS->getNilai();?>;
+		if(typeof nilai.labels != 'undefined')
+		{
+			labels = nilai.labels;
+		}
+		if(typeof nilai.data != 'undefined')
+		{
+			data = nilai.data;
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
+				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+			});
+			createChart();
+			$('#nilai').val(JSON.stringify(nilai));
 		});
-		createChart();
-		$('#nilai').val(JSON.stringify(nilai));
-	});
-</script>
+	</script>
+
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
 		<form name="updateform" id="updateform" action="" method="post">
@@ -370,12 +397,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAmandemen();?></td>
-						<td>
-							<input class="form-control" type="number" step="1" name="amandemen" id="amandemen" value="<?php echo $kurvaS->getAmandemen();?>" autocomplete="off"/>
-						</td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
 						<td>
 							<div style="position: relative;">
@@ -388,6 +409,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<button type="button" class="btn btn-tn btn-primary" onclick="moveLeft()"><?php echo $appLanguage->getMoveLeft();?></button>
 								<button type="button" class="btn btn-tn btn-primary" onclick="moveRight()"><?php echo $appLanguage->getMoveRight();?></button>								
 							</div>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td>
+							<input class="form-control" type="number" step="1" name="sort_order" id="sort_order" value="<?php echo $kurvaS->getSortOrder();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -478,33 +505,41 @@ require_once $appInclude->mainAppHeader(__DIR__);
 			// define map here
 			
 ?>
-<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
-<script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
-<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
-<script>
-	let nilai = <?php echo $kurvaS->getNilai();?>;
-	if(typeof nilai.labels != 'undefined')
-	{
-		labels = nilai.labels;
-	}
-	if(typeof nilai.data != 'undefined')
-	{
-		data = nilai.data;
-	}
-	document.addEventListener('DOMContentLoaded', function() {
-		initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', false, function(lbl, dt){
+
+	<link rel="stylesheet" href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/css/coreui-chartjs.css">
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/chart.js/js/chart.umd.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chart.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/chartjs-adapter-date-fns.js"></script>
+    <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
+	<script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
+
+
+	<input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?php echo $kurvaS->getTanggalMulai();?>"/>
+	<input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?php echo $kurvaS->getTanggalSelesai();?>"/>
+
+
+	<script>
+		let nilai = <?php echo $kurvaS->getNilai();?>;
+		if(typeof nilai.labels != 'undefined')
+		{
+			labels = nilai.labels;
+		}
+		if(typeof nilai.data != 'undefined')
+		{
+			data = nilai.data;
+		}
+		document.addEventListener('DOMContentLoaded', function() {
+			initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', false, function(lbl, dt){
+				$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));
+			});			
+			createChart();
 		});
-		createChart();
-	});
-</script>
-<input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?php echo $kurvaS->getTanggalMulai();?>"/>
-<input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?php echo $kurvaS->getTanggalSelesai();?>"/>
+
+	</script>
+
 <div class="page page-jambi page-detail">
 	<div class="jambi-wrapper">
 		<?php
@@ -536,16 +571,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $kurvaS->getTanggalSelesai();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getAmandemen();?></td>
-						<td><?php echo $kurvaS->getAmandemen();?></td>
-					</tr>
-					<tr>
 						<td><?php echo $appEntityLanguage->getNilai();?></td>
 						<td>
 							<div style="position: relative;">
 								<canvas id="kurvaCanvas" width="100%" height="400"></canvas>
 							</div>
 						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
+						<td><?php echo $kurvaS->getSortOrder();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getDefaultData();?></td>
@@ -626,8 +661,7 @@ $appEntityLanguage = new AppEntityLanguage(new KurvaS(), $appConfig, $currentUse
 
 $specMap = array(
 	"proyekId" => PicoSpecification::filter("proyekId", "number"),
-	"nama" => PicoSpecification::filter("nama", "fulltext"),
-	"amandemen" => PicoSpecification::filter("amandemen", "number")
+	"nama" => PicoSpecification::filter("nama", "fulltext")
 );
 $sortOrderMap = array(
 	"proyekId" => "proyekId",
@@ -635,7 +669,7 @@ $sortOrderMap = array(
 	"tanggalMulai" => "tanggalMulai",
 	"tanggalSelesai" => "tanggalSelesai",
 	"nilai" => "nilai",
-	"amandemen" => "amandemen",
+	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",
 	"aktif" => "aktif"
 );
@@ -653,7 +687,7 @@ $sortable = PicoSortable::fromUserInput($inputGet, $sortOrderMap, array(
 		"sortType" => PicoSort::ORDER_TYPE_DESC
 	),
 	array(
-		"sortBy" => "amandemen", 
+		"sortBy" => "sortOrder", 
 		"sortType" => PicoSort::ORDER_TYPE_ASC
 	)
 ));
@@ -704,7 +738,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getTanggalMulai() => $headerFormat->getTanggalMulai(),
 		$appEntityLanguage->getTanggalSelesai() => $headerFormat->getTanggalSelesai(),
 		$appEntityLanguage->getNilai() => $headerFormat->asString(),
-		$appEntityLanguage->getAmandemen() => $headerFormat->getAmandemen(),
+		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getDefaultData() => $headerFormat->asString(),
 		$appEntityLanguage->getWaktuBuat() => $headerFormat->getWaktuBuat(),
 		$appEntityLanguage->getWaktuUbah() => $headerFormat->getWaktuUbah(),
@@ -724,7 +758,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getTanggalMulai(),
 			$row->getTanggalSelesai(),
 			$row->getNilai(),
-			$row->getAmandemen(),
+			$row->getSortOrder(),
 			$row->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->getWaktuBuat(),
 			$row->getWaktuUbah(),
@@ -770,13 +804,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAmandemen();?></span>
-					<span class="filter-control">
-						<input type="text" name="amandemen" class="form-control" value="<?php echo $inputGet->getAmandemen();?>" autocomplete="off"/>
-					</span>
-				</span>
-				
-				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
 				<?php if($userPermission->isAllowedDetail()){ ?>
@@ -817,6 +844,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-header"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="kurva_s_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-kurva-s-id"/>
@@ -837,13 +867,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="tanggal_mulai" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggalMulai();?></a></td>
 								<td data-col-name="tanggal_selesai" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggalSelesai();?></a></td>
-								<td data-col-name="amandemen" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAmandemen();?></a></td>
+								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 							</tr>
 						</thead>
 					
-						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
+						<tbody class="data-table-manual-sort" data-offset="<?php echo $pageData->getDataOffset();?>">
 							<?php 
 							$dataIndex = 0;
 							while($kurvaS = $pageData->fetch())
@@ -851,7 +881,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 							?>
 		
-							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+							<tr data-primary-key="<?php echo $kurvaS->getKurvaSId();?>" data-sort-order="<?php echo $kurvaS->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-body data-sort-handler"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="kurva_s_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-kurva-s-id" name="checked_row_id[]" value="<?php echo $kurvaS->getKurvaSId();?>"/>
@@ -872,7 +905,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="nama"><?php echo $kurvaS->getNama();?></td>
 								<td data-col-name="tanggal_mulai"><?php echo $kurvaS->getTanggalMulai();?></td>
 								<td data-col-name="tanggal_selesai"><?php echo $kurvaS->getTanggalSelesai();?></td>
-								<td data-col-name="amandemen"><?php echo $kurvaS->getAmandemen();?></td>
+								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $kurvaS->getSortOrder();?></td>
 								<td data-col-name="default_data"><?php echo $kurvaS->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $kurvaS->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
@@ -891,6 +924,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<?php } ?>
+						<?php if($userPermission->isAllowedSortOrder()){ ?>
+						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>
