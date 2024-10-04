@@ -186,15 +186,6 @@ require_once $appInclude->mainAppHeader(__DIR__);
 <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/moment.min.js"></script>
 <script src="<?php echo $baseAssetsUrl;?>lib.assets/chart/kurva-s.min.js"></script>
 <script>
-	let nilai = <?php echo $kurvaS->getNilai();?>;
-	if(typeof nilai.labels != 'undefined')
-	{
-		labels = nilai.labels;
-	}
-	if(typeof nilai.data != 'undefined')
-	{
-		data = nilai.data;
-	}
 	document.addEventListener('DOMContentLoaded', function() {
 		initChart('#kurvaCanvas', '#tanggal_mulai', '#tanggal_selesai', true, function(lbl, dt){
 			$('#nilai').val(JSON.stringify({labels:lbl, data:dt}));

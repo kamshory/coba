@@ -60,14 +60,13 @@ class SCurveUtil
             foreach($rows as $kurvaS)
             {
                 $json = json_decode($kurvaS->getNilai());
-                $labels = $json->labels;
-                $labelsString = [];
-                $data = $json->data;
-                foreach($labels as $label)
+                $data = [];
+                foreach($json->labels as $index=>$label)
                 {
-                    $labelsString[] = date('Y-m-d H:i:s', round($label / 1000));
+                    $key = date('Y-m-d H:i:s', round($label / 1000));
+                    $data[] = ["x"=>$key, "y"=>floatval($json->data[$index])];
                 }
-                $curves[$kurvaS->getKurvaSId()] = array_combine($labelsString, $data);
+                $curves[$kurvaS->getKurvaSId()] = ['label'=>$kurvaS->getNama(), 'data'=> $data];
             }
         }
         catch(Exception $e)
@@ -112,7 +111,7 @@ class SCurveUtil
                 {
                     $labelsString[] = date('Y-m-d H:i:s', round($label / 1000));
                 }
-                $curves[$kurvaS->getKurvaSId()] = array_combine($labelsString, $data);
+                $curves[$kurvaS->getKurvaSId()] = array('label'=>$kurvaS->getNama(), 'data'=> array_combine($labelsString, $data));
             }  
         }
         catch(Exception $e)

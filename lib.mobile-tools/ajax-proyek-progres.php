@@ -1,69 +1,86 @@
 
 <?php
 
+use MagicApp\AppLanguage;
 use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
+use MagicObject\Util\PicoIniUtil;
+use MagicObject\Util\PicoStringUtil;
 use Sipro\Entity\Data\ProgresProyek;
 use Sipro\Entity\Data\Proyek;
 use Sipro\Util\DateUtil;
+use Sipro\Util\SCurveUtil;
 
-require_once dirname(__DIR__) . "/inc.app/auth-supervisor.php";
+require_once dirname(__DIR__) . "/inc.app/app.php";
+
+$appLanguage = new AppLanguage(
+  $appConfig,
+  'id',
+  function($var, $value)
+  {
+      $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
+
+      if(!file_exists(dirname($inputSource)))
+      {
+          mkdir(dirname($inputSource), 0755, true);
+      }
+      $sourceData = null;
+      if(file_exists($inputSource) && filesize($inputSource) > 3)
+      {
+          $sourceData = PicoIniUtil::parseIniFile($inputSource);
+      }
+      if($sourceData == null || $sourceData === false)
+      {
+          $sourceData = array();
+      }   
+      $output = array_merge($sourceData, array(PicoStringUtil::snakeize($var) => $value));
+      PicoIniUtil::writeIniFile($output, $inputSource);
+  }
+);
 
 $template = '{
   "type": "line",
   "data": {
-    "labels": ["January", "February", "March", "April", "May", "June", "July"],
-    "datasets": [{
-      "label": "Progres Proyek",
-      "backgroundColor": "rgba(255,255,255,.55)",
-      "borderColor": "rgba(180,180,180,.85)",
-      "pointBackgroundColor": "coreui.Utils.getStyle(\'--cui-primary\')",
-      "data": [65, 59, 84, 84, 51, 55, 40]
-    }]
+    "datasets": []
   },
   "options": {
+    "spanGaps": 172800000,
+    "responsive": true,
+    "interaction": {
+      "mode": "nearest"
+    },
     "plugins": {
-      "legend": {
+      "title": {
         "display": false
       }
     },
-    "maintainAspectRatio": false,
     "scales": {
       "x": {
-        "border": {
-          "display": false
-        },
-        "grid": {
+        "type": "time",
+        "display": true,
+        "title": {
           "display": false,
-          "drawBorder": false
+          "text": "Waktu"
         },
         "ticks": {
-          "display": false
+          "autoSkip": false,
+          "maxRotation": 0,
+          "major": {
+            "enabled": true
+          },
+          "font": {
+            "weight": "bold"
+          }
         }
       },
       "y": {
-        "min": -8,
-        "max": 108,
-        "display": false,
-        "grid": {
-          "display": false
-        },
-        "ticks": {
-          "display": false
+        "display": true,
+        "title": {
+          "display": true,
+          "text": "Persen"
         }
-      }
-    },
-    "elements": {
-      "line": {
-        "borderWidth": 1,
-        "tension": 0.4
-      },
-      "point": {
-        "radius": 4,
-        "hitRadius": 10,
-        "hoverRadius": 4
       }
     }
   }
@@ -80,6 +97,7 @@ if($inputGet->countableProyeks())
 {
     $proyeks = $inputGet->getProyeks();
     $i = 0;
+    $sCurveUtil = new SCurveUtil($database);
     foreach($proyeks as $proyekId)
     {
         $config[$i] = new MagicObject();
@@ -100,23 +118,32 @@ if($inputGet->countableProyeks())
 
             foreach($rows as $row)
             {
-                $keys[] = DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($row->getWaktuBuat())));
-                $values[] = $row->getPersen();           
+                $key = DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($row->getWaktuBuat())));
+                $values[] = ['x'=>$key, 'y'=>floatval($row->getPersen())];           
             }
+            $sc = new MagicObject(['label'=>'Progres Proyek', 'data'=>$values]);
+            $config[$i]->getData()->pushDatasets($sc);
         }
         catch(Exception $e)
         {
             $proyek = new Proyek(null, $database);
             $proyek->find($proyekId);
-            $keys = [
-              DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuBuat()))),
-              DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuUbah())))
+            $values = [
+              ['x'=>DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuBuat()))), 'y'=>0],
+              ['x'=>DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuUbah()))), 'y'=>floatval($proyek->getPersen())]
             ];
-            $values = [0, $proyek->getPersen()];
+            $sc = new MagicObject(['label'=>'Progres Proyek', 'data'=>$values]);
+            $config[$i]->getData()->pushDatasets($sc);
 
         }
         $config[$i]->getData()->setLabels($keys);
-        $config[$i]->getData()->getDatasets()[0]->setData($values);
+
+        $curves = $sCurveUtil->getSelectedCurve($proyekId);
+        foreach($curves as $curve)
+        {
+          $sc = new MagicObject(['label'=>$curve['label'], 'data'=>$curve['data']]);
+          $config[$i]->getData()->pushDatasets($sc);
+        }
         $i++;
     }
 }

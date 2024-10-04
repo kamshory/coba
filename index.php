@@ -145,8 +145,8 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
               <div class="position-relative w-100 box-sizing-border-box proyek-nama text-nowrap text-truncate d-inline-block"><?php echo $proyekDipilihVal[$i]['nama'];?></div>
             </div>
           </div>
-          <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
-            <canvas class="chart" id="card-chart-<?php echo $j;?>" height="70" style="display: block; box-sizing: border-box; height: 70px; width: 266px;" width="266"></canvas>
+          <div class="c-chart-wrapper mt-3 mx-3" style="height:150px;">
+            <canvas class="chart" id="card-chart-<?php echo $j;?>" height="150" style="display: block; box-sizing: border-box; height: 150px; width: 266px;" width="266"></canvas>
           </div>
           <div class="px-3">
             <div class="progress progress-thin">

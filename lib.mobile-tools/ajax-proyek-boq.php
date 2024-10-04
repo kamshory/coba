@@ -1,5 +1,6 @@
 <?php
 
+use MagicApp\AppLanguage;
 use MagicApp\Field;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
@@ -7,12 +8,38 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
+use MagicObject\Util\PicoIniUtil;
+use MagicObject\Util\PicoStringUtil;
 use Sipro\Entity\Data\BillOfQuantityProyek;
 use Sipro\Entity\Data\Proyek;
 use Sipro\Util\DateUtil;
 
-require_once dirname(__DIR__) . "/inc.app/auth-supervisor.php";
+require_once dirname(__DIR__) . "/inc.app/app.php";
 
+$appLanguage = new AppLanguage(
+  $appConfig,
+  'id',
+  function($var, $value)
+  {
+      $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
+
+      if(!file_exists(dirname($inputSource)))
+      {
+          mkdir(dirname($inputSource), 0755, true);
+      }
+      $sourceData = null;
+      if(file_exists($inputSource) && filesize($inputSource) > 3)
+      {
+          $sourceData = PicoIniUtil::parseIniFile($inputSource);
+      }
+      if($sourceData == null || $sourceData === false)
+      {
+          $sourceData = array();
+      }   
+      $output = array_merge($sourceData, array(PicoStringUtil::snakeize($var) => $value));
+      PicoIniUtil::writeIniFile($output, $inputSource);
+  }
+);
 $boqProyek = new BillOfQuantityProyek(null, $database);
 $inputGet = new InputGet();
 $proyekId = $inputGet->getProyekId();
