@@ -261,6 +261,23 @@ class SetterGetter extends stdClass
             $this->removeValue($var, $params[0]);
             return $this;
         }
+        else if (strncasecmp($method, "push", 4) === 0 && isset($params) && isset($params[0]) && !$this->_readonly) {
+            $var = lcfirst(substr($method, 4));
+            if(!isset($this->$var))
+            {
+                $this->$var = array();
+            }
+            $this->$var[] = $params[0];
+            return $this;
+        }
+        else if (strncasecmp($method, "pop", 3) === 0) {
+            $var = lcfirst(substr($method, 3));
+            if(isset($this->$var) && is_array($this->$var))
+            {
+                return array_pop($this->$var);
+            }
+            return null;
+        }
     }
 
     /**

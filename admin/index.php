@@ -138,7 +138,11 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
     }
 
     ?>
-
+    <style>
+      .progres-proyek > .card .card-body .proyek-nama{
+        margin-top: -6px;
+      }
+    </style>
     <div class="container">
     <div class="row g-4 mb-4 progres-proyek-container">
       
@@ -150,12 +154,11 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
         <div class="card text-white bg-info pb-3">
           <div class="card-body pb-0 d-flex justify-content-between align-items-start position-relative w-100 box-sizing-border-box">
             <div class="position-relative w-100 box-sizing-border-box">
-              <div class="position-relative w-100 box-sizing-border-box fs-5 fw-semibold proyek-persen">Progres <?php echo $proyekDipilihVal[$i]['persen'];?>%</div>
-              <div class="position-relative w-100 box-sizing-border-box proyek-nama text-nowrap text-truncate d-inline-block"><?php echo $proyekDipilihVal[$i]['nama'];?></div>
+              <div class="position-relative w-100 box-sizing-border-box proyek-nama text-nowrap text-truncate d-inline-block">[<?php echo floor($proyekDipilihVal[$i]['persen']);?>%] <?php echo $proyekDipilihVal[$i]['nama'];?></div>
             </div>
           </div>
-          <div class="c-chart-wrapper mt-3 mx-3" style="height:150px;">
-            <canvas class="chart" id="card-chart-<?php echo $j;?>" height="150" style="display: block; box-sizing: border-box; height: 150px; width: 266px;" width="266"></canvas>
+          <div class="c-chart-wrapper mx-3" style="height:150px;">
+            <canvas class="chart" id="card-chart-<?php echo $j;?>" height="150" style="display: block; box-sizing: border-box; height: 150px; width: 100%;"></canvas>
           </div>
           <div class="px-3">
             <div class="progress progress-thin">
@@ -193,6 +196,14 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
 
               
               document.addEventListener('DOMContentLoaded', function() {
+              Chart.register({
+                  id: 'moment',
+                  beforeInit: function(chart) {
+                      chart.data.labels = chart.data.labels.map(function(label) {
+                      return moment(label).format('YYYY-MM-DD HH:mm:ss');
+                      });
+                  }
+              });
               document.querySelector('#proyek_id').addEventListener('change', function(e){
                 if(e.target.value != '')
                 {
@@ -268,14 +279,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
               function createChart(config)
               {
                 ctx = document.getElementById('main-chart2').getContext('2d');
-                Chart.register({
-                    id: 'moment',
-                    beforeInit: function(chart) {
-                        chart.data.labels = chart.data.labels.map(function(label) {
-                        return moment(label).format('YYYY-MM-DD HH:mm:ss');
-                        });
-                    }
-                });
+                
 
                 config.options.plugins.tooltip = {
                   callbacks: {

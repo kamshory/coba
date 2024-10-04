@@ -48,12 +48,19 @@ $template = '{
   "options": {
     "spanGaps": 172800000,
     "responsive": true,
+    "maintainAspectRatio": false,
     "interaction": {
       "mode": "nearest"
     },
     "plugins": {
       "title": {
         "display": false
+      },
+      "legend": {
+        "labels": {
+          "boxWidth": 10,
+          "boxHeight": 8
+        }
       }
     },
     "scales": {
@@ -121,7 +128,7 @@ if($inputGet->countableProyeks())
                 $key = DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($row->getWaktuBuat())));
                 $values[] = ['x'=>$key, 'y'=>floatval($row->getPersen())];           
             }
-            $sc = new MagicObject(['label'=>'Progres Proyek', 'data'=>$values]);
+            $sc = new MagicObject(['label'=>'Progres', 'data'=>$values]);
             $config[$i]->getData()->pushDatasets($sc);
         }
         catch(Exception $e)
@@ -132,7 +139,7 @@ if($inputGet->countableProyeks())
               ['x'=>DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuBuat()))), 'y'=>0],
               ['x'=>DateUtil::translateDate($appLanguage, date($dateFormat, strtotime($proyek->getWaktuUbah()))), 'y'=>floatval($proyek->getPersen())]
             ];
-            $sc = new MagicObject(['label'=>'Progres Proyek', 'data'=>$values]);
+            $sc = new MagicObject(['label'=>'Progres', 'data'=>$values]);
             $config[$i]->getData()->pushDatasets($sc);
 
         }
