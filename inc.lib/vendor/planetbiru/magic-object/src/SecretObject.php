@@ -205,18 +205,19 @@ class SecretObject extends stdClass //NOSONAR
             $this->modifyNullProperties($var, $params[0]);
             return $this;
         }
-        else if (strncasecmp($method, "unset", 5) === 0 && !$this->_readonly) {
+        else if (strncasecmp($method, "unset", 5) === 0)
+        {
             $var = lcfirst(substr($method, 5));
-            $this->removeValue($var, $params[0]);
+            unset($this->{$var});
             return $this;
         }
         else if (strncasecmp($method, "push", 4) === 0 && isset($params) && isset($params[0]) && !$this->_readonly) {
             $var = lcfirst(substr($method, 4));
-            if(!isset($this->$var))
+            if(!isset($this->$var) || !is_array($this->$var))
             {
                 $this->$var = array();
             }
-            $this->$var[] = $params[0];
+            array_push($this->$var, $params[0]);
             return $this;
         }
         else if (strncasecmp($method, "pop", 3) === 0) {
@@ -505,13 +506,13 @@ class SecretObject extends stdClass //NOSONAR
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->_set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->_set($key2, $value);
                 }
             }

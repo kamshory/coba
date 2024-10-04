@@ -66,13 +66,13 @@ class PicoDataLabel extends SetterGetter
             {
                 $values = $data->value();
                 foreach ($values as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                 }
             }
             else if (is_array($data) || is_object($data)) {
                 foreach ($data as $key => $value) {
-                    $key2 = PicoStringUtil::camelize($key);
+                    $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
                     $this->set($key2, $value);
                 }
             }
@@ -85,7 +85,7 @@ class PicoDataLabel extends SetterGetter
      *
      * @return stdClass
      */
-    public function getObjectInfo() // NOSONAR
+    public function getObjectInfo()
     {
         $reflexClass = new PicoAnnotationParser($this->className);
         $table = $reflexClass->getParameter(self::ANNOTATION_TABLE);

@@ -8,7 +8,6 @@ use MagicObject\Request\InputPost;
 use MagicApp\PicoModule;
 use MagicApp\AppEntityLanguage;
 use MagicApp\Field;
-use MagicObject\Database\PicoDatabaseQueryBuilder;
 use MagicObject\Database\PicoPredicate;
 use MagicObject\Database\PicoSort;
 use MagicObject\Database\PicoSortable;
@@ -251,12 +250,12 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                 let cardChart = {};
                 for(let i in data)
                 {
-                 let config = data[i];
-                 config.options.plugins.tooltip = {
+                 let config2 = data[i];
+                 config2.options.plugins.tooltip = {
                   callbacks: {
                     label: function(tooltipItem) {
                       let label = tooltipItem.dataset.label;
-                      let value = tooltipItem.raw.toFixed(2);
+                      let value = tooltipItem.parsed.y.toFixed(2);
                       return ` ${label}: ${value}%`;
                     }
                   }
@@ -266,7 +265,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                 {
                     chart.destroy();
                 }
-                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config);
+                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config2);
                 }
               })
               .catch(error => {

@@ -13,6 +13,11 @@ use Symfony\Component\Yaml\Yaml;
  */
 class PicoSecretParser
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Parse SecretObject
      * @param SecretObject $data
@@ -23,7 +28,7 @@ class PicoSecretParser
         $secretObject = new SecretObject();
         $values = $data->value();
         foreach ($values as $key => $value) {
-            $key2 = PicoStringUtil::camelize($key);
+            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
             if(is_scalar($value))
             {
                 $secretObject->set($key2, $value);
@@ -45,7 +50,7 @@ class PicoSecretParser
     {
         $secretObject = new SecretObject();
         foreach ($data as $key => $value) {
-            $key2 = PicoStringUtil::camelize($key);
+            $key2 = PicoStringUtil::camelize(str_replace("-", "_", $key));
             if(is_scalar($value))
             {
                 $secretObject->set($key2, $value);
@@ -61,7 +66,7 @@ class PicoSecretParser
     /**
      * Check if input is associated array
      *
-     * @param array $array
+     * @param array $array Array
      * @return boolean
      */
     private static function hasStringKeys($array) {
@@ -101,9 +106,9 @@ class PicoSecretParser
     /**
      * Update object
      *
-     * @param SecretObject $obj
-     * @param string $key
-     * @param mixed $val
+     * @param SecretObject $obj Secret object
+     * @param string $key Property name
+     * @param mixed $val Property value
      * @return SecretObject
      */
     private static function updateObject($obj, $key, $val)
@@ -133,7 +138,7 @@ class PicoSecretParser
     /**
      * Check if value is object
      *
-     * @param [type] $value
+     * @param mixed $value Value to be checked
      * @return boolean
      */
     private static function isObject($value)
@@ -147,7 +152,7 @@ class PicoSecretParser
 
     /**
      * Parse recursive
-     * @param array $data
+     * @param array $data Data to be parsed
      */
     public static function parseRecursiveArray($data)
     {

@@ -93,9 +93,9 @@ class PicoDtoGenerator
     /**
      * Create property
      *
-     * @param array $typeMap
-     * @param string $columnName
-     * @param string $columnType
+     * @param array $typeMap Type map
+     * @param string $columnName Column name
+     * @param string $columnType Column type
      * @return string
      */
     protected function createProperty($typeMap, $columnName, $columnType)
@@ -121,7 +121,7 @@ class PicoDtoGenerator
     /**
      * Get property name
      *
-     * @param string $name
+     * @param string $name Column name
      * @return string
      */
     protected function getPropertyName($name)
@@ -268,7 +268,7 @@ class PicoDtoGenerator
 
         $rows = PicoColumnGenerator::getColumnList($this->database, $picoTableName);
 
-        $attrs = [];
+        $attrs = array();
         if(is_array($rows))
         {
             foreach($rows as $row)

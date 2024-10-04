@@ -242,12 +242,12 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
                 let cardChart = {};
                 for(let i in data)
                 {
-                 let config = data[i];
-                 config.options.plugins.tooltip = {
+                 let config2 = data[i];
+                 config2.options.plugins.tooltip = {
                   callbacks: {
                     label: function(tooltipItem) {
                       let label = tooltipItem.dataset.label;
-                      let value = tooltipItem.raw.toFixed(2);
+                      let value = tooltipItem.parsed.y.toFixed(2);
                       return ` ${label}: ${value}%`;
                     }
                   }
@@ -257,7 +257,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
                 {
                     chart.destroy();
                 }
-                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config);
+                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config2);
                 }
               })
               .catch(error => {

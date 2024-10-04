@@ -10,6 +10,11 @@ use stdClass;
  */
 class PicoArrayUtil
 {
+    private function __construct()
+    {
+        // prevent object construction from outside the class
+    }
+    
     /**
      * Camelize array keys
      *
@@ -71,7 +76,7 @@ class PicoArrayUtil
             #  - camelCase to snake_case
             # $transformedKey = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', ltrim($key, '!')));
 
-            $transformedKey = PicoStringUtil::camelize($key);
+            $transformedKey = PicoStringUtil::camelize(str_replace("-", "_", $key));
 
             # Work recursively
             if (is_array($value))

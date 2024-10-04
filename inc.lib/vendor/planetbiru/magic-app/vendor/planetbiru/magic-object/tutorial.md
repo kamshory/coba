@@ -9545,19 +9545,19 @@ File `import.yml`
 ```yml
 database_target:
   driver: mysql
-  host: server1.planetbiru.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Cebong2017
+  password: Jenglotsaurus
   database_name: sipro
   databseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
-  host: server1.planetbiru.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Cebong2017
+  password: Jenglotsaurus
   database_name: sipro_ori
   databseSchema: public
   timeZone: Asia/Jakarta
@@ -9661,19 +9661,19 @@ File `import.yml`
 ```yml
 database_target:
   driver: mysql
-  host: server1.planetbiru.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Cebong2017
+  password: Jenglotsaurus
   database_name: sipro
   databseSchema: public
   timeZone: Asia/Jakarta
 database_source:
   driver: mysql
-  host: server1.planetbiru.com
+  host: server1.domain.tld
   port: 3306
   username: root
-  password: Cebong2017
+  password: Jenglotsaurus
   database_name: sipro_ori
   databseSchema: public
   timeZone: Asia/Jakarta

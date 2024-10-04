@@ -25,6 +25,13 @@ class Area
     public $href;
 
     /**
+     * Attributes
+     *
+     * @var string[]
+     */
+    public $attributes;
+
+    /**
      * Zoom
      *
      * @var float
@@ -37,12 +44,17 @@ class Area
      * @param Rectangle|Triangle|Polygon|Circle $object One of Rectangle, Triangle, Polygon, or Circle
      * @param float $zoom Zoom
      * @param string $href Href
+     * @param string[] $attributes Attributes
      */
-    public function __construct($object, $zoom = 1, $href = null)
+    public function __construct($object, $zoom = 1, $href = null, $attributes = null)
     {
         if(isset($href))
         {
             $this->href = $href;
+        }
+        if(isset($attributes))
+        {
+            $this->attributes = $attributes;
         }
         $this->zoom = $zoom;
         if($object instanceof Rectangle)
@@ -70,7 +82,7 @@ class Area
     /**
      * Get rectangle coordinates
      *
-     * @param Rectangle $object
+     * @param Rectangle $object Rectangle
      * @return float[]
      */
     public function coordsFromRectangle($object)
@@ -86,7 +98,7 @@ class Area
     /**
      * Get triangle coordinates
      *
-     * @param Triangle $object
+     * @param Triangle $object Triangle
      * @return float[]
      */
     public function coordsFromTriangle($object)
@@ -104,7 +116,7 @@ class Area
     /**
      * Get Polygon coordinates
      *
-     * @param Polygon $object
+     * @param Polygon $object Polygon
      * @return float[]
      */
     public function coordsFromPolygon($object)
@@ -122,7 +134,7 @@ class Area
     /**
      * Get circle info
      *
-     * @param Circle $object
+     * @param Circle $object Circle
      * @return float[]
      */
     public function coordsFromCircle($object)
@@ -133,7 +145,7 @@ class Area
     /**
      * Get coordinates
      *
-     * @param float $zoom
+     * @param float $zoom Zoom
      * @return float[]
      */
     public function getCoords($zoom = 1)
@@ -165,6 +177,13 @@ class Area
         {
             $attrs[] = 'href="'.$this->href.'"';
         }
+        if(isset($this->attributes) && is_array($this->attributes))
+        {
+            foreach($this->attributes as $key=>$value)
+            {
+                $attrs[] = $key . "=\"" . htmlspecialchars($value) . "\"";
+            }
+        }
         return '<area '.implode(' ', $attrs).' />';
     }
 
@@ -189,6 +208,7 @@ class Area
     /**
      * Set the value of zoom
      *
+     * @param float $zoom Zoom
      * @return self
      */
     public function setZoom($zoom)
