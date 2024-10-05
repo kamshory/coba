@@ -14,9 +14,9 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use Sipro\AppIncludeImpl;
 use Sipro\Entity\Data\BillOfQuantity;
-use Sipro\Entity\Data\BukuHarian;
 use Sipro\Entity\Data\Proyek;
 use Sipro\Util\DateUtil;
+use Sipro\Util\ProyekUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -37,51 +37,10 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
 ?>
 <?php
     $hari = $appConfig->getHariProyek();
-    
-    $proyekDipilih = array();
-    
-    // dapatkan proyek dengan buku harian 3 hari ke belakang
-    $specsBukuHarian = PicoSpecification::getInstance()
-      ->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("-$hari days"))))
-      ->addAnd(PicoPredicate::getInstance()->lessThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("1 days"))))
-    ;
-    $sortsBukuHarian = PicoSortable::getInstance()
-      ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
-    ;
-    $finderBukuHarian = new BukuHarian(null, $database);
-    $daftarProyek = array();
-    $daftarNamaSupervisor = array();
-    try
-    {
-      $pageDataBukuHarian = $finderBukuHarian->findAll($specsBukuHarian, null, $sortsBukuHarian);
-      foreach($pageDataBukuHarian->getResult() as $bukuHarian)
-      {
-        $proyekDipilih[$bukuHarian->getProyekId()] = array(
-          'proyek_id'=>$bukuHarian->getProyekId(), 
-          'nama'=>$bukuHarian->issetProyek() ? $bukuHarian->getProyek()->getNama() : '',
-          'persen'=>$bukuHarian->issetProyek() ? floatval($bukuHarian->getProyek()->getPersen()) : 0
-        );
-        $daftarProyek[] = intval($bukuHarian->getProyekId());
-        $proyekId = $bukuHarian->getProyekId();
-        if($bukuHarian->hasValueSupervisor())
-        {
-          if(!isset($daftarNamaSupervisor[$proyekId]))
-          {
-            $daftarNamaSupervisor[$proyekId] = array();
-          }
-          $daftarNamaSupervisor[$proyekId][] = $bukuHarian->getSupervisor()->getNama();
-          $daftarNamaSupervisor[$proyekId] = array_unique($daftarNamaSupervisor[$proyekId]);
-
-        }
-        
-      }
-    }
-    catch(Exception $e)
-    {
-      // do nothing
-    }
-
-    $daftarProyek = array_unique($daftarProyek);
+    $cache = ProyekUtil::getDaftarProyek($database, $hari);
+    $daftarProyek = $cache->daftarProyek;
+    $proyekDipilih = $cache->proyekDipilih;
+    $daftarNamaSupervisor = $cache->daftarNamaSupervisor;
     
 
     $specsBOQ = PicoSpecification::getInstance()
@@ -98,6 +57,9 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
     $finderBOQ = new BillOfQuantity(null, $database);
 
     $listProyek = array();
+    $sortsBukuHarian = PicoSortable::getInstance()
+        ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
+        ;
     try
     {
       $pageDataBOQ = $finderBOQ->findAll($specsBOQ, null, $sortsBukuHarian);
@@ -190,128 +152,21 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
                 max-width: 200px;
               }
             </style>
-            <script>
-              
-
-              
-              document.addEventListener('DOMContentLoaded', function() {
-              Chart.register({
-                  id: 'moment',
-                  beforeInit: function(chart) {
-                      chart.data.labels = chart.data.labels.map(function(label) {
-                      return moment(label).format('YYYY-MM-DD HH:mm:ss');
-                      });
-                  }
-              });
-              document.querySelector('#proyek_id').addEventListener('change', function(e){
-                if(e.target.value != '')
-                {
-                  fetch('../lib.mobile-tools/ajax-proyek-boq.php?proyek_id='+e.target.value, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                  })
-                  .then(response => {
-                      if (!response.ok) {
-                          throw new Error('Network response was not ok ' + response.statusText);
-                      }
-                      return response.json();
-                  })
-                  .then(data => {
-                    createChart(data);
-                    document.querySelector('#min-date').innerHTML = data.minDate;
-                    document.querySelector('#max-date').innerHTML = data.maxDate;
-                  })
-                  .catch(error => {
-                      console.error('There has been a problem with your fetch operation:', error);
-                  });
-                }
-              });
-              let proyeks = [];
-              $('.progres-proyek').each(function(){
-                proyeks.push('proyeks[]='+$(this).attr('data-proyek-id'));
-              });
-
-
-              fetch('../lib.mobile-tools/ajax-proyek-progres.php?'+proyeks.join('&'), {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-              })
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error('Network response was not ok ' + response.statusText);
-                  }
-                  return response.json();
-              })
-              .then(data => {
-                let cardChart = {};
-                for(let i in data)
-                {
-                 let config2 = data[i];
-                 config2.options.plugins.tooltip = {
-                  callbacks: {
-                    label: function(tooltipItem) {
-                      let label = tooltipItem.dataset.label;
-                      let value = tooltipItem.parsed.y.toFixed(2);
-                      return ` ${label}: ${value}%`;
-                    }
-                  }
-                };
-                
-                if(chart)
-                {
-                    chart.destroy();
-                }
-                 cardChart[i] = new Chart(document.getElementById('card-chart-'+i), config2);
-                }
-              })
-              .catch(error => {
-                  console.error('There has been a problem with your fetch operation:', error);
-              });
-            });
-          
-              var chart;
-              var ctx;
-              function createChart(config)
-              {
-                ctx = document.getElementById('main-chart2').getContext('2d');
-                
-
-                config.options.plugins.tooltip = {
-                  callbacks: {
-                    label: function(tooltipItem) {
-                      let label = tooltipItem.dataset.label;
-                      let value = tooltipItem.raw.y.toFixed(2);
-                      return ` ${label}: ${value}%`;
-                    }
-                  }
-                };
-                
-                if(chart)
-                {
-                    chart.destroy();
-                }
-                chart = new Chart(ctx, config);
-            }
-
-            </script>
+            
             <form action="">
-            <select class="form-control" id="proyek_id">
-            <option value="">- Pilih Proyek -</option>
-            <?php
-                      
-            foreach($proyekDipilih as $proyekObj)
-            {
-                ?>
-                <option value="<?php echo $proyekObj['proyek_id'];?>"><?php echo $proyekObj['nama'];?></option>
+              <select class="form-control" id="proyek_id">
+                <option value="">- Pilih Proyek -</option>
                 <?php
-            }
-            ?>
-        </select>
-        </form>
+                          
+                foreach($proyekDipilih as $proyekObj)
+                {
+                    ?>
+                    <option value="<?php echo $proyekObj['proyek_id'];?>"><?php echo $proyekObj['nama'];?></option>
+                    <?php
+                }
+                ?>
+            </select>
+            </form>
             </div>
 
           </div>
@@ -329,79 +184,6 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
         <div class="card mb-4">
           <div class="card-header">Progress Pekerjaan Proyek</div>
           <div class="card-body">
-            
-            <?php
-            $hari = $appConfig->getHariProyek();
-            
-            // dapatkan proyek dengan buku harian 3 hari ke belakang
-            $specsBukuHarian = PicoSpecification::getInstance()
-              ->addAnd(PicoPredicate::getInstance()->greaterThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("-$hari days"))))
-              ->addAnd(PicoPredicate::getInstance()->lessThanOrEquals(Field::of()->waktuBuat, date('Y-m-d H:i:s', strtotime("1 days"))))
-            ;
-            $sortsBukuHarian = PicoSortable::getInstance()
-              ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
-            ;
-            $finderBukuHarian = new BukuHarian(null, $database);
-            $daftarProyek = array();
-            $daftarNamaSupervisor = array();
-            try
-            {
-              $pageDataBukuHarian = $finderBukuHarian->findAll($specsBukuHarian, null, $sortsBukuHarian);
-              foreach($pageDataBukuHarian->getResult() as $bukuHarian)
-              {
-                $daftarProyek[] = intval($bukuHarian->getProyekId());
-                $proyekId = $bukuHarian->getProyekId();
-                if($bukuHarian->hasValueSupervisor())
-                {
-                  if(!isset($daftarNamaSupervisor[$proyekId]))
-                  {
-                    $daftarNamaSupervisor[$proyekId] = array();
-                  }
-                  $daftarNamaSupervisor[$proyekId][] = $bukuHarian->getSupervisor()->getNama();
-                  $daftarNamaSupervisor[$proyekId] = array_unique($daftarNamaSupervisor[$proyekId]);
-                }
-              }
-            }
-            catch(Exception $e)
-            {
-              // do nothing
-            }
-
-            $daftarProyek = array_unique($daftarProyek);
-
-            $specsBOQ = PicoSpecification::getInstance()
-              ->addAnd(PicoPredicate::getInstance()->in(Field::of()->proyekId, $daftarProyek))
-              ->addAnd(PicoPredicate::getInstance()->equals(Field::of()->aktif, true))
-              ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, null))
-              ->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->volume, 0))
-            ;
-
-            $sortsBOQ = PicoSortable::getInstance()
-              ->addSortable(new PicoSort(Field::of()->waktuBuat, PicoSort::ORDER_TYPE_ASC))
-            ;
-
-            $finderBOQ = new BillOfQuantity(null, $database);
-
-            $listProyek = array();
-            try
-            {
-              $pageDataBOQ = $finderBOQ->findAll($specsBOQ, null, $sortsBukuHarian);
-              $listBOQ = $pageDataBOQ->getResult();
-              foreach($listBOQ as $idx=>$boq)
-              {
-                if(!isset($listProyek[$boq->getProyekId()]))
-                {
-                  $listProyek[$boq->getProyekId()] = array();
-                }
-                $listProyek[$boq->getProyekId()][] = $boq;
-              }
-            }
-            catch(Exception $e)
-            {
-              // do nothing
-            }
-
-            ?>
 
             <div class="table-responsive">
               <table class="table border mb-0">
@@ -519,28 +301,11 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
     <script src="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/utils/js/index.js"></script>
     
     <script>
-      Chart.defaults.pointHitDetectionRadius = 1;
-      Chart.defaults.plugins.tooltip.enabled = false;
-      Chart.defaults.plugins.tooltip.mode = 'index';
-      Chart.defaults.plugins.tooltip.position = 'nearest';
-      Chart.defaults.plugins.tooltip.external = coreui.ChartJS.customTooltips;
-      Chart.defaults.defaultFontColor = coreui.Utils.getStyle('--cui-body-color');
-      document.documentElement.addEventListener('ColorSchemeChange', () => {
-        cardChart1.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--cui-primary');
-        cardChart2.data.datasets[0].pointBackgroundColor = coreui.Utils.getStyle('--cui-info');
-        mainChart.options.scales.x.grid.color = coreui.Utils.getStyle('--cui-border-color-translucent');
-        mainChart.options.scales.x.ticks.color = coreui.Utils.getStyle('--cui-body-color');
-        mainChart.options.scales.y.border.color = coreui.Utils.getStyle('--cui-border-color-translucent');
-        mainChart.options.scales.y.grid.color = coreui.Utils.getStyle('--cui-border-color-translucent');
-        mainChart.options.scales.y.ticks.color = coreui.Utils.getStyle('--cui-body-color');
-        cardChart1.update();
-        cardChart2.update();
-        mainChart.update();
-      });
-      const random = (min, max) =>
-      // eslint-disable-next-line no-mixed-operators
-      Math.floor(Math.random() * (max - min + 1) + min);
+      var urlBoq = '../lib.mobile-tools/ajax-proyek-boq.php';
+      var urlProgres = '../lib.mobile-tools/ajax-proyek-progres.php';
     </script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/home.min.js'></script>
+
         <?php
 
 require_once $appInclude->mainAppFooter(__DIR__);

@@ -193,6 +193,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		createChart();
 	});
 </script>
+<style>
+	.chartjs-tooltip{
+		margin-top: 20px;
+	}
+</style>
 <div class="page page-jambi page-insert">
 	<div class="jambi-wrapper">
 		<form name="createform" id="createform" action="" method="post">
@@ -321,6 +326,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		$('#nilai').val(JSON.stringify(nilai));
 	});
 </script>
+<style>
+	.chartjs-tooltip{
+		margin-top: 20px;
+	}
+</style>
 <div class="page page-jambi page-update">
 	<div class="jambi-wrapper">
 		<form name="updateform" id="updateform" action="" method="post">
@@ -494,6 +504,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		createChart();
 	});
 </script>
+<style>
+	.chartjs-tooltip{
+		margin-top: 20px;
+	}
+</style>
 <input type="hidden" name="tanggal_mulai" id="tanggal_mulai" value="<?php echo $kurvaS->getTanggalMulai();?>"/>
 <input type="hidden" name="tanggal_selesai" id="tanggal_selesai" value="<?php echo $kurvaS->getTanggalSelesai();?>"/>
 <div class="page page-jambi page-detail">
