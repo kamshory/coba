@@ -18,6 +18,8 @@ class Cache extends MagicObject
 	/**
 	 * Cache ID
 	 * 
+	 * @Id
+	 * @GeneratedValue(strategy=GenerationType.UUID)
 	 * @NotNull
 	 * @Column(name="cache_id", type="varchar(100)", length=100, nullable=false)
 	 * @Label(content="Cache ID")

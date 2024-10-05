@@ -106,7 +106,11 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
     </style>
     <div class="container">
     <div class="row g-4 mb-4 progres-proyek-container">
-      
+    <style>
+    .chartjs-tooltip{
+      margin-top: 10px;
+    }
+    </style>
     <?php
       for($i = $nproyek - 1, $j = 0; $i >= 0 && $j < 4; $i--, $j++)
       {

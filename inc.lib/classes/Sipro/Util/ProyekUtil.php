@@ -13,11 +13,10 @@ use stdClass;
 
 class ProyekUtil
 {
-
-    public static function getDaftarProyek($database, $hari)
+    public static function getDaftarProyek($database, $hari, $lifetime = 3600)
     {
         $cacheKey = 'daftar-proyek';
-        $expire = date('Y-m-d H:i:s', time() + 3600);
+        $expire = date('Y-m-d H:i:s', time() + $lifetime);
         $now = date('Y-m-d H:i:s');
 
         $specsCache = PicoSpecification::getInstance()
@@ -72,8 +71,7 @@ class ProyekUtil
                         $daftarNamaSupervisor[$proyekId][] = $bukuHarian->getSupervisor()->getNama();
                         $daftarNamaSupervisor[$proyekId] = array_unique($daftarNamaSupervisor[$proyekId]);
 
-                    }
-                    
+                    }                 
                 }
             }
             catch(Exception $e)
@@ -88,14 +86,10 @@ class ProyekUtil
             $result->proyekDipilih = $proyekDipilih;
             $result->daftarNamaSupervisor = $daftarNamaSupervisor;
 
-
+            $cache = new Cache(null, $database);
             $cache->setCacheId($cacheKey)->setContent(json_encode($result))->setExpire($expire);
             $cache->save();
-        }
-
-       
+        }    
         return $result;
-    }
-
-    
+    } 
 }
