@@ -17,7 +17,6 @@ document.documentElement.addEventListener('ColorSchemeChange', () => {
     mainChart.update();
 });
 const random = (min, max) =>
-    // eslint-disable-next-line no-mixed-operators
     Math.floor(Math.random() * (max - min + 1) + min);
 
 
@@ -65,35 +64,35 @@ document.addEventListener('DOMContentLoaded', function () {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json();
-    })
-    .then(data => {
-        let cardChart = {};
-        for (let i in data) {
-            let config2 = data[i];
-            config2.options.plugins.tooltip = {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        let label = tooltipItem.dataset.label;
-                        let value = tooltipItem.parsed.y.toFixed(2);
-                        return ` ${label}: ${value}%`;
-                    }
-                }
-            };
-
-            if (chart) {
-                chart.destroy();
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-            cardChart[i] = new Chart(document.getElementById('card-chart-' + i), config2);
-        }
-    })
-    .catch(error => {
-        console.error('There has been a problem with your fetch operation:', error);
-    });
+            return response.json();
+        })
+        .then(data => {
+            let cardChart = {};
+            for (let i in data) {
+                let config2 = data[i];
+                config2.options.plugins.tooltip = {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            let label = tooltipItem.dataset.label;
+                            let value = tooltipItem.parsed.y.toFixed(2);
+                            return ` ${label}: ${value}%`;
+                        }
+                    }
+                };
+
+                if (chart) {
+                    chart.destroy();
+                }
+                cardChart[i] = new Chart(document.getElementById('card-chart-' + i), config2);
+            }
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 });
 
 var chart;
@@ -110,6 +109,23 @@ function createChart(config) {
             }
         }
     };
+
+    config.options.plugins.legend = {
+        labels: {
+            generateLabels: function (chart) {
+                const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                labels.forEach(label => {
+                    if (label.text.length > 12) {
+                        label.text = label.text.substring(0, 12) + '...';
+                    }
+                });
+                return labels;
+            },
+            boxWidth: 10,
+            boxHeight: 8
+        }
+    };
+
 
     if (chart) {
         chart.destroy();

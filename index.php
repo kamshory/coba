@@ -12,7 +12,6 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\InputPost;
 use Sipro\Entity\Data\BillOfQuantity;
-use Sipro\Entity\Data\BukuHarian;
 use Sipro\Util\DateUtil;
 use Sipro\Util\ProyekUtil;
 
@@ -30,7 +29,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 
     <?php
     $hari = $appConfig->getHariProyek();
-    $cache = ProyekUtil::getDaftarProyek($database, $hari);
+    $cache = ProyekUtil::getDaftarProyek($database, $hari, 7200);
     $daftarProyek = $cache->daftarProyek;
     $proyekDipilih = $cache->proyekDipilih;
     $daftarNamaSupervisor = $cache->daftarNamaSupervisor;
@@ -167,7 +166,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
 
           </div>
         </div>
-        <div class="c-chart-wrapper" style="height:400px;margin-top:40px;">
+        <div class="c-chart-wrapper" style="height:400px;">
           <canvas class="chart" id="main-chart2" height="400" style="display: block; box-sizing: border-box; height: 400px; width: 1238px;" width="1238"></canvas>
         </div>
       </div>
@@ -300,7 +299,7 @@ require_once __DIR__ . "/inc.app/header-supervisor.php";
       var urlBoq = 'lib.mobile-tools/ajax-proyek-boq.php';
       var urlProgres = 'lib.mobile-tools/ajax-proyek-progres.php';
     </script>
-    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/home.min.js'></script>
+    <script src='<?php echo $baseAssetsUrl;?>lib.assets/chart/home.js'></script>
         
     <?php
 require_once __DIR__ . "/inc.app/footer-supervisor.php";

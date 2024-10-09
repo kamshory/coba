@@ -165,6 +165,7 @@ $template = '{
     "options": {
       "spanGaps": 172800000,
       "responsive": true,
+      "maintainAspectRatio": false,
       "interaction": {
         "mode": "nearest"
       },

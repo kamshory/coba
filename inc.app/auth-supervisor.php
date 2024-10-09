@@ -9,17 +9,16 @@ use Sipro\Entity\Data\Supervisor;
 
 require_once __DIR__."/app.php";
 require_once __DIR__."/session.php";
-
 $currentLoggedInSupervisor = new Supervisor(null, $database);
 if(isset($sessions->supervisorUsername) && isset($sessions->supervisorPassword))
 {
     try
     {
+ 
         $currentLoggedInSupervisor->findOneByUsernameAndPasswordAndActiveAndBlocked($sessions->supervisorUsername, sha1($sessions->supervisorPassword), true, false);
     }
     catch(Exception $e)
     {
-        echo $e->getMessage();
         require_once __DIR__ . "/default-supervisor.php";
         require_once __DIR__ . "/login-form-supervisor.php";
         exit();

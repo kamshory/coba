@@ -37,7 +37,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
 ?>
 <?php
     $hari = $appConfig->getHariProyek();
-    $cache = ProyekUtil::getDaftarProyek($database, $hari);
+    $cache = ProyekUtil::getDaftarProyek($database, $hari, 7200);
     $daftarProyek = $cache->daftarProyek;
     $proyekDipilih = $cache->proyekDipilih;
     $daftarNamaSupervisor = $cache->daftarNamaSupervisor;
@@ -175,7 +175,7 @@ $baseAssetsUrl = $appConfig->getSite()->getBaseUrl();
 
           </div>
         </div>
-        <div class="c-chart-wrapper" style="height:400px;margin-top:40px;">
+        <div class="c-chart-wrapper" style="height:400px;">
           <canvas class="chart" id="main-chart2" height="400" style="display: block; box-sizing: border-box; height: 400px; width: 1238px;" width="1238"></canvas>
         </div>
       </div>
