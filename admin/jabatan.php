@@ -4,6 +4,7 @@
 // Visit https://github.com/Planetbiru/MagicAppBuilder
 
 use MagicObject\MagicObject;
+use MagicObject\SetterGetter;
 use MagicObject\Database\PicoPage;
 use MagicObject\Database\PicoPageable;
 use MagicObject\Database\PicoPredicate;
@@ -22,6 +23,7 @@ use Sipro\Entity\Data\Jabatan;
 use Sipro\AppIncludeImpl;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
+
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
@@ -42,6 +44,7 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$jabatan = new Jabatan(null, $database);
 	$jabatan->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$jabatan->setSingkatan($inputPost->getSingkatan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jabatan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jabatan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jabatan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -66,6 +69,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
 	$jabatan = new Jabatan(null, $database);
 	$jabatan->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$jabatan->setSingkatan($inputPost->getSingkatan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$jabatan->setSortOrder($inputPost->getSortOrder(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$jabatan->setDefaultData($inputPost->getDefaultData(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$jabatan->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -160,6 +164,28 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 	}
 	$currentModule->redirectToItself();
 }
+else if($inputPost->getUserAction() == UserAction::SORT_ORDER)
+{
+	$jabatan = new Jabatan(null, $database);
+	if($inputPost->getNewOrder() != null && $inputPost->countableNewOrder())
+	{
+		foreach($inputPost->getNewOrder() as $dataItem)
+		{
+			if(is_string($dataItem))
+			{
+				$dataItem = new SetterGetter(json_decode($dataItem));
+			}
+			$primaryKeyValue = $dataItem->getPrimaryKey();
+			$sortOrder = $dataItem->getSortOrder();
+			$jabatan->where(PicoSpecification::getInstance()
+				->addAnd(new PicoPredicate(Field::of()->jabatanId, $primaryKeyValue))
+			)
+			->setSortOrder($sortOrder)
+			->update();
+		}
+	}
+	$currentModule->redirectToItself();
+}
 if($inputGet->getUserAction() == UserAction::CREATE)
 {
 $appEntityLanguage = new AppEntityLanguage(new Jabatan(), $appConfig, $currentUser->getLanguageId());
@@ -174,6 +200,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSingkatan();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="singkatan" id="singkatan"/>
 						</td>
 					</tr>
 					<tr>
@@ -232,6 +264,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
 							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $jabatan->getNama();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getSingkatan();?></td>
+						<td>
+							<input class="form-control" type="text" name="singkatan" id="singkatan" value="<?php echo $jabatan->getSingkatan();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -322,6 +360,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $jabatan->getNama();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getSingkatan();?></td>
+						<td><?php echo $jabatan->getSingkatan();?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getSortOrder();?></td>
 						<td><?php echo $jabatan->getSortOrder();?></td>
 					</tr>
@@ -379,10 +421,12 @@ else
 $appEntityLanguage = new AppEntityLanguage(new Jabatan(), $appConfig, $currentUser->getLanguageId());
 
 $specMap = array(
-	
+	"nama" => PicoSpecification::filter("nama", "fulltext"),
+	"singkatan" => PicoSpecification::filter("singkatan", "fulltext")
 );
 $sortOrderMap = array(
 	"nama" => "nama",
+	"singkatan" => "singkatan",
 	"sortOrder" => "sortOrder",
 	"defaultData" => "defaultData",
 	"aktif" => "aktif"
@@ -419,6 +463,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appLanguage->getNumero() => $headerFormat->asNumber(),
 		$appEntityLanguage->getJabatanId() => $headerFormat->getJabatanId(),
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
+		$appEntityLanguage->getSingkatan() => $headerFormat->getSingkatan(),
 		$appEntityLanguage->getSortOrder() => $headerFormat->getSortOrder(),
 		$appEntityLanguage->getDefaultData() => $headerFormat->asString(),
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
@@ -429,6 +474,7 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			sprintf("%d", $index + 1),
 			$row->getJabatanId(),
 			$row->getNama(),
+			$row->getSingkatan(),
 			$row->getSortOrder(),
 			$row->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
@@ -444,6 +490,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 	<div class="jambi-wrapper">
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
+					<span class="filter-control">
+						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
+				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getSingkatan();?></span>
+					<span class="filter-control">
+						<input type="text" name="singkatan" class="form-control" value="<?php echo $inputGet->getSingkatan();?>" autocomplete="off"/>
+					</span>
+				</span>
+				
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
@@ -485,6 +545,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<table class="table table-row table-sort-by-column">
 						<thead>
 							<tr>
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-header"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-controll data-selector" data-key="jabatan_id">
 									<input type="checkbox" class="checkbox check-master" data-selector=".checkbox-jabatan-id"/>
@@ -502,13 +565,14 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
+								<td data-col-name="singkatan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSingkatan();?></a></td>
 								<td data-col-name="sort_order" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSortOrder();?></a></td>
 								<td data-col-name="default_data" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getDefaultData();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 							</tr>
 						</thead>
 					
-						<tbody data-offset="<?php echo $pageData->getDataOffset();?>">
+						<tbody class="data-table-manual-sort" data-offset="<?php echo $pageData->getDataOffset();?>">
 							<?php 
 							$dataIndex = 0;
 							while($jabatan = $pageData->fetch())
@@ -516,7 +580,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								$dataIndex++;
 							?>
 		
-							<tr data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+							<tr data-primary-key="<?php echo $jabatan->getJabatanId();?>" data-sort-order="<?php echo $jabatan->getSortOrder();?>" data-number="<?php echo $pageData->getDataOffset() + $dataIndex;?>">
+								<?php if($userPermission->isAllowedSortOrder()){ ?>
+								<td class="data-sort data-sort-body data-sort-handler"></td>
+								<?php } ?>
 								<?php if($userPermission->isAllowedBatchAction()){ ?>
 								<td class="data-selector" data-key="jabatan_id">
 									<input type="checkbox" class="checkbox check-slave checkbox-jabatan-id" name="checked_row_id[]" value="<?php echo $jabatan->getJabatanId();?>"/>
@@ -534,7 +601,8 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nama"><?php echo $jabatan->getNama();?></td>
-								<td data-col-name="sort_order"><?php echo $jabatan->getSortOrder();?></td>
+								<td data-col-name="singkatan"><?php echo $jabatan->getSingkatan();?></td>
+								<td data-col-name="sort_order" class="data-sort-order-column"><?php echo $jabatan->getSortOrder();?></td>
 								<td data-col-name="default_data"><?php echo $jabatan->optionDefaultData($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $jabatan->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
@@ -553,6 +621,9 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
+						<?php } ?>
+						<?php if($userPermission->isAllowedSortOrder()){ ?>
+						<button type="submit" class="btn btn-primary" name="user_action" value="sort_order" disabled="disabled"><?php echo $appLanguage->getSaveCurrentOrder();?></button>
 						<?php } ?>
 					</div>
 				</div>

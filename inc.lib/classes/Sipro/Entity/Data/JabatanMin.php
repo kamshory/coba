@@ -29,11 +29,20 @@ class JabatanMin extends MagicObject
 	/**
 	 * Nama
 	 * 
-	 * @Column(name="nama", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="nama", type="varchar(100)", length=100, nullable=true)
 	 * @Label(content="Nama")
 	 * @var string
 	 */
 	protected $nama;
+
+	/**
+	 * Singkatan
+	 * 
+	 * @Column(name="singkatan", type="varchar(20)", length=20, nullable=true)
+	 * @Label(content="Singkatan")
+	 * @var string
+	 */
+	protected $singkatan;
 
 	/**
 	 * Sort Order
