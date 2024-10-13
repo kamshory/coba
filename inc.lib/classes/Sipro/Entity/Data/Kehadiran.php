@@ -82,6 +82,24 @@ class Kehadiran extends MagicObject
 	protected $tanggal;
 
 	/**
+	 * Periode ID
+	 * 
+	 * @Column(name="periode_id", type="varchar(6)", length=6, nullable=true)
+	 * @Label(content="Periode ID")
+	 * @var string
+	 */
+	protected $periodeId;
+
+	/**
+	 * Periode
+	 * 
+	 * @JoinColumn(name="periode_id", referenceColumnName="periode_id")
+	 * @Label(content="Periode")
+	 * @var PeriodeMin
+	 */
+	protected $periode;
+
+	/**
 	 * Waktu Masuk
 	 * 
 	 * @Column(name="waktu_masuk", type="timestamp", length=19, nullable=true)
@@ -107,6 +125,33 @@ class Kehadiran extends MagicObject
 	 * @var LokasiKehadiranMin
 	 */
 	protected $lokasiMasuk;
+
+	/**
+	 * Alamat Masuk
+	 * 
+	 * @Column(name="alamat_masuk", type="longtext", nullable=true)
+	 * @Label(content="Alamat Masuk")
+	 * @var string
+	 */
+	protected $alamatMasuk;
+
+	/**
+	 * Latitude Masuk
+	 * 
+	 * @Column(name="latitude_masuk", type="double", nullable=true)
+	 * @Label(content="Latitude Masuk")
+	 * @var double
+	 */
+	protected $latitudeMasuk;
+
+	/**
+	 * Longitude Masuk
+	 * 
+	 * @Column(name="longitude_masuk", type="double", nullable=true)
+	 * @Label(content="Longitude Masuk")
+	 * @var double
+	 */
+	protected $longitudeMasuk;
 
 	/**
 	 * Foto Masuk
@@ -152,6 +197,33 @@ class Kehadiran extends MagicObject
 	 * @var LokasiKehadiranMin
 	 */
 	protected $lokasiPulang;
+
+	/**
+	 * Alamat Pulang
+	 * 
+	 * @Column(name="alamat_pulang", type="longtext", nullable=true)
+	 * @Label(content="Alamat Pulang")
+	 * @var string
+	 */
+	protected $alamatPulang;
+
+	/**
+	 * Latitude Pulang
+	 * 
+	 * @Column(name="latitude_pulang", type="double", nullable=true)
+	 * @Label(content="Latitude Pulang")
+	 * @var double
+	 */
+	protected $latitudePulang;
+
+	/**
+	 * Longitude Pulang
+	 * 
+	 * @Column(name="longitude_pulang", type="double", nullable=true)
+	 * @Label(content="Longitude Pulang")
+	 * @var double
+	 */
+	protected $longitudePulang;
 
 	/**
 	 * Foto Pulang

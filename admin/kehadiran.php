@@ -23,6 +23,7 @@ use Sipro\Entity\Data\Kehadiran;
 use Sipro\AppIncludeImpl;
 use Sipro\Entity\Data\UserMin;
 use Sipro\Entity\Data\SupervisorMin;
+use Sipro\Entity\Data\PeriodeMin;
 use Sipro\Entity\Data\LokasiKehadiranMin;
 use MagicApp\XLSX\DocumentWriter;
 use MagicApp\XLSX\XLSXDataFormat;
@@ -50,13 +51,20 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$kehadiran->setUserId($inputPost->getUserId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setSupervisorId($inputPost->getSupervisorId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setPeriodeId($inputPost->getPeriodeId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setWaktuMasuk($inputPost->getWaktuMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setLokasiMasukId($inputPost->getLokasiMasukId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setFotoMasuk($inputPost->getFotoMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setAlamatMasuk($inputPost->getAlamatMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setLatitudeMasuk($inputPost->getLatitudeMasuk(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$kehadiran->setLongitudeMasuk($inputPost->getLongitudeMasuk(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$kehadiran->setIpMasuk($inputPost->getIpMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setWaktuPulang($inputPost->getWaktuPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setLokasiPulangId($inputPost->getLokasiPulangId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setFotoPulang($inputPost->getFotoPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setAlamatPulang($inputPost->getAlamatPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setLatitudePulang($inputPost->getLatitudePulang(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$kehadiran->setLongitudePulang($inputPost->getLongitudePulang(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$kehadiran->setIpPulang($inputPost->getIpPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setAktivitas($inputPost->getAktivitas(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -84,13 +92,20 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$kehadiran->setUserId($inputPost->getUserId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setSupervisorId($inputPost->getSupervisorId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setTanggal($inputPost->getTanggal(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setPeriodeId($inputPost->getPeriodeId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setWaktuMasuk($inputPost->getWaktuMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setLokasiMasukId($inputPost->getLokasiMasukId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setFotoMasuk($inputPost->getFotoMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setAlamatMasuk($inputPost->getAlamatMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setLatitudeMasuk($inputPost->getLatitudeMasuk(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$kehadiran->setLongitudeMasuk($inputPost->getLongitudeMasuk(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$kehadiran->setIpMasuk($inputPost->getIpMasuk(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setWaktuPulang($inputPost->getWaktuPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setLokasiPulangId($inputPost->getLokasiPulangId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$kehadiran->setFotoPulang($inputPost->getFotoPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setAlamatPulang($inputPost->getAlamatPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$kehadiran->setLatitudePulang($inputPost->getLatitudePulang(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
+	$kehadiran->setLongitudePulang($inputPost->getLongitudePulang(PicoFilterConstant::FILTER_SANITIZE_NUMBER_FLOAT, false, false, true));
 	$kehadiran->setIpPulang($inputPost->getIpPulang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setAktivitas($inputPost->getAktivitas(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$kehadiran->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
@@ -246,6 +261,23 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getPeriode();?></td>
+						<td>
+							<select class="form-control" name="periode_id" id="periode_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new PeriodeMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->periodeId, Field::of()->nama)
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuMasuk();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="datetime-local" name="waktu_masuk" id="waktu_masuk"/>
@@ -272,6 +304,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getFotoMasuk();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="foto_masuk" id="foto_masuk"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatMasuk();?></td>
+						<td>
+							<textarea class="form-control" name="alamat_masuk" id="alamat_masuk" spellcheck="false"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudeMasuk();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="latitude_masuk" id="latitude_masuk"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudeMasuk();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="longitude_masuk" id="longitude_masuk"/>
 						</td>
 					</tr>
 					<tr>
@@ -307,6 +357,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getFotoPulang();?></td>
 						<td>
 							<input autocomplete="off" class="form-control" type="text" name="foto_pulang" id="foto_pulang"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatPulang();?></td>
+						<td>
+							<textarea class="form-control" name="alamat_pulang" id="alamat_pulang" spellcheck="false"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudePulang();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="latitude_pulang" id="latitude_pulang"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudePulang();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="number" step="any" name="longitude_pulang" id="longitude_pulang"/>
 						</td>
 					</tr>
 					<tr>
@@ -412,6 +480,23 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getPeriode();?></td>
+						<td>
+							<select class="form-control" name="periode_id" id="periode_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new PeriodeMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->periodeId, Field::of()->nama, $kehadiran->getPeriodeId())
+								; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuMasuk();?></td>
 						<td>
 							<input class="form-control" type="datetime-local" name="waktu_masuk" id="waktu_masuk" value="<?php echo $kehadiran->getWaktuMasuk();?>" autocomplete="off"/>
@@ -438,6 +523,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getFotoMasuk();?></td>
 						<td>
 							<input class="form-control" type="text" name="foto_masuk" id="foto_masuk" value="<?php echo $kehadiran->getFotoMasuk();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatMasuk();?></td>
+						<td>
+							<textarea class="form-control" name="alamat_masuk" id="alamat_masuk" spellcheck="false"><?php echo $kehadiran->getAlamatMasuk();?></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudeMasuk();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="latitude_masuk" id="latitude_masuk" value="<?php echo $kehadiran->getLatitudeMasuk();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudeMasuk();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="longitude_masuk" id="longitude_masuk" value="<?php echo $kehadiran->getLongitudeMasuk();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -473,6 +576,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getFotoPulang();?></td>
 						<td>
 							<input class="form-control" type="text" name="foto_pulang" id="foto_pulang" value="<?php echo $kehadiran->getFotoPulang();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatPulang();?></td>
+						<td>
+							<textarea class="form-control" name="alamat_pulang" id="alamat_pulang" spellcheck="false"><?php echo $kehadiran->getAlamatPulang();?></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudePulang();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="latitude_pulang" id="latitude_pulang" value="<?php echo $kehadiran->getLatitudePulang();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudePulang();?></td>
+						<td>
+							<input class="form-control" type="number" step="any" name="longitude_pulang" id="longitude_pulang" value="<?php echo $kehadiran->getLongitudePulang();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -552,6 +673,14 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"objectName" => "supervisor",
 			"propertyName" => "nama"
 		), 
+		"periodeId" => array(
+			"columnName" => "periode_id",
+			"entityName" => "PeriodeMin",
+			"tableName" => "periode",
+			"primaryKey" => "periode_id",
+			"objectName" => "periode",
+			"propertyName" => "nama"
+		), 
 		"lokasiMasukId" => array(
 			"columnName" => "lokasi_masuk_id",
 			"entityName" => "LokasiKehadiranMin",
@@ -611,6 +740,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $kehadiran->getTanggal();?></td>
 					</tr>
 					<tr>
+						<td><?php echo $appEntityLanguage->getPeriode();?></td>
+						<td><?php echo $kehadiran->issetPeriode() ? $kehadiran->getPeriode()->getNama() : "";?></td>
+					</tr>
+					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuMasuk();?></td>
 						<td><?php echo $kehadiran->getWaktuMasuk();?></td>
 					</tr>
@@ -621,6 +754,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getFotoMasuk();?></td>
 						<td><?php echo $kehadiran->getFotoMasuk();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatMasuk();?></td>
+						<td><?php echo $kehadiran->getAlamatMasuk();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudeMasuk();?></td>
+						<td><?php echo $kehadiran->getLatitudeMasuk();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudeMasuk();?></td>
+						<td><?php echo $kehadiran->getLongitudeMasuk();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpMasuk();?></td>
@@ -637,6 +782,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getFotoPulang();?></td>
 						<td><?php echo $kehadiran->getFotoPulang();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAlamatPulang();?></td>
+						<td><?php echo $kehadiran->getAlamatPulang();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLatitudePulang();?></td>
+						<td><?php echo $kehadiran->getLatitudePulang();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getLongitudePulang();?></td>
+						<td><?php echo $kehadiran->getLongitudePulang();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getIpPulang();?></td>
@@ -702,20 +859,28 @@ $specMap = array(
 	"grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
 	"userId" => PicoSpecification::filter("userId", "number"),
 	"supervisorId" => PicoSpecification::filter("supervisorId", "number"),
-	"tanggal" => PicoSpecification::filter("tanggal", "fulltext")
+	"tanggal" => PicoSpecification::filter("tanggal", "fulltext"),
+	"periodeId" => PicoSpecification::filter("periodeId", "fulltext")
 );
 $sortOrderMap = array(
 	"grupPengguna" => "grupPengguna",
 	"userId" => "userId",
 	"supervisorId" => "supervisorId",
 	"tanggal" => "tanggal",
+	"periodeId" => "periodeId",
 	"waktuMasuk" => "waktuMasuk",
 	"lokasiMasukId" => "lokasiMasukId",
 	"fotoMasuk" => "fotoMasuk",
+	"alamatMasuk" => "alamatMasuk",
+	"latitudeMasuk" => "latitudeMasuk",
+	"longitudeMasuk" => "longitudeMasuk",
 	"ipMasuk" => "ipMasuk",
 	"waktuPulang" => "waktuPulang",
 	"lokasiPulangId" => "lokasiPulangId",
 	"fotoPulang" => "fotoPulang",
+	"alamatPulang" => "alamatPulang",
+	"latitudePulang" => "latitudePulang",
+	"longitudePulang" => "longitudePulang",
 	"ipPulang" => "ipPulang",
 	"aktivitas" => "aktivitas",
 	"aktif" => "aktif"
@@ -755,6 +920,14 @@ $subqueryMap = array(
 	"objectName" => "supervisor",
 	"propertyName" => "nama"
 ), 
+"periodeId" => array(
+	"columnName" => "periode_id",
+	"entityName" => "PeriodeMin",
+	"tableName" => "periode",
+	"primaryKey" => "periode_id",
+	"objectName" => "periode",
+	"propertyName" => "nama"
+), 
 "lokasiMasukId" => array(
 	"columnName" => "lokasi_masuk_id",
 	"entityName" => "LokasiKehadiranMin",
@@ -788,13 +961,20 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getUser() => $headerFormat->asString(),
 		$appEntityLanguage->getSupervisor() => $headerFormat->asString(),
 		$appEntityLanguage->getTanggal() => $headerFormat->getTanggal(),
+		$appEntityLanguage->getPeriode() => $headerFormat->asString(),
 		$appEntityLanguage->getWaktuMasuk() => $headerFormat->getWaktuMasuk(),
 		$appEntityLanguage->getLokasiMasuk() => $headerFormat->asString(),
 		$appEntityLanguage->getFotoMasuk() => $headerFormat->getFotoMasuk(),
+		$appEntityLanguage->getAlamatMasuk() => $headerFormat->asString(),
+		$appEntityLanguage->getLatitudeMasuk() => $headerFormat->getLatitudeMasuk(),
+		$appEntityLanguage->getLongitudeMasuk() => $headerFormat->getLongitudeMasuk(),
 		$appEntityLanguage->getIpMasuk() => $headerFormat->getIpMasuk(),
 		$appEntityLanguage->getWaktuPulang() => $headerFormat->getWaktuPulang(),
 		$appEntityLanguage->getLokasiPulang() => $headerFormat->asString(),
 		$appEntityLanguage->getFotoPulang() => $headerFormat->getFotoPulang(),
+		$appEntityLanguage->getAlamatPulang() => $headerFormat->asString(),
+		$appEntityLanguage->getLatitudePulang() => $headerFormat->getLatitudePulang(),
+		$appEntityLanguage->getLongitudePulang() => $headerFormat->getLongitudePulang(),
 		$appEntityLanguage->getIpPulang() => $headerFormat->getIpPulang(),
 		$appEntityLanguage->getAktivitas() => $headerFormat->asString(),
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
@@ -808,13 +988,20 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->issetUser() ? $row->getUser()->getFirstName() : "",
 			$row->issetSupervisor() ? $row->getSupervisor()->getNama() : "",
 			$row->getTanggal(),
+			$row->issetPeriode() ? $row->getPeriode()->getNama() : "",
 			$row->getWaktuMasuk(),
 			$row->issetLokasiMasuk() ? $row->getLokasiMasuk()->getNama() : "",
 			$row->getFotoMasuk(),
+			$row->getAlamatMasuk(),
+			$row->getLatitudeMasuk(),
+			$row->getLongitudeMasuk(),
 			$row->getIpMasuk(),
 			$row->getWaktuPulang(),
 			$row->issetLokasiPulang() ? $row->getLokasiPulang()->getNama() : "",
 			$row->getFotoPulang(),
+			$row->getAlamatPulang(),
+			$row->getLatitudePulang(),
+			$row->getLongitudePulang(),
 			$row->getIpPulang(),
 			$row->getAktivitas(),
 			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
@@ -882,6 +1069,24 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
+					<span class="filter-label"><?php echo $appEntityLanguage->getPeriode();?></span>
+					<span class="filter-control">
+							<select class="form-control" name="periode_id">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new PeriodeMin(null, $database), 
+								PicoSpecification::getInstance()
+									->addAnd(new PicoPredicate(Field::of()->aktif, true))
+									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
+								PicoSortable::getInstance()
+									->add(new PicoSort(Field::of()->sortOrder, PicoSort::ORDER_TYPE_ASC))
+									->add(new PicoSort(Field::of()->nama, PicoSort::ORDER_TYPE_ASC)), 
+								Field::of()->periodeId, Field::of()->nama, $inputGet->getPeriodeId())
+								; ?>
+							</select>
+					</span>
+				</span>
+				
+				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
 				<?php if($userPermission->isAllowedDetail()){ ?>
@@ -942,13 +1147,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="user_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUser();?></a></td>
 								<td data-col-name="supervisor_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisor();?></a></td>
 								<td data-col-name="tanggal" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggal();?></a></td>
+								<td data-col-name="periode_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPeriode();?></a></td>
 								<td data-col-name="waktu_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuMasuk();?></a></td>
 								<td data-col-name="lokasi_masuk_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLokasiMasuk();?></a></td>
 								<td data-col-name="foto_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFotoMasuk();?></a></td>
+								<td data-col-name="alamat_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAlamatMasuk();?></a></td>
+								<td data-col-name="latitude_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLatitudeMasuk();?></a></td>
+								<td data-col-name="longitude_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLongitudeMasuk();?></a></td>
 								<td data-col-name="ip_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpMasuk();?></a></td>
 								<td data-col-name="waktu_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuPulang();?></a></td>
 								<td data-col-name="lokasi_pulang_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLokasiPulang();?></a></td>
 								<td data-col-name="foto_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFotoPulang();?></a></td>
+								<td data-col-name="alamat_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAlamatPulang();?></a></td>
+								<td data-col-name="latitude_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLatitudePulang();?></a></td>
+								<td data-col-name="longitude_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLongitudePulang();?></a></td>
 								<td data-col-name="ip_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpPulang();?></a></td>
 								<td data-col-name="aktivitas" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktivitas();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
@@ -984,13 +1196,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td data-col-name="user_id"><?php echo $kehadiran->issetUser() ? $kehadiran->getUser()->getFirstName() : "";?></td>
 								<td data-col-name="supervisor_id"><?php echo $kehadiran->issetSupervisor() ? $kehadiran->getSupervisor()->getNama() : "";?></td>
 								<td data-col-name="tanggal"><?php echo $kehadiran->getTanggal();?></td>
+								<td data-col-name="periode_id"><?php echo $kehadiran->issetPeriode() ? $kehadiran->getPeriode()->getNama() : "";?></td>
 								<td data-col-name="waktu_masuk"><?php echo $kehadiran->getWaktuMasuk();?></td>
 								<td data-col-name="lokasi_masuk_id"><?php echo $kehadiran->issetLokasiMasuk() ? $kehadiran->getLokasiMasuk()->getNama() : "";?></td>
 								<td data-col-name="foto_masuk"><?php echo $kehadiran->getFotoMasuk();?></td>
+								<td data-col-name="alamat_masuk"><?php echo $kehadiran->getAlamatMasuk();?></td>
+								<td data-col-name="latitude_masuk"><?php echo $kehadiran->getLatitudeMasuk();?></td>
+								<td data-col-name="longitude_masuk"><?php echo $kehadiran->getLongitudeMasuk();?></td>
 								<td data-col-name="ip_masuk"><?php echo $kehadiran->getIpMasuk();?></td>
 								<td data-col-name="waktu_pulang"><?php echo $kehadiran->getWaktuPulang();?></td>
 								<td data-col-name="lokasi_pulang_id"><?php echo $kehadiran->issetLokasiPulang() ? $kehadiran->getLokasiPulang()->getNama() : "";?></td>
 								<td data-col-name="foto_pulang"><?php echo $kehadiran->getFotoPulang();?></td>
+								<td data-col-name="alamat_pulang"><?php echo $kehadiran->getAlamatPulang();?></td>
+								<td data-col-name="latitude_pulang"><?php echo $kehadiran->getLatitudePulang();?></td>
+								<td data-col-name="longitude_pulang"><?php echo $kehadiran->getLongitudePulang();?></td>
 								<td data-col-name="ip_pulang"><?php echo $kehadiran->getIpPulang();?></td>
 								<td data-col-name="aktivitas"><?php echo $kehadiran->getAktivitas();?></td>
 								<td data-col-name="aktif"><?php echo $kehadiran->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
