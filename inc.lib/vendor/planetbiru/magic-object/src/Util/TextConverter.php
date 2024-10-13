@@ -1,5 +1,6 @@
 <?php
-namespace Sipro\Util;
+
+namespace MagicObject\Util;
 
 /**
  * Class TextConverter
