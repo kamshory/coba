@@ -18,7 +18,7 @@ $entityApvInfo = $appConfig->getEntityApvInfo();
 
 $database = new PicoDatabase($appConfig->getDatabase(), null, function($sql){
     //echo $sql."<br><br>\r\n";
-    //error_log($sql);
+    error_log($sql);
 });
 try
 {
