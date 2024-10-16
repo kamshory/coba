@@ -36,4 +36,14 @@ class PeriodeMin extends MagicObject
 	 */
 	protected $nama;
 
+	/**
+	 * Aktif
+	 * 
+	 * @Column(name="aktif", type="tinyint(1)", length=1, default_value="1", nullable=true)
+	 * @DefaultColumn(value="1")
+	 * @Label(content="Aktif")
+	 * @var boolean
+	 */
+	protected $aktif;
+
 }
