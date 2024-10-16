@@ -66,7 +66,6 @@ if($inputGet->getUserAction() == 'autogenerate')
 
 		$periode->setPeriodeId($currentPeriod)->setNama($monthStr.' '.$year)->save();
 
-
 		for($i = 1; $i < 12; $i++)
 		{
 			$currentPeriod = PeriodUtil::nextPeriod($currentPeriod, 1);
