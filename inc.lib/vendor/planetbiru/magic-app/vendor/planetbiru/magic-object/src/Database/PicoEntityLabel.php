@@ -121,7 +121,7 @@ class PicoEntityLabel
 
         $filtered = array();
         foreach ($merged as $prop => $val) {
-            $filtered[$prop] = isset($val[$lang]) ? $val[$lang] : null;
+            $filtered[$prop] = $val[$lang] ?? null;
         }
         return $filtered;
     }
@@ -135,7 +135,7 @@ class PicoEntityLabel
      * @return array The parsed key-value pairs.
      * @throws InvalidAnnotationException If the query input is invalid.
      */
-    private function parseKeyValue($reflexClass, $queryString, $parameter)
+    private function parseKeyValue(PicoAnnotationParser $reflexClass, $queryString, $parameter)
     {
         try {
             return $reflexClass->parseKeyValue($queryString);
@@ -231,9 +231,9 @@ class PicoEntityLabel
                 if (strcasecmp($param, self::ANNOTATION_GENERATED_VALUE) === 0 && isset($columns[$prop->name])) {
                     $vals = $this->parseKeyValue($reflexProp, $val, $param);
                     $autoIncrementKeys[$prop->name] = [
-                        self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
-                        self::KEY_STRATEGY => isset($vals[self::KEY_STRATEGY]) ? $vals[self::KEY_STRATEGY] : null,
-                        self::KEY_GENERATOR => isset($vals[self::KEY_GENERATOR]) ? $vals[self::KEY_GENERATOR] : null,
+                        self::KEY_NAME => $columns[$prop->name][self::KEY_NAME] ?? null,
+                        self::KEY_STRATEGY => $vals[self::KEY_STRATEGY] ?? null,
+                        self::KEY_GENERATOR => $vals[self::KEY_GENERATOR] ?? null,
                     ];
                 }
             }
@@ -244,9 +244,9 @@ class PicoEntityLabel
                     $vals = $this->parseKeyValue($reflexProp, $val, $param);
                     if (isset($vals[self::KEY_VALUE])) {
                         $defaultValue[$prop->name] = [
-                            self::KEY_NAME => isset($columns[$prop->name][self::KEY_NAME]) ? $columns[$prop->name][self::KEY_NAME] : null,
+                            self::KEY_NAME => $columns[$prop->name][self::KEY_NAME] ?? null,
                             self::KEY_VALUE => $vals[self::KEY_VALUE],
-                            self::KEY_PROPERTY_TYPE => isset($columns[$prop->name][self::KEY_PROPERTY_TYPE]) ? $columns[$prop->name][self::KEY_PROPERTY_TYPE] : null,
+                            self::KEY_PROPERTY_TYPE => $columns[$prop->name][self::KEY_PROPERTY_TYPE],
                         ];
                     }
                 }
@@ -261,7 +261,7 @@ class PicoEntityLabel
         }
 
         // Consolidate object information
-        $info = new stdClass();
+        $info = new stdClass;
         $info->tableName = $picoTableName;
         $info->columns = $columns;
         $info->joinColumns = $joinColumns;

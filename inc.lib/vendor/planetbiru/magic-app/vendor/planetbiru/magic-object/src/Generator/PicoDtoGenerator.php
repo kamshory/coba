@@ -177,8 +177,8 @@ class PicoDtoGenerator
      */
     protected function createValueOf($picoTableName, $rows)
     {
-        $className = isset($this->entityName) ? $this->entityName : ucfirst(PicoStringUtil::camelize($picoTableName));
-        $dtoName = isset($this->dtoName) ? $this->dtoName : ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
+        $className = $this->entityName ?? ucfirst(PicoStringUtil::camelize($picoTableName));
+        $dtoName = $this->dtoName ?? ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
 
         $str = "";
         $str .= "    /**\r\n";
@@ -241,7 +241,7 @@ class PicoDtoGenerator
     {
         $typeMap = $this->getTypeMap();
         $picoTableName = $this->tableName;
-        $classNameDto = isset($this->dtoName) ? $this->dtoName : ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
+        $classNameDto = $this->dtoName ?? ucfirst(PicoStringUtil::camelize($picoTableName)) . "Dto";
         $fileName = $this->baseNamespaceDto . "/" . $classNameDto;
         $path = $this->baseDir . "/" . $fileName . ".php";
         $path = str_replace("\\", "/", $path);

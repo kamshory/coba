@@ -66,7 +66,7 @@ class PicoUploadFile
         if (strncasecmp($method, "get", 3) === 0) {
             $var = substr($method, 3);
             $camel = PicoStringUtil::camelize($var);
-            $key = isset($this->map[$camel]) ? $this->map[$camel] : null;
+            $key = $this->map[$camel] ?? null;
             return isset($this->values[$key]) ? $this->values[$key] : new PicoUploadFileContainer();
         }
     }
@@ -93,7 +93,7 @@ class PicoUploadFile
         $camel = PicoStringUtil::camelize($name);
         if (isset($this->map[$camel])) {
             $key = $this->map[$camel];
-            return isset($this->values[$key]) ? $this->values[$key] : new PicoUploadFileContainer();
+            return $this->values[$key] ?? new PicoUploadFileContainer();
         }
         return new PicoUploadFileContainer();
     }
