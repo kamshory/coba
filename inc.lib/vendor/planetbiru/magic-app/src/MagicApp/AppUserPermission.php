@@ -139,19 +139,37 @@ class AppUserPermission
      */
     public function allowedAccess($inputGet, $inputPost)
     {
-        $userAction = $inputPost->getUserAction() ?? $inputGet->getUserAction();
+        $userAction = null;
+        if(isset($inputPost) && $inputPost->getUserAction() != null)
+        {
+            $userAction = $inputPost->getUserAction();
+        }
+        if($userAction == null && isset($inputGet) && $inputGet->getUserAction() != null)
+        {
+            $userAction = $inputGet->getUserAction();
+        }
 
-        if (!$this->currentModule->getAppModule()->issetModuleId()) {
-            try {
+
+        if(!$this->currentModule->getAppModule()->issetModuleId())
+        {
+            try
+            {
                 $this->currentModule->getAppModule()->findOneByModuleCode($this->currentModule->getModuleName());
-            } catch (Exception $e) {
-                // Handle exceptions as necessary
+            }
+            catch(Exception $e)
+            {
+                // do nothing
             }
         }
 
-        return isset($userAction) && !empty($userAction)
-            ? $this->isAllowedTo($userAction)
-            : $this->isAllowedTo(UserAction::SHOW_ALL);
+        if(!isset($userAction) || empty($userAction))
+        {
+            return $this->isAllowedTo(UserAction::SHOW_ALL);
+        }
+        else
+        {
+            return $this->isAllowedTo($userAction);
+        }
     }
 
     /**
