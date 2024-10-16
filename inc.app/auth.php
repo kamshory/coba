@@ -4,6 +4,7 @@ use MagicApp\AppLanguage;
 use MagicApp\AppUser;
 use MagicObject\Database\PicoPageData;
 use MagicObject\SetterGetter;
+use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use Sipro\Entity\App\AppModuleImpl;
@@ -40,7 +41,7 @@ if(isset($sessions->adminUsername) && isset($sessions->adminPassword))
         function($var, $value)
         {
             $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
-
+            $inputSource = FileUtil::fixFilePath($inputSource);
             if(!file_exists(dirname($inputSource)))
             {
                 mkdir(dirname($inputSource), 0755, true);

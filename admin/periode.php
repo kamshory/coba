@@ -18,8 +18,11 @@ use MagicApp\Field;
 use MagicApp\PicoModule;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
+use MagicApp\Utility\PeriodUtil;
 use Sipro\Entity\Data\Periode;
 use Sipro\AppIncludeImpl;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
 
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
@@ -37,11 +40,56 @@ if(!$userPermission->allowedAccess($inputGet, $inputPost))
 	exit();
 }
 
+if($inputGet->getUserAction() == 'autogenerate')
+{
+	echo "OK";
+	try{
+		$periode = new Periode(null, $database);
+		$currentPeriod = date('Ym');
+		$year = substr($currentPeriod, 0, 4);
+		$month = substr($currentPeriod, 4);
+		$monthArray = [
+			'01' => 'Januari',
+			'02' => 'Februari',
+			'03' => 'Maret',
+			'04' => 'April',
+			'05' => 'Mei',
+			'06' => 'Juni',
+			'07' => 'Juli',
+			'08' => 'Agustus',
+			'09' => 'September',
+			'10' => 'Oktober',
+			'11' => 'November',
+			'12' => 'Desember'
+		];
+		$monthStr = $monthArray[$month];
+
+		$periode->setPeriodeId($currentPeriod)->setNama($monthStr.' '.$year)->save();
+
+
+		for($i = 1; $i < 12; $i++)
+		{
+			$currentPeriod = PeriodUtil::nextPeriod($currentPeriod, 1);
+			$year = substr($currentPeriod, 0, 4);
+			$month = substr($currentPeriod, 4);
+			$monthStr = $monthArray[$month];
+			$periode->setPeriodeId($currentPeriod)->setNama($monthStr.' '.$year)->save();
+		}
+	}
+	catch(Exception $e)
+	{
+		
+	}
+	header('Location: '.basename($_SERVER['PHP_SELF']));
+	exit();
+}
+
 if($inputPost->getUserAction() == UserAction::CREATE)
 {
 	$periode = new Periode(null, $database);
 	$periode->setPeriodeId($inputPost->getPeriodeId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$periode->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$periode->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$periode->setAdminBuat($currentAction->getUserId());
 	$periode->setWaktuBuat($currentAction->getTime());
 	$periode->setIpBuat($currentAction->getIp());
@@ -64,6 +112,7 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$periode = new Periode(null, $database);
 	$periode->setPeriodeId($inputPost->getPeriodeId(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$periode->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$periode->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$periode->setAdminUbah($currentAction->getUserId());
 	$periode->setWaktuUbah($currentAction->getTime());
 	$periode->setIpUbah($currentAction->getIp());
@@ -181,6 +230,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
 						</td>
 					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAktif();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1"/> <?php echo $appEntityLanguage->getAktif();?></label>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -225,6 +280,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td>
 							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $periode->getNama();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAktif();?></td>
+						<td>
+							<label><input class="form-check-input" type="checkbox" name="aktif" id="aktif" value="1" <?php echo $periode->createCheckedAktif();?>/> <?php echo $appEntityLanguage->getAktif();?></label>
 						</td>
 					</tr>
 				</tbody>
@@ -300,6 +361,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $appEntityLanguage->getNama();?></td>
 						<td><?php echo $periode->getNama();?></td>
 					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getAktif();?></td>
+						<td><?php echo $periode->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
+					</tr>
 				</tbody>
 			</table>
 			<table class="responsive responsive-two-cols" border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -351,7 +416,8 @@ $specMap = array(
 );
 $sortOrderMap = array(
 	"periodeId" => "periodeId",
-	"nama" => "nama"
+	"nama" => "nama",
+	"aktif" => "aktif"
 );
 
 // You can define your own specifications
@@ -373,6 +439,31 @@ $dataLoader = new Periode(null, $database);
 
 $subqueryMap = null;
 
+if($inputGet->getUserAction() == UserAction::EXPORT)
+{
+	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$sheetName = "Sheet 1";
+
+	$headerFormat = new XLSXDataFormat($dataLoader, 3);
+	$pageData = $dataLoader->findAll($specification, null, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_COUNT_DATA | MagicObject::FIND_OPTION_NO_FETCH_DATA);
+	$exporter->write($pageData, $fileName, $sheetName, array(
+		$appLanguage->getNumero() => $headerFormat->asNumber(),
+		$appEntityLanguage->getPeriodeId() => $headerFormat->getPeriodeId(),
+		$appEntityLanguage->getNama() => $headerFormat->getNama(),
+		$appEntityLanguage->getAktif() => $headerFormat->asString()
+	), 
+	function($index, $row, $appLanguage){
+		
+		return array(
+			sprintf("%d", $index + 1),
+			$row->getPeriodeId(),
+			$row->getNama(),
+			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
+		);
+	});
+	exit();
+}
 /*ajaxSupport*/
 if(!$currentAction->isRequestViaAjax()){
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -398,10 +489,20 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<button type="submit" class="btn btn-success"><?php echo $appLanguage->getButtonSearch();?></button>
 				</span>
+				<?php if($userPermission->isAllowedDetail()){ ?>
+		
+				<span class="filter-group">
+					<button type="submit" name="user_action" value="export" class="btn btn-success"><?php echo $appLanguage->getButtonExport();?></button>
+				</span>
+				<?php } ?>
 				<?php if($userPermission->isAllowedCreate()){ ?>
 		
 				<span class="filter-group">
 					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl(UserAction::CREATE);?>'"><?php echo $appLanguage->getButtonAdd();?></button>
+				</span>
+
+				<span class="filter-group">
+					<button type="button" class="btn btn-primary" onclick="window.location='<?php echo $currentModule->getRedirectUrl('autogenerate');?>'"><?php echo $appLanguage->getButtonAutogenerate();?></button>
 				</span>
 				<?php } ?>
 			</form>
@@ -448,6 +549,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="periode_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPeriodeId();?></a></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
+								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 							</tr>
 						</thead>
 					
@@ -478,6 +580,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="periode_id"><?php echo $periode->getPeriodeId();?></td>
 								<td data-col-name="nama"><?php echo $periode->getNama();?></td>
+								<td data-col-name="aktif"><?php echo $periode->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
 							<?php 
 							}
@@ -488,6 +591,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</div>
 				<div class="button-wrapper">
 					<div class="button-area">
+						<?php if($userPermission->isAllowedUpdate()){ ?>
+						<button type="submit" class="btn btn-success" name="user_action" value="activate"><?php echo $appLanguage->getButtonActivate();?></button>
+						<button type="submit" class="btn btn-warning" name="user_action" value="deactivate"><?php echo $appLanguage->getButtonDeactivate();?></button>
+						<?php } ?>
 						<?php if($userPermission->isAllowedDelete()){ ?>
 						<button type="submit" class="btn btn-danger" name="user_action" value="delete" data-onclik-message="<?php echo htmlspecialchars($appLanguage->getWarningDeleteConfirmation());?>"><?php echo $appLanguage->getButtonDelete();?></button>
 						<?php } ?>

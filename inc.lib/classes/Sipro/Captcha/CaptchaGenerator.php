@@ -3,6 +3,7 @@
 namespace Sipro\Captcha;
 
 use InvalidArgumentException;
+use MagicObject\Util\File\FileUtil;
 use RuntimeException;
 
 /**
@@ -126,6 +127,7 @@ class CaptchaGenerator
      */
     public function setImage($image)
     {
+        $image = FileUtil::fixFilePath($image);
         if (false === file_exists($image)) {
             throw new InvalidArgumentException('The background-image do not exists!');
         }

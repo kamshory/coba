@@ -1,5 +1,6 @@
 <?php
 
+use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 
 require_once __DIR__ . "/inc.lib/vendor/autoload.php";
@@ -68,6 +69,7 @@ $arr = array(
 
 foreach($arr as $file)
 {
+    $file = FileUtil::fixFilePath($file);
     if(!file_exists(dirname($file)))
     {
         mkdir(dirname($file), 0755, true);
@@ -83,6 +85,7 @@ if(isset($_POST['translate']))
     {
         $tranlate = explode("\r\n", $inputStr);
         $keys = explode("|", $keysStr);
+        $inputId = FileUtil::fixFilePath($inputId);
         if(file_exists($inputId))
         {
             $inputArray = PicoIniUtil::parseIniFile($inputId);
@@ -110,12 +113,14 @@ if(isset($_POST['translate']))
 }
 foreach($arr as $file)
 {
+    $file = FileUtil::fixFilePath($file);
     if(!file_exists(dirname($file)))
     {
         mkdir(dirname($file), 0755, true);
         file_put_contents($file, "");
     }
 }
+$inputSource = FileUtil::fixFilePath($inputSource);
 if(file_exists($inputSource))
 {
     $inputArray = @PicoIniUtil::parseIniFile($inputSource);

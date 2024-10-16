@@ -1,9 +1,14 @@
 <?php
 
+use MagicObject\Util\File\FileUtil;
+
 class ImageUtil
 {
     public static function imageResizeMax($source, $destination, $maxwidth, $maxheight, $interlace = false, $type = 'jpeg', $quality = 80)
     {
+        $source = FileUtil::fixFilePath($source);
+        $destination = FileUtil::fixFilePath($destination);
+
         $imageinfo = getimagesize($source);
         $image = new StdClass();
         if (empty($imageinfo)) {

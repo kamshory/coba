@@ -6,6 +6,7 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
+use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use Sipro\Entity\Data\ProgresProyek;
@@ -21,7 +22,7 @@ $appLanguage = new AppLanguage(
   function($var, $value)
   {
       $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
-
+      $inputSource = FileUtil::fixFilePath($inputSource);
       if(!file_exists(dirname($inputSource)))
       {
           mkdir(dirname($inputSource), 0755, true);

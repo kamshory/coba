@@ -127,6 +127,15 @@ class Kehadiran extends MagicObject
 	protected $lokasiMasuk;
 
 	/**
+	 * Foto Masuk
+	 * 
+	 * @Column(name="foto_masuk", type="longtext", nullable=true)
+	 * @Label(content="Foto Masuk")
+	 * @var string
+	 */
+	protected $fotoMasuk;
+
+	/**
 	 * Alamat Masuk
 	 * 
 	 * @Column(name="alamat_masuk", type="longtext", nullable=true)
@@ -152,15 +161,6 @@ class Kehadiran extends MagicObject
 	 * @var double
 	 */
 	protected $longitudeMasuk;
-
-	/**
-	 * Foto Masuk
-	 * 
-	 * @Column(name="foto_masuk", type="longtext", nullable=true)
-	 * @Label(content="Foto Masuk")
-	 * @var string
-	 */
-	protected $fotoMasuk;
 
 	/**
 	 * IP Masuk
@@ -199,6 +199,15 @@ class Kehadiran extends MagicObject
 	protected $lokasiPulang;
 
 	/**
+	 * Foto Pulang
+	 * 
+	 * @Column(name="foto_pulang", type="longtext", nullable=true)
+	 * @Label(content="Foto Pulang")
+	 * @var string
+	 */
+	protected $fotoPulang;
+
+	/**
 	 * Alamat Pulang
 	 * 
 	 * @Column(name="alamat_pulang", type="longtext", nullable=true)
@@ -224,15 +233,6 @@ class Kehadiran extends MagicObject
 	 * @var double
 	 */
 	protected $longitudePulang;
-
-	/**
-	 * Foto Pulang
-	 * 
-	 * @Column(name="foto_pulang", type="longtext", nullable=true)
-	 * @Label(content="Foto Pulang")
-	 * @var string
-	 */
-	protected $fotoPulang;
 
 	/**
 	 * IP Pulang

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b88392febda6ea1b7b32f869b2f5157e",
+    "content-hash": "5e74a1035fb5bf1ecb3b5bcbed6c266c",
     "packages": [
         {
             "name": "phpmailer/phpmailer",
@@ -89,16 +89,16 @@
         },
         {
             "name": "planetbiru/magic-app",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicApp.git",
-                "reference": "cddb3cd90ad9e2f63c2754828725fa64a8ced0c3"
+                "reference": "fc3bc9e6ca9034947f2d04e2fb1a67237d95519d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/cddb3cd90ad9e2f63c2754828725fa64a8ced0c3",
-                "reference": "cddb3cd90ad9e2f63c2754828725fa64a8ced0c3",
+                "url": "https://api.github.com/repos/Planetbiru/MagicApp/zipball/fc3bc9e6ca9034947f2d04e2fb1a67237d95519d",
+                "reference": "fc3bc9e6ca9034947f2d04e2fb1a67237d95519d",
                 "shasum": ""
             },
             "require": {
@@ -122,9 +122,9 @@
             "description": "Magic app",
             "support": {
                 "issues": "https://github.com/Planetbiru/MagicApp/issues",
-                "source": "https://github.com/Planetbiru/MagicApp/tree/1.0.0"
+                "source": "https://github.com/Planetbiru/MagicApp/tree/1.1.0"
             },
-            "time": "2024-10-15T16:39:29+00:00"
+            "time": "2024-10-16T02:54:28+00:00"
         },
         {
             "name": "planetbiru/magic-object",
@@ -132,12 +132,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Planetbiru/MagicObject.git",
-                "reference": "d7bab6220ba4059d5a038038445cca650a21880c"
+                "reference": "60157d1da619e693912eace36a0f1314cc676250"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/d7bab6220ba4059d5a038038445cca650a21880c",
-                "reference": "d7bab6220ba4059d5a038038445cca650a21880c",
+                "url": "https://api.github.com/repos/Planetbiru/MagicObject/zipball/60157d1da619e693912eace36a0f1314cc676250",
+                "reference": "60157d1da619e693912eace36a0f1314cc676250",
                 "shasum": ""
             },
             "require": {
@@ -163,7 +163,7 @@
                 "issues": "https://github.com/Planetbiru/MagicObject/issues",
                 "source": "https://github.com/Planetbiru/MagicObject/tree/2.0.0"
             },
-            "time": "2024-10-15T16:38:15+00:00"
+            "time": "2024-10-16T02:49:37+00:00"
         },
         {
             "name": "symfony/yaml",

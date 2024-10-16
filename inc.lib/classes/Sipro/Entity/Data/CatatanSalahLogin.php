@@ -41,7 +41,7 @@ class CatatanSalahLogin extends MagicObject
 	 * 
 	 * @Column(name="user_id", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="User ID")
-	 * @var string
+	 * @var integer
 	 */
 	protected $userId;
 
@@ -50,7 +50,7 @@ class CatatanSalahLogin extends MagicObject
 	 * 
 	 * @JoinColumn(name="user_id", referenceColumnName="user_id")
 	 * @Label(content="User")
-	 * @var User
+	 * @var UserMin
 	 */
 	protected $user;
 
@@ -59,7 +59,7 @@ class CatatanSalahLogin extends MagicObject
 	 * 
 	 * @Column(name="supervisor_id", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="Supervisor ID")
-	 * @var string
+	 * @var integer
 	 */
 	protected $supervisorId;
 
@@ -68,7 +68,7 @@ class CatatanSalahLogin extends MagicObject
 	 * 
 	 * @JoinColumn(name="supervisor_id", referenceColumnName="supervisor_id")
 	 * @Label(content="Supervisor")
-	 * @var Supervisor
+	 * @var SupervisorMin
 	 */
 	protected $supervisor;
 
@@ -84,10 +84,19 @@ class CatatanSalahLogin extends MagicObject
 	/**
 	 * IP Buat
 	 * 
-	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true)
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
 	 * @Label(content="IP Buat")
 	 * @var string
 	 */
 	protected $ipBuat;
+
+	/**
+	 * Aktif
+	 * 
+	 * @Column(name="aktif", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Aktif")
+	 * @var boolean
+	 */
+	protected $aktif;
 
 }

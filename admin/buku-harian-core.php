@@ -9,6 +9,7 @@ use MagicObject\Database\PicoSpecification;
 use MagicObject\MagicObject;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
+use MagicObject\Util\File\FileUtil;
 use Sipro\Entity\Data\BukuHarian;
 use Sipro\Entity\Data\Pekerjaan;
 use Sipro\Util\CommonUtil;
@@ -372,6 +373,7 @@ try {
                             <?php
                             if ($bukuHarian->getAccKtsk()) {
                                 $signaturePath1 = dirname(dirname(__FILE__)) . "/lib.signature/ktsk/" . $bukuHarian->getKtskId() . "/signature.png";
+                                $signaturePath1 = FileUtil::fixFilePath($signaturePath1);
                                 if(file_exists($signaturePath1))
                                 {
                                     $filetime = filemtime($signaturePath1);
@@ -392,6 +394,7 @@ try {
                             <div style="height:120px; overflow:visible" class="image-container signature-container">
                             <?php
                             $signaturePath2 = dirname(dirname(__FILE__)) . "/lib.signature/supervisor/" . $bukuHarian->getKoordinatorId() . "/signature.png";
+                            $signaturePath2 = FileUtil::fixFilePath($signaturePath2);
                             if(file_exists($signaturePath2))
                             {
                                 $filetime = filemtime($signaturePath2);

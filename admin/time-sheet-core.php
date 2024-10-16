@@ -8,6 +8,7 @@ use MagicObject\Database\PicoSortable;
 use MagicObject\Database\PicoSpecification;
 use MagicObject\Request\InputGet;
 use MagicObject\Request\PicoFilterConstant;
+use MagicObject\Util\File\FileUtil;
 use Sipro\Entity\Data\AkhirPekan;
 use Sipro\Entity\Data\BukuHarian;
 use Sipro\Entity\Data\Cuti;
@@ -472,6 +473,7 @@ if ($supervisorId != 0 && !empty($periodeId)) {
 						<div style="height:80px; overflow:visible" class="signature-container">
 						<?php
 						$signaturePath1 = dirname(dirname(__FILE__)) . "/lib.signature/ktsk/" . $val2['ktsk_id'] . "/signature.png";
+						$signaturePath1 = FileUtil::fixFilePath($signaturePath1);
 						if(file_exists($signaturePath1))
 						{
 						$filetime = filemtime($signaturePath1);
@@ -574,6 +576,7 @@ if ($supervisorId != 0 && !empty($periodeId)) {
 					<div style="height: 80px; overflow:visible" class="signature-container">
 					<?php
 					$signaturePath2 = dirname(dirname(__FILE__)) . "/lib.signature/supervisor/$supervisorId/signature.png";
+					$signaturePath2 = FileUtil::fixFilePath($signaturePath2);
 					if(file_exists($signaturePath2))
 					{
 						$filetime = filemtime($signaturePath2);

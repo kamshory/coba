@@ -3,6 +3,7 @@
 use MagicApp\AppLanguage;
 use MagicObject\MagicObject;
 use MagicObject\SetterGetter;
+use MagicObject\Util\File\FileUtil;
 use MagicObject\Util\PicoIniUtil;
 use MagicObject\Util\PicoStringUtil;
 use Sipro\Entity\Data\Supervisor;
@@ -33,6 +34,7 @@ if(isset($sessions->supervisorUsername) && isset($sessions->supervisorPassword))
         function($var, $value)
         {
             $inputSource = dirname(__DIR__) . "/inc.lang/source/app.ini";
+            $inputSource = FileUtil::fixFilePath($inputSource);
 
             if(!file_exists(dirname($inputSource)))
             {

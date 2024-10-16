@@ -1,7 +1,7 @@
 <?php
 
-use MagicObject\File\PicoUplodFile;
 use MagicObject\Request\InputPost;
+use MagicObject\Util\File\FileUtil;
 use Sipro\Entity\Data\BukuHarian;
 use Sipro\Entity\Data\GaleriProyek;
 
@@ -46,7 +46,7 @@ else
 {
 	include_once dirname(dirname(__FILE__))."/lib.inc/functions-image.php";
 
-	$files = new PicoUplodFile();
+	$files = new PicoUploadFile();
 	
 	$bukuHarianId = $inputPost->getBukuHarianId();
 	$pekerjaanId = $inputPost->getPekerjaanId();
@@ -143,6 +143,8 @@ else
 						$height = 1;
 					}
 					$width2 = round(100*$width/$height);
+
+					$file = FileUtil::fixFilePath($targetdir."/".$newname);
 					
 					$md5 = md5_file($targetdir."/".$newname);
 					$ip = addslashes($_SERVER['REMOTE_ADDR']);

@@ -216,7 +216,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							<select class="form-control" name="grup_pengguna" id="grup_pengguna">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="supervisor">Supervisor</option>
-								<option value="user">User</option>
+								<option value="user">Administrator</option>
 							</select>
 						</td>
 					</tr>
@@ -435,7 +435,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 							<select class="form-control" name="grup_pengguna" id="grup_pengguna" data-value="<?php echo $kehadiran->getGrupPengguna();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
 								<option value="supervisor" <?php echo AppFormBuilder::selected($kehadiran->getGrupPengguna(), 'supervisor');?>>Supervisor</option>
-								<option value="user" <?php echo AppFormBuilder::selected($kehadiran->getGrupPengguna(), 'user');?>>User</option>
+								<option value="user" <?php echo AppFormBuilder::selected($kehadiran->getGrupPengguna(), 'user');?>>Administrator</option>
 							</select>
 						</td>
 					</tr>
@@ -705,8 +705,8 @@ $appEntityLanguage = new AppEntityLanguage(new Kehadiran(), $appConfig, $current
 require_once $appInclude->mainAppHeader(__DIR__);
 			// define map here
 			$mapForGrupPengguna = array(
-				"supervisor" => array("value" => "supervisor", "label" => "Supervisor", "default" => "false"),
-				"user" => array("value" => "user", "label" => "User", "default" => "false")
+				"supervisor" => array("value" => "supervisor", "label" => "Supervisor", "default" => "true"),
+				"user" => array("value" => "user", "label" => "Administrator", "default" => "true")
 			);
 ?>
 <div class="page page-jambi page-detail">
@@ -852,8 +852,8 @@ else
 {
 $appEntityLanguage = new AppEntityLanguage(new Kehadiran(), $appConfig, $currentUser->getLanguageId());
 $mapForGrupPengguna = array(
-	"supervisor" => array("value" => "supervisor", "label" => "Supervisor", "default" => "false"),
-	"user" => array("value" => "user", "label" => "User", "default" => "false")
+	"supervisor" => array("value" => "supervisor", "label" => "Supervisor", "default" => "true"),
+	"user" => array("value" => "user", "label" => "Administrator", "default" => "true")
 );
 $specMap = array(
 	"grupPengguna" => PicoSpecification::filter("grupPengguna", "fulltext"),
@@ -863,25 +863,13 @@ $specMap = array(
 	"periodeId" => PicoSpecification::filter("periodeId", "fulltext")
 );
 $sortOrderMap = array(
-	"grupPengguna" => "grupPengguna",
 	"userId" => "userId",
 	"supervisorId" => "supervisorId",
 	"tanggal" => "tanggal",
-	"periodeId" => "periodeId",
 	"waktuMasuk" => "waktuMasuk",
 	"lokasiMasukId" => "lokasiMasukId",
-	"fotoMasuk" => "fotoMasuk",
-	"alamatMasuk" => "alamatMasuk",
-	"latitudeMasuk" => "latitudeMasuk",
-	"longitudeMasuk" => "longitudeMasuk",
-	"ipMasuk" => "ipMasuk",
 	"waktuPulang" => "waktuPulang",
 	"lokasiPulangId" => "lokasiPulangId",
-	"fotoPulang" => "fotoPulang",
-	"alamatPulang" => "alamatPulang",
-	"latitudePulang" => "latitudePulang",
-	"longitudePulang" => "longitudePulang",
-	"ipPulang" => "ipPulang",
 	"aktivitas" => "aktivitas",
 	"aktif" => "aktif"
 );
@@ -1020,8 +1008,11 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getGrupPengguna();?></span>
 					<span class="filter-control">
-							<select class="form-control" name="grup_pengguna">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option></select>
+							<select class="form-control" name="grup_pengguna" data-value="<?php echo $inputGet->getGrupPengguna();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="supervisor" <?php echo AppFormBuilder::selected($inputGet->getGrupPengguna(), 'supervisor');?>>Supervisor</option>
+								<option value="user" <?php echo AppFormBuilder::selected($inputGet->getGrupPengguna(), 'user');?>>Administrator</option>
+							</select>
 					</span>
 				</span>
 				
@@ -1143,25 +1134,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
-								<td data-col-name="grup_pengguna" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getGrupPengguna();?></a></td>
 								<td data-col-name="user_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUser();?></a></td>
 								<td data-col-name="supervisor_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getSupervisor();?></a></td>
 								<td data-col-name="tanggal" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggal();?></a></td>
-								<td data-col-name="periode_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPeriode();?></a></td>
 								<td data-col-name="waktu_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuMasuk();?></a></td>
 								<td data-col-name="lokasi_masuk_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLokasiMasuk();?></a></td>
-								<td data-col-name="foto_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFotoMasuk();?></a></td>
-								<td data-col-name="alamat_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAlamatMasuk();?></a></td>
-								<td data-col-name="latitude_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLatitudeMasuk();?></a></td>
-								<td data-col-name="longitude_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLongitudeMasuk();?></a></td>
-								<td data-col-name="ip_masuk" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpMasuk();?></a></td>
 								<td data-col-name="waktu_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuPulang();?></a></td>
 								<td data-col-name="lokasi_pulang_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLokasiPulang();?></a></td>
-								<td data-col-name="foto_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getFotoPulang();?></a></td>
-								<td data-col-name="alamat_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAlamatPulang();?></a></td>
-								<td data-col-name="latitude_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLatitudePulang();?></a></td>
-								<td data-col-name="longitude_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getLongitudePulang();?></a></td>
-								<td data-col-name="ip_pulang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpPulang();?></a></td>
 								<td data-col-name="aktivitas" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktivitas();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 							</tr>
@@ -1192,25 +1171,13 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								</td>
 								<?php } ?>
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
-								<td data-col-name="grup_pengguna"><?php echo isset($mapForGrupPengguna) && isset($mapForGrupPengguna[$kehadiran->getGrupPengguna()]) && isset($mapForGrupPengguna[$kehadiran->getGrupPengguna()]["label"]) ? $mapForGrupPengguna[$kehadiran->getGrupPengguna()]["label"] : "";?></td>
 								<td data-col-name="user_id"><?php echo $kehadiran->issetUser() ? $kehadiran->getUser()->getFirstName() : "";?></td>
 								<td data-col-name="supervisor_id"><?php echo $kehadiran->issetSupervisor() ? $kehadiran->getSupervisor()->getNama() : "";?></td>
 								<td data-col-name="tanggal"><?php echo $kehadiran->getTanggal();?></td>
-								<td data-col-name="periode_id"><?php echo $kehadiran->issetPeriode() ? $kehadiran->getPeriode()->getNama() : "";?></td>
 								<td data-col-name="waktu_masuk"><?php echo $kehadiran->getWaktuMasuk();?></td>
 								<td data-col-name="lokasi_masuk_id"><?php echo $kehadiran->issetLokasiMasuk() ? $kehadiran->getLokasiMasuk()->getNama() : "";?></td>
-								<td data-col-name="foto_masuk"><?php echo $kehadiran->getFotoMasuk();?></td>
-								<td data-col-name="alamat_masuk"><?php echo $kehadiran->getAlamatMasuk();?></td>
-								<td data-col-name="latitude_masuk"><?php echo $kehadiran->getLatitudeMasuk();?></td>
-								<td data-col-name="longitude_masuk"><?php echo $kehadiran->getLongitudeMasuk();?></td>
-								<td data-col-name="ip_masuk"><?php echo $kehadiran->getIpMasuk();?></td>
 								<td data-col-name="waktu_pulang"><?php echo $kehadiran->getWaktuPulang();?></td>
 								<td data-col-name="lokasi_pulang_id"><?php echo $kehadiran->issetLokasiPulang() ? $kehadiran->getLokasiPulang()->getNama() : "";?></td>
-								<td data-col-name="foto_pulang"><?php echo $kehadiran->getFotoPulang();?></td>
-								<td data-col-name="alamat_pulang"><?php echo $kehadiran->getAlamatPulang();?></td>
-								<td data-col-name="latitude_pulang"><?php echo $kehadiran->getLatitudePulang();?></td>
-								<td data-col-name="longitude_pulang"><?php echo $kehadiran->getLongitudePulang();?></td>
-								<td data-col-name="ip_pulang"><?php echo $kehadiran->getIpPulang();?></td>
 								<td data-col-name="aktivitas"><?php echo $kehadiran->getAktivitas();?></td>
 								<td data-col-name="aktif"><?php echo $kehadiran->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 							</tr>
