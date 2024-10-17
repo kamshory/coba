@@ -41,7 +41,7 @@ class BukuHarian extends MagicObject
 	 * 
 	 * @JoinColumn(name="proyek_id", referenceColumnName="proyek_id")
 	 * @Label(content="Proyek")
-	 * @var Proyek
+	 * @var ProyekMin
 	 */
 	protected $proyek;
 
