@@ -26,22 +26,22 @@ use GdImage;
 class FaceDetector
 {
     /**
-     * @var array $detectionData Array berisi data deteksi wajah yang diperlukan untuk proses deteksi.
+     * @var array $detectionData Array containing face detection data required for the detection process.
      */
     protected $detectionData;
 
     /**
-     * @var GdImage $canvas Resource gambar yang sedang diproses untuk deteksi wajah.
+     * @var GdImage $canvas Image resource currently being processed for face detection.
      */
     protected $canvas;
 
     /**
-     * @var array|null $face Informasi tentang wajah yang terdeteksi, termasuk posisi dan ukuran.
+     * @var array|null $face Information about the detected face, including position and size.
      */
     protected $face;
 
     /**
-     * @var GdImage $reducedCanvas Resource gambar yang sudah diubah ukuran untuk meningkatkan efisiensi deteksi.
+     * @var GdImage $reducedCanvas Resized image resource to improve detection efficiency.
      */
     private $reducedCanvas;
 
