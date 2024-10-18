@@ -95,20 +95,20 @@ class FaceDetector
             throw new NoFileException("Can not load $file");
         }
 
-        $im_width = imagesx($this->canvas);
-        $im_height = imagesy($this->canvas);
+        $imWidth = imagesx($this->canvas);
+        $imHeight = imagesy($this->canvas);
 
         //Resample before detection?
-        $diff_width = 320 - $im_width;
-        $diff_height = 240 - $im_height;
+        $diff_width = 320 - $imWidth;
+        $diff_height = 240 - $imHeight;
         if ($diff_width > $diff_height) {
-            $ratio = $im_width / 320;
+            $ratio = $imWidth / 320;
         } else {
-            $ratio = $im_height / 240;
+            $ratio = $imHeight / 240;
         }
 
         if ($ratio != 0) {
-            $this->reducedCanvas = imagecreatetruecolor($im_width / $ratio, $im_height / $ratio);
+            $this->reducedCanvas = imagecreatetruecolor($imWidth / $ratio, $imHeight / $ratio);
 
             imagecopyresampled(
                 $this->reducedCanvas,
@@ -117,10 +117,10 @@ class FaceDetector
                 0,
                 0,
                 0,
-                $im_width / $ratio,
-                $im_height / $ratio,
-                $im_width,
-                $im_height
+                $imWidth / $ratio,
+                $imHeight / $ratio,
+                $imWidth,
+                $imHeight
             );
 
             $stats = $this->getImgStats($this->reducedCanvas);
@@ -174,18 +174,18 @@ class FaceDetector
 
     /**
      * Crops the detected face from the photo.
-     * Should be called after the `faceDetect` function.
+     * This method should be called after the `faceDetect` function.
      * If a file name is provided, the cropped face will be saved to that file;
      * otherwise, it will be output directly to standard output.
      *
-     * @param string|null $outFileName File name to store the cropped face. If null, the face will be printed to output.
-     * @param int $margin Optional margin around the detected face (in pixels).
-     * @param int $width Desired width of the cropped image (in pixels).
-     * @param int $height Desired height of the cropped image (in pixels).
+     * @param string|null $outFileName Optional. File name to store the cropped face. If null, the face will be printed to output.
+     * @param int $margin Optional. Margin around the detected face (in pixels).
+     * @param int $width Optional. Desired width of the cropped image (in pixels).
+     * @param int $height Optional. Desired height of the cropped image (in pixels).
      *
      * @throws NoFaceException If no face has been detected.
      */
-    public function cropFaceToJpeg($outFileName, $margin, $width, $height)
+    public function cropFaceToJpeg($outFileName = null, $margin = 50, $width = 200, $height = 200)
     {
         if (empty($this->face)) {
             throw new NoFaceException('No face detected');
@@ -227,6 +227,88 @@ class FaceDetector
     }
 
     /**
+     * Draws L-shaped frames around the detected face on the original image.
+     * This method should be called after the `faceDetect` function.
+     * If a file name is provided, the image with frames will be saved to that file;
+     * otherwise, the image will be output directly to standard output.
+     *
+     * @param string|null $outFileName Optional. File name to store the image with frames. If null, the image will be printed to output.
+     * @param int $margin Optional. Margin around the detected face (in pixels).
+     * @param int $width Optional. Desired width of the frame (in pixels).
+     * @param int $height Optional. Desired height of the frame (in pixels).
+     * @param int $frameWidth Optional. Width of the L-shaped frame (in pixels).
+     * @param int $frameThickness Optional. The thickness of the frame in pixels.
+     *
+     * @throws NoFaceException If no face has been detected.
+     */
+    public function drawFaceFrames($outFileName = null, $margin = 50, $width = 200, $height = 200, $frameWidth = 20, $frameThickness = 1)
+    {
+        if (empty($this->face)) {
+            throw new NoFaceException('No face detected');
+        }
+
+        $color = imagecolorallocate($this->canvas, 255, 0, 0); // red
+
+        // Calculate the position and size of the frame
+        if($width < $height)
+        {
+            $x = max(0, $this->face['x'] - $margin / 2);
+            $y = max(0, $this->face['y'] - $margin);
+        }
+        else if($width > $height)
+        {
+            $x = max(0, $this->face['x'] - $margin);
+            $y = max(0, $this->face['y'] - $margin / 2);
+        }
+        else
+        {
+            $x = max(0, $this->face['x'] - $margin);
+            $y = max(0, $this->face['y'] - $margin);
+        }
+        $w = $this->face['w'] + 2 * $margin;
+        $h = $this->face['w'] + 2 * $margin;
+
+
+        // Adjust width and height based on the provided ratio
+        $aspectRatio = $width / $height;
+
+        if ($aspectRatio > 1) {
+            $newWidth = $w;
+            $newHeight = (int)($newWidth / $aspectRatio);
+        } else {
+            $newHeight = $h;
+            $newWidth = (int)($newHeight * $aspectRatio);
+        }
+
+        // Draw L-shaped frames at each corner with specified thickness
+        for ($i = 0; $i < $frameThickness; $i++) {
+            // Top left
+            imageline($this->canvas, $x, $y + $i, $x + $frameWidth, $y + $i, $color); // Top horizontal
+            imageline($this->canvas, $x + $i, $y, $x + $i, $y + $frameWidth, $color); // Left vertical
+
+            // Top right
+            imageline($this->canvas, $x + $newWidth - $frameWidth, $y + $i, $x + $newWidth, $y + $i, $color); // Top horizontal
+            imageline($this->canvas, $x + $newWidth - $i, $y, $x + $newWidth - $i, $y + $frameWidth, $color); // Right vertical
+
+            // Bottom left
+            imageline($this->canvas, $x + $i, $y + $newHeight, $x + $i, $y + $newHeight - $frameWidth, $color); // Bottom vertical
+            imageline($this->canvas, $x, $y + $newHeight - $i, $x + $frameWidth, $y + $newHeight - $i, $color); // Bottom horizontal
+
+            // Bottom right
+            imageline($this->canvas, $x + $newWidth - $frameWidth, $y + $newHeight - $i, $x + $newWidth, $y + $newHeight - $i, $color); // Bottom horizontal
+            imageline($this->canvas, $x + $newWidth - $i, $y + $newHeight - $frameWidth, $x + $newWidth - $i, $y + $newHeight, $color); // Right vertical
+        }
+        if ($outFileName === null) {
+            header('Content-type: image/jpeg');
+        }
+
+        imagejpeg($this->canvas, $outFileName);
+    }
+
+
+
+
+    /**
      * Returns the detected face data in JSON format.
      *
      * @return string JSON-encoded face data.
@@ -255,12 +337,12 @@ class FaceDetector
      */
     protected function getImgStats($canvas)
     {
-        $image_width = imagesx($canvas);
-        $image_height = imagesy($canvas);
-        $iis =  $this->computeII($canvas, $image_width, $image_height);
+        $imageWidth = imagesx($canvas);
+        $imageHeight = imagesy($canvas);
+        $iis =  $this->computeII($canvas, $imageWidth, $imageHeight);
         return array(
-            'width' => $image_width,
-            'height' => $image_height,
+            'width' => $imageWidth,
+            'height' => $imageHeight,
             'ii' => $iis['ii'],
             'ii2' => $iis['ii2']
         );
@@ -270,15 +352,15 @@ class FaceDetector
      * Computes integral images for the given canvas.
      *
      * @param GdImage $canvas The image resource.
-     * @param int $image_width The width of the image.
-     * @param int $image_height The height of the image.
+     * @param int $imageWidth The width of the image.
+     * @param int $imageHeight The height of the image.
      *
      * @return array Array containing the integral image and the squared integral image.
      */
-    protected function computeII($canvas, $image_width, $image_height)
+    protected function computeII($canvas, $imageWidth, $imageHeight)
     {
-        $ii_w = $image_width+1;
-        $ii_h = $image_height+1;
+        $ii_w = $imageWidth+1;
+        $ii_h = $imageHeight+1;
         $ii = array();
         $ii2 = array();
 
@@ -301,11 +383,11 @@ class FaceDetector
                 $rowsum += $grey;
                 $rowsum2 += $grey*$grey;
 
-                $ii_above = ($i-1)*$ii_w + $j;
-                $ii_this = $i*$ii_w + $j;
+                $iiAbove = ($i-1)*$ii_w + $j;
+                $iiThis = $i*$ii_w + $j;
 
-                $ii[$ii_this] = $ii[$ii_above] + $rowsum;
-                $ii2[$ii_this] = $ii2[$ii_above] + $rowsum2;
+                $ii[$iiThis] = $ii[$iiAbove] + $rowsum;
+                $ii2[$iiThis] = $ii2[$iiAbove] + $rowsum2;
             }
         }
         return array('ii'=>$ii, 'ii2' => $ii2);
@@ -325,17 +407,17 @@ class FaceDetector
     {
         $s_w = $width/20.0;
         $s_h = $height/20.0;
-        $start_scale = $s_h < $s_w ? $s_h : $s_w;
+        $startScale = $s_h < $s_w ? $s_h : $s_w;
         $scale_update = 1 / 1.2;
-        for ($scale = $start_scale; $scale > 1; $scale *= $scale_update) {
+        for ($scale = $startScale; $scale > 1; $scale *= $scale_update) {
             $w = (20*$scale) >> 0;
             $endx = $width - $w - 1;
             $endy = $height - $w - 1;
             $step = max($scale, 2) >> 0;
-            $inv_area = 1 / ($w*$w);
+            $invArea = 1 / ($w*$w);
             for ($y = 0; $y < $endy; $y += $step) {
                 for ($x = 0; $x < $endx; $x += $step) {
-                    $passed = $this->detectOnSubImage($x, $y, $scale, $ii, $ii2, $w, $width+1, $inv_area);
+                    $passed = $this->detectOnSubImage($x, $y, $scale, $ii, $ii2, $w, $width+1, $invArea);
                     if ($passed) {
                         return array('x'=>$x, 'y'=>$y, 'w'=>$w);
                     }
@@ -355,51 +437,51 @@ class FaceDetector
      * @param array $ii2 Squared integral image.
      * @param int $w Width of the sub-image.
      * @param int $iiw Width of the integral image.
-     * @param float $inv_area Inverse area of the sub-image.
+     * @param float $invArea Inverse area of the sub-image.
      *
      * @return bool True if a face is detected; otherwise false.
      */
-    protected function detectOnSubImage($x, $y, $scale, $ii, $ii2, $w, $iiw, $inv_area)
+    protected function detectOnSubImage($x, $y, $scale, $ii, $ii2, $w, $iiw, $invArea)
     {
-        $mean  = ($ii[($y+$w)*$iiw + $x + $w] + $ii[$y*$iiw+$x] - $ii[($y+$w)*$iiw+$x] - $ii[$y*$iiw+$x+$w])*$inv_area;
+        $mean  = ($ii[($y+$w)*$iiw + $x + $w] + $ii[$y*$iiw+$x] - $ii[($y+$w)*$iiw+$x] - $ii[$y*$iiw+$x+$w])*$invArea;
 
         $vnorm = ($ii2[($y+$w)*$iiw + $x + $w]
                   + $ii2[$y*$iiw+$x]
                   - $ii2[($y+$w)*$iiw+$x]
-                  - $ii2[$y*$iiw+$x+$w])*$inv_area - ($mean*$mean);
+                  - $ii2[$y*$iiw+$x+$w])*$invArea - ($mean*$mean);
 
         $vnorm = $vnorm > 1 ? sqrt($vnorm) : 1;
 
-        $count_data = count($this->detectionData);
+        $countData = count($this->detectionData);
 
-        for ($i_stage = 0; $i_stage < $count_data; $i_stage++) {
-            $stage = $this->detectionData[$i_stage];
+        for ($iStage = 0; $iStage < $countData; $iStage++) {
+            $stage = $this->detectionData[$iStage];
             $trees = $stage[0];
 
-            $stage_thresh = $stage[1];
-            $stage_sum = 0;
+            $stageThresh = $stage[1];
+            $stageSum = 0;
 
-            $count_trees = count($trees);
+            $countTrees = count($trees);
 
-            for ($i_tree = 0; $i_tree < $count_trees; $i_tree++) {
-                $tree = $trees[$i_tree];
-                $current_node = $tree[0];
-                $tree_sum = 0;
-                while ($current_node != null) {
-                    $vals = $current_node[0];
-                    $node_thresh = $vals[0];
+            for ($iTree = 0; $iTree < $countTrees; $iTree++) {
+                $tree = $trees[$iTree];
+                $currentNode = $tree[0];
+                $treeSum = 0;
+                while ($currentNode != null) {
+                    $vals = $currentNode[0];
+                    $nodeThresh = $vals[0];
                     $leftval = $vals[1];
                     $rightval = $vals[2];
                     $leftidx = $vals[3];
                     $rightidx = $vals[4];
-                    $rects = $current_node[1];
+                    $rects = $currentNode[1];
 
-                    $rect_sum = 0;
-                    $count_rects = count($rects);
+                    $rectSum = 0;
+                    $countRects = count($rects);
 
-                    for ($i_rect = 0; $i_rect < $count_rects; $i_rect++) {
+                    for ($iRect = 0; $iRect < $countRects; $iRect++) {
                         $s = $scale;
-                        $rect = $rects[$i_rect];
+                        $rect = $rects[$iRect];
                         $rx = ($rect[0]*$s+$x)>>0;
                         $ry = ($rect[1]*$s+$y)>>0;
                         $rw = ($rect[2]*$s)>>0;
@@ -411,22 +493,22 @@ class FaceDetector
                                   - $ii[($ry+$rh)*$iiw+$rx]
                                   - $ii[$ry*$iiw+$rx+$rw])*$wt;
 
-                        $rect_sum += $r_sum;
+                        $rectSum += $r_sum;
                     }
 
-                    $rect_sum *= $inv_area;
+                    $rectSum *= $invArea;
 
-                    $current_node = null;
+                    $currentNode = null;
 
-                    if ($rect_sum >= $node_thresh*$vnorm) {
+                    if ($rectSum >= $nodeThresh*$vnorm) {
 
                         if ($rightidx == -1) {
 
-                            $tree_sum = $rightval;
+                            $treeSum = $rightval;
 
                         } else {
 
-                            $current_node = $tree[$rightidx];
+                            $currentNode = $tree[$rightidx];
 
                         }
 
@@ -434,18 +516,18 @@ class FaceDetector
 
                         if ($leftidx == -1) {
 
-                            $tree_sum = $leftval;
+                            $treeSum = $leftval;
 
                         } else {
 
-                            $current_node = $tree[$leftidx];
+                            $currentNode = $tree[$leftidx];
                         }
                     }
                 }
 
-                $stage_sum += $tree_sum;
+                $stageSum += $treeSum;
             }
-            if ($stage_sum < $stage_thresh) {
+            if ($stageSum < $stageThresh) {
                 return false;
             }
         }
