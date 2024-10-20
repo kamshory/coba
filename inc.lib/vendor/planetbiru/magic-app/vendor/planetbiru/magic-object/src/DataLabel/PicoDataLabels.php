@@ -9,8 +9,6 @@ use MagicObject\DataLabel\PicoDataLabel;
  *
  * This class allows for the storage and management of multiple data labels.
  *
- * @author Kamshory
- * @package MagicObject\DataLabel
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDataLabels

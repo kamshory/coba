@@ -7,9 +7,7 @@ use MagicObject\SecretObject;
 /**
  * Class PicoSession
  * This class manages session handling.
- * 
- * @author Kamshory
- * @package MagicObject\Session
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSession

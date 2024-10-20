@@ -25,9 +25,6 @@ use ReflectionProperty;
 
 /**
  * Database persistence
- * 
- * @author Kamshory
- * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabasePersistence // NOSONAR

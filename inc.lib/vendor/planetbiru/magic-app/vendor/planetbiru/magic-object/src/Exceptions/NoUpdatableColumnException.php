@@ -14,10 +14,6 @@ use Throwable;
  * such as in ORM frameworks or data access layers. It helps to ensure 
  * that update operations are valid and that the integrity of the 
  * database is maintained.
- * 
- * @author Kamshory
- * @package MagicObject\Exceptions
- * @link https://github.com/Planetbiru/MagicObject
  */
 class NoUpdatableColumnException extends Exception
 {

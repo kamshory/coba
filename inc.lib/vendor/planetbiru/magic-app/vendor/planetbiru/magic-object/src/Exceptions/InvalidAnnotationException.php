@@ -11,10 +11,6 @@ use Throwable;
  * This exception can be thrown when an annotation is improperly formatted,
  * missing, or fails validation in contexts such as reflection, metadata
  * processing, or any system relying on annotations for configuration.
- * 
- * @author Kamshory
- * @package MagicObject\Exceptions
- * @link https://github.com/Planetbiru/MagicObject
  */
 class InvalidAnnotationException extends Exception
 {

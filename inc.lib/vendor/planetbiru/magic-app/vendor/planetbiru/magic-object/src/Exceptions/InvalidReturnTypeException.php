@@ -10,7 +10,6 @@ use Throwable;
  * Exception thrown when an invalid return type is encountered.
  *
  * @package MagicObject\Exceptions
- * @link https://github.com/Planetbiru/MagicObject
  */
 class InvalidReturnTypeException extends Exception
 {

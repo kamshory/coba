@@ -7,9 +7,6 @@ use stdClass;
 
 /**
  * Pageable
- * 
- * @author Kamshory
- * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPageable

@@ -11,10 +11,7 @@ use MagicObject\MagicObject;
  * Class PicoSelectOption
  *
  * This class generates HTML `<option>` elements based on data from a MagicObject entity.
- * 
- * @author Kamshory
- * @package MagicObject\Response\Generated
- * @link https://github.com/Planetbiru/Request
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoSelectOption
 {

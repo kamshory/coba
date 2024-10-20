@@ -6,8 +6,6 @@ namespace MagicObject\Constants;
  *
  * This class defines constants for standard HTTP status codes.
  * 
- * @author Kamshory
- * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoHttpStatus

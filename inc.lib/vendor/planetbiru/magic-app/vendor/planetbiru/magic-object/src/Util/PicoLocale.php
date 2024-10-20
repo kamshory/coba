@@ -4,9 +4,6 @@ namespace MagicObject\Util;
 
 /**
  * Locale
- * 
- * @author Kamshory
- * @package MagicObject\Util
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoLocale

@@ -21,10 +21,6 @@ use MagicObject\Exceptions\InvalidInputFormatException;
  * $passwordUtil->validate('YourSecureP@ssw0rd!');
  * $hashedPassword = $passwordUtil->getHash('YourSecureP@ssw0rd!');
  * ```
- * 
- * @author Kamshory
- * @package MagicObject\Util
- * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPasswordUtil{
     const ALG_MD2          = "md2";

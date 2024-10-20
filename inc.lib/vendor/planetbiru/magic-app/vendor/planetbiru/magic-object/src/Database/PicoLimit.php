@@ -7,9 +7,7 @@ namespace MagicObject\Database;
  *
  * This class provides functionality to manage pagination in database queries
  * by setting limits and offsets.
- * 
- * @author Kamshory
- * @package MagicObject\Database
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoLimit

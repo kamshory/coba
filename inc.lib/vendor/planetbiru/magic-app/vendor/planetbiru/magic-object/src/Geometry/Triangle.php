@@ -7,10 +7,6 @@ namespace MagicObject\Geometry;
  *
  * This class represents a triangle in a 2D space using three vertices.
  * It provides methods to calculate the lengths of the sides and the area using Heron's formula.
- * 
- * @author Kamshory
- * @package MagicObject\Geometry
- * @link https://github.com/Planetbiru/MagicObject
  */
 class Triangle {
 

@@ -4,46 +4,35 @@ namespace MagicObject\Util\Image;
 
 use GdImage;
 
-/**
- * Class ImageColor
- *
- * Represents an RGB color and provides methods for manipulating and retrieving
- * color information in various formats (hexadecimal, RGB). This class can
- * also allocate the color to a given GD image resource for rendering.
- * 
- * @author Kamshory
- * @package MagicObject\Util\Image
- * @link https://github.com/Planetbiru/MagicObject
- */
 class ImageColor
 {
     /**
      * Red component
      *
-     * @var int
+     * @var integer
      */
     protected $red;
 
     /**
      * Green component
      *
-     * @var int
+     * @var integer
      */
     protected $green;
 
     /**
      * Blue component
      *
-     * @var int
+     * @var integer
      */
     protected $blue;
 
     /**
      * Constructor
      *
-     * @param int $red   Red component
+     * @param int $red Red component
      * @param int $green Green component
-     * @param int $blue  Blue component
+     * @param int $blue Blue component
      */
     public function __construct($red, $green, $blue)
     {
@@ -52,11 +41,12 @@ class ImageColor
         $this->blue = $blue;
     }
 
+
     /**
-     * Allocate color in the given image resource.
+     * Allocate image
      *
-     * @param GdImage $image The GD image resource.
-     * @return int The color index of the allocated color.
+     * @param GdImage $image
+     * @return int
      */
     public function allocate($image)
     {
@@ -64,9 +54,9 @@ class ImageColor
     }
 
     /**
-     * Get color in hexadecimal format.
+     * Get color in hexadecimal format
      *
-     * @return string The color represented as a hexadecimal string.
+     * @return string
      */
     public function getHex()
     {
@@ -74,9 +64,9 @@ class ImageColor
     }
 
     /**
-     * Get color in RGB format.
+     * Get color in RGB format
      *
-     * @return string The color represented as an RGB string.
+     * @return string
      */
     public function getRgb()
     {
@@ -84,9 +74,9 @@ class ImageColor
     }
 
     /**
-     * Get the red component of the color.
+     * Get red component
      *
-     * @return int The red component.
+     * @return int
      */
     public function getRed()
     {
@@ -94,10 +84,11 @@ class ImageColor
     }
 
     /**
-     * Set the red component of the color.
+     * Set red component
      *
-     * @param int $red The red component.
-     * @return self The current instance for method chaining.
+     * @param int  $red  Red component
+     *
+     * @return self
      */
     public function setRed($red)
     {
@@ -107,9 +98,9 @@ class ImageColor
     }
 
     /**
-     * Get the green component of the color.
+     * Get green component
      *
-     * @return int The green component.
+     * @return int
      */
     public function getGreen()
     {
@@ -117,10 +108,11 @@ class ImageColor
     }
 
     /**
-     * Set the green component of the color.
+     * Set green component
      *
-     * @param int $green The green component.
-     * @return self The current instance for method chaining.
+     * @param int  $green  Green component
+     *
+     * @return self
      */
     public function setGreen($green)
     {
@@ -130,9 +122,9 @@ class ImageColor
     }
 
     /**
-     * Get the blue component of the color.
+     * Get blue component
      *
-     * @return int The blue component.
+     * @return int
      */
     public function getBlue()
     {
@@ -140,10 +132,11 @@ class ImageColor
     }
 
     /**
-     * Set the blue component of the color.
+     * Set blue component
      *
-     * @param int $blue The blue component.
-     * @return self The current instance for method chaining.
+     * @param int  $blue  Blue component
+     *
+     * @return self
      */
     public function setBlue($blue)
     {

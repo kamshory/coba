@@ -8,10 +8,6 @@ use MagicObject\MagicObject;
  * Class PicoDatabaseEntity
  *
  * Represents a database entity that manages multiple database connections.
- * 
- * @author Kamshory
- * @package MagicObject\Database
- * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoDatabaseEntity
 {

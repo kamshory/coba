@@ -11,10 +11,6 @@ namespace MagicObject\Geometry;
  * attributes or hyperlinks. It also provides methods to calculate 
  * coordinates based on the shape type, apply zoom factors, and generate 
  * an HTML representation for use in maps or similar applications.
- * 
- * @author Kamshory
- * @package MagicObject\Geometry
- * @link https://github.com/Planetbiru/MagicObject
  */
 class Area
 {

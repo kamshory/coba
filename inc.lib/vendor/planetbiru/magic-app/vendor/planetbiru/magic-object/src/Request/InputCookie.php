@@ -6,9 +6,7 @@ use MagicObject\Util\ClassUtil\PicoObjectParser;
 
 /**
  * Class for handling input from cookies.
- * 
- * @author Kamshory
- * @package MagicObject\Request
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class InputCookie extends PicoRequestBase {

@@ -9,10 +9,7 @@ use MagicObject\Database\PicoDatabaseQueryBuilder;
  * Class JSONSelectOption
  *
  * This class fetches data from a database and prepares it for use in JSON select options.
- * 
- * @author Kamshory
- * @package MagicObject\Response\Generated
- * @link https://github.com/Planetbiru/Request
+ * @link https://github.com/Planetbiru/MagicObject
  */
 class JSONSelectOption
 {

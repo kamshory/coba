@@ -22,20 +22,20 @@ use MagicApp\PicoApproval;
 use MagicApp\WaitingFor;
 use MagicApp\UserAction;
 use MagicApp\AppUserPermission;
-use MagicApp\XLSX\DocumentWriter;
-use MagicApp\XLSX\XLSXDataFormat;
-use MagicObject\Util\PicoPasswordUtil;
 use Sipro\Entity\Data\Supervisor;
 use Sipro\AppIncludeImpl;
 use Sipro\Entity\Data\SupervisorApv;
 use Sipro\Entity\Data\SupervisorTrash;
 use Sipro\Entity\Data\JabatanMin;
+use Sipro\Entity\Data\Jabatan;
+use MagicApp\XLSX\DocumentWriter;
+use MagicApp\XLSX\XLSXDataFormat;
+use MagicObject\Util\PicoPasswordUtil;
 
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
 $inputPost = new InputPost();
-
 
 $currentModule = new PicoModule($appConfig, $database, $appModule, "/admin", "supervisor", "Supervisor");
 $userPermission = new AppUserPermission($appConfig, $database, $appUserRole, $currentModule, $currentUser);
@@ -64,34 +64,40 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	{
 		// do nothing
 	}
-	$supervisor->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisor->setKoordinator($inputPost->getKoordinator(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$supervisor->setNamaDepan($inputPost->getNamaDepan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisor->setNamaBelakang($inputPost->getNamaBelakang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisor->setNama(trim($supervisor->getNamaDepan().' '.$supervisor->getNamaBelakang()));
+	$supervisor->setKoordinator($inputPost->getKoordinator(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$supervisor->setJabatanId($inputPost->getJabatanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$supervisor->setJenisKelamin($inputPost->getJenisKelamin(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisor->setTempatLahir($inputPost->getTempatLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisor->setTanggalLahir($inputPost->getTanggalLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisor->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisor->setTelepon($inputPost->getTelepon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisor->setIpTerakhirAktif($inputPost->getIpTerakhirAktif(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisor->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$supervisor->setTandaTangan($inputPost->getTandaTangan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisor->setUkuranBaju($inputPost->getUkuranBaju(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisor->setUkuranSepatu($inputPost->getUkuranSepatu(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisor->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$supervisor->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$supervisor->setDraft(true);
 	$supervisor->setWaitingFor(WaitingFor::CREATE);
-	$supervisor->setAdminBuat($currentUser->getUserId());
+	$supervisor->setAdminBuat($currentAction->getUserId());
 	$supervisor->setWaktuBuat($currentAction->getTime());
 	$supervisor->setIpBuat($currentAction->getIp());
-	$supervisor->setAdminUbah($currentUser->getUserId());
+	$supervisor->setAdminUbah($currentAction->getUserId());
 	$supervisor->setWaktuUbah($currentAction->getTime());
 	$supervisor->setIpUbah($currentAction->getIp());
 
-	$supervisor->insert();
-
-	$supervisorApv = new SupervisorApv($supervisor, $database);
-	$supervisorApv->insert();
-	$supervisorUpdate = new Supervisor(null, $database);
-	$supervisorUpdate->setSupervisorId($supervisor->getSupervisorId())->setApprovalId($supervisorApv->getSupervisorApvId())->update();
-	$newId = $supervisor->getSupervisorId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->supervisor_id, $newId);
+	try
+	{
+		$supervisor->insert();
+		$newId = $supervisor->getSupervisorId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->supervisor_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -99,41 +105,52 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$supervisorApv->setNip($inputPost->getNip(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisorApv->setUsername($inputPost->getUsername(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$password = $inputPost->getPassword(PicoFilterConstant::FILTER_DEFAULT, false, false, true);
-	$util = new PicoPasswordUtil();
+	$util = new PicoPasswordUtil(PicoPasswordUtil::ALG_SHA1);
 	try
 	{
 		$passwordHash = $util->getHash($password);
 		$passwordHash = $util->getHash($passwordHash);
-		$supervisor->setPassword($passwordHash);
+		$supervisorApv->setPassword($passwordHash);
 	}
 	catch(Exception $e)
 	{
 		// do nothing
 	}
-	$supervisorApv->setNama($inputPost->getNama(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisorApv->setKoordinator($inputPost->getKoordinator(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$supervisorApv->setNamaDepan($inputPost->getNamaDepan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisorApv->setNamaBelakang($inputPost->getNamaBelakang(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisorApv->setNama(trim($supervisor->getNamaDepan().' '.$supervisor->getNamaBelakang()));
+	$supervisorApv->setKoordinator($inputPost->getKoordinator(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$supervisorApv->setJabatanId($inputPost->getJabatanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
 	$supervisorApv->setJenisKelamin($inputPost->getJenisKelamin(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisorApv->setTempatLahir($inputPost->getTempatLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisorApv->setTanggalLahir($inputPost->getTanggalLahir(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisorApv->setEmail($inputPost->getEmail(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
 	$supervisorApv->setTelepon($inputPost->getTelepon(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisorApv->setIpTerakhirAktif($inputPost->getIpTerakhirAktif(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
-	$supervisorApv->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
+	$supervisorApv->setTandaTangan($inputPost->getTandaTangan(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisorApv->setUkuranBaju($inputPost->getUkuranBaju(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisorApv->setUkuranSepatu($inputPost->getUkuranSepatu(PicoFilterConstant::FILTER_SANITIZE_SPECIAL_CHARS, false, false, true));
+	$supervisorApv->setBlokir($inputPost->getBlokir(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
 	$supervisorApv->setAktif($inputPost->getAktif(PicoFilterConstant::FILTER_SANITIZE_BOOL, false, false, true));
-	$supervisorApv->setAdminUbah($currentUser->getUserId());
+	$supervisorApv->setAdminUbah($currentAction->getUserId());
 	$supervisorApv->setWaktuUbah($currentAction->getTime());
 	$supervisorApv->setIpUbah($currentAction->getIp());
 
-	$supervisorApv->insert();
+	try
+	{
+		$supervisorApv->insert();
 
-	$supervisor = new Supervisor(null, $database);
-	$supervisor->setAdminMintaUbah($currentUser->getUserId());
-	$supervisor->setWaktuMintaUbah($currentAction->getTime());
-	$supervisor->setIpMintaUbah($currentAction->getIp());
-	$supervisor->setSupervisorId($inputPost->getSupervisorId())->setApprovalId($supervisorApv->getSupervisorApvId())->setWaitingFor(WaitingFor::UPDATE)->update();
-	$newId = $supervisor->getSupervisorId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->supervisor_id, $newId);
+		$supervisor = new Supervisor(null, $database);
+		$supervisor->setAdminMintaUbah($currentAction->getUserId());
+		$supervisor->setWaktuMintaUbah($currentAction->getTime());
+		$supervisor->setIpMintaUbah($currentAction->getIp());
+		$supervisor->setSupervisorId($inputPost->getSupervisorId())->setApprovalId($supervisorApv->getSupervisorApvId())->setWaitingFor(WaitingFor::UPDATE)->update();
+		$newId = $supervisor->getSupervisorId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->supervisor_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -153,7 +170,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 					)
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, true))
 				)
-				->setAdminMintaUbah($currentUser->getUserId())
+				->setAdminMintaUbah($currentAction->getUserId())
 				->setWaktuMintaUbah($currentAction->getTime())
 				->setIpMintaUbah($currentAction->getIp())
 				->setWaitingFor(WaitingFor::ACTIVATE)
@@ -185,7 +202,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 					)
 					->addAnd(PicoPredicate::getInstance()->notEquals(Field::of()->aktif, false))
 				)
-				->setAdminMintaUbah($currentUser->getUserId())
+				->setAdminMintaUbah($currentAction->getUserId())
 				->setWaktuMintaUbah($currentAction->getTime())
 				->setIpMintaUbah($currentAction->getIp())
 				->setWaitingFor(WaitingFor::DEACTIVATE)
@@ -216,7 +233,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 							->addOr(PicoPredicate::getInstance()->equals(Field::of()->waitingFor, null))
 					)
 				)
-				->setAdminMintaUbah($currentUser->getUserId())
+				->setAdminMintaUbah($currentAction->getUserId())
 				->setWaktuMintaUbah($currentAction->getTime())
 				->setIpMintaUbah($currentAction->getIp())
 				->setWaitingFor(WaitingFor::DELETE)
@@ -309,7 +326,8 @@ else if($inputPost->getUserAction() == UserAction::APPROVE)
 				Field::of()->nip, 
 				Field::of()->username, 
 				Field::of()->password, 
-				Field::of()->nama, 
+				Field::of()->namaDepan, 
+				Field::of()->namaBelakang, 
 				Field::of()->koordinator, 
 				Field::of()->jabatanId, 
 				Field::of()->jenisKelamin, 
@@ -317,13 +335,15 @@ else if($inputPost->getUserAction() == UserAction::APPROVE)
 				Field::of()->tanggalLahir, 
 				Field::of()->email, 
 				Field::of()->telepon, 
-				Field::of()->ipTerakhirAktif, 
+				Field::of()->tandaTangan, 
+				Field::of()->ukuranBaju, 
+				Field::of()->ukuranSepatu, 
 				Field::of()->blokir, 
 				Field::of()->aktif
 			);
 
 			$approval->approve($columToBeCopied, new SupervisorApv(), new SupervisorTrash(), 
-			$currentUser->getUserId(),  
+			$currentAction->getUserId(),  
 			$currentAction->getTime(),  
 			$currentAction->getIp(), 
 			$approvalCallback);
@@ -367,7 +387,7 @@ else if($inputPost->getUserAction() == UserAction::REJECT)
 			}); 
 
 			$approval->reject(new SupervisorApv(),
-			$currentUser->getUserId(),  
+			$currentAction->getUserId(),  
 			$currentAction->getTime(),  
 			$currentAction->getIp(), 
 			$approvalCallback
@@ -401,13 +421,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="password" name="password" id="password"/>
+							<input autocomplete="off" class="form-control" type="text" name="password" id="password"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
+						<td><?php echo $appEntityLanguage->getNamaDepan();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="nama" id="nama"/>
+							<input autocomplete="off" class="form-control" type="text" name="nama_depan" id="nama_depan" required="required"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaBelakang();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="nama_belakang" id="nama_belakang"/>
 						</td>
 					</tr>
 					<tr>
@@ -468,9 +494,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getIpTerakhirAktif();?></td>
+						<td><?php echo $appEntityLanguage->getTandaTangan();?></td>
 						<td>
-							<input autocomplete="off" class="form-control" type="text" name="ip_terakhir_aktif" id="ip_terakhir_aktif"/>
+							<input autocomplete="off" class="form-control" type="text" name="tanda_tangan" id="tanda_tangan"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranBaju();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="ukuran_baju" id="ukuran_baju"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranSepatu();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="ukuran_sepatu" id="ukuran_sepatu"/>
 						</td>
 					</tr>
 					<tr>
@@ -509,7 +547,7 @@ else if($inputGet->getUserAction() == UserAction::UPDATE)
 	$supervisor = new Supervisor(null, $database);
 	try{
 		$supervisor->findOneBySupervisorId($inputGet->getSupervisorId());
-		if($supervisor->hasValueSupervisorId())
+		if($supervisor->issetSupervisorId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Supervisor(), $appConfig, $currentUser->getLanguageId());
 require_once $appInclude->mainAppHeader(__DIR__);
@@ -536,13 +574,19 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<input class="form-control" type="password" name="password" id="password" value="" autocomplete="off"/>
+							<input class="form-control" type="text" name="password" id="password" value="<?php echo $supervisor->getPassword();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
+						<td><?php echo $appEntityLanguage->getNamaDepan();?></td>
 						<td>
-							<input class="form-control" type="text" name="nama" id="nama" value="<?php echo $supervisor->getNama();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="nama_depan" id="nama_depan" value="<?php echo $supervisor->getNamaDepan();?>" autocomplete="off" required="required"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaBelakang();?></td>
+						<td>
+							<input class="form-control" type="text" name="nama_belakang" id="nama_belakang" value="<?php echo $supervisor->getNamaBelakang();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -603,9 +647,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getIpTerakhirAktif();?></td>
+						<td><?php echo $appEntityLanguage->getTandaTangan();?></td>
 						<td>
-							<input class="form-control" type="text" name="ip_terakhir_aktif" id="ip_terakhir_aktif" value="<?php echo $supervisor->getIpTerakhirAktif();?>" autocomplete="off"/>
+							<input class="form-control" type="text" name="tanda_tangan" id="tanda_tangan" value="<?php echo $supervisor->getTandaTangan();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranBaju();?></td>
+						<td>
+							<input class="form-control" type="text" name="ukuran_baju" id="ukuran_baju" value="<?php echo $supervisor->getUkuranBaju();?>" autocomplete="off"/>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranSepatu();?></td>
+						<td>
+							<input class="form-control" type="text" name="ukuran_sepatu" id="ukuran_sepatu" value="<?php echo $supervisor->getUkuranSepatu();?>" autocomplete="off"/>
 						</td>
 					</tr>
 					<tr>
@@ -678,31 +734,15 @@ else if($inputGet->getUserAction() == UserAction::DETAIL)
 			"primaryKey" => "jabatan_id",
 			"objectName" => "jabatan",
 			"propertyName" => "nama"
-		), 
-		"pembuat" => array(
-			"columnName" => "admin_buat",
-			"entityName" => "User",
-			"tableName" => "user",
-			"primaryKey" => "user_id",
-			"objectName" => "pembuat",
-			"propertyName" => "first_name"
-		), 
-		"pengubah" => array(
-			"columnName" => "admin_ubah",
-			"entityName" => "User",
-			"tableName" => "user",
-			"primaryKey" => "user_id",
-			"objectName" => "pengubah",
-			"propertyName" => "first_name"
 		)
 		);
 		$supervisor->findOneWithPrimaryKeyValue($inputGet->getSupervisorId(), $subqueryMap);
-		if($supervisor->hasValueSupervisorId())
+		if($supervisor->issetSupervisorId())
 		{
 			// define map here
 			$mapForJenisKelamin = array(
-				"L" => array("value" => "L", "label" => "Laki-Laki", "default" => "true"),
-				"P" => array("value" => "P", "label" => "Perempuan", "default" => "true")
+				"L" => array("value" => "L", "label" => "Laki-Laki", "default" => "false"),
+				"P" => array("value" => "P", "label" => "Perempuan", "default" => "false")
 			);
 			if(UserAction::isRequireNextAction($inputGet) && $supervisor->notNullApprovalId())
 			{
@@ -754,12 +794,30 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
+						<td><?php echo $appEntityLanguage->getPassword();?></td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNama($supervisorApv->getNama()));?>"><?php echo $supervisor->getNama();?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsPassword($supervisorApv->getPassword()));?>"><?php echo $supervisor->getPassword();?></span>
 						</td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNama($supervisorApv->getNama()));?>"><?php echo $supervisorApv->getNama();?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsPassword($supervisorApv->getPassword()));?>"><?php echo $supervisorApv->getPassword();?></span>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaDepan();?></td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNamaDepan($supervisorApv->getNamaDepan()));?>"><?php echo $supervisor->getNamaDepan();?></span>
+						</td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNamaDepan($supervisorApv->getNamaDepan()));?>"><?php echo $supervisorApv->getNamaDepan();?></span>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaBelakang();?></td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNamaBelakang($supervisorApv->getNamaBelakang()));?>"><?php echo $supervisor->getNamaBelakang();?></span>
+						</td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsNamaBelakang($supervisorApv->getNamaBelakang()));?>"><?php echo $supervisorApv->getNamaBelakang();?></span>
 						</td>
 					</tr>
 					<tr>
@@ -774,10 +832,10 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getJabatan();?></td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsJabatanId($supervisorApv->getJabatanId()));?>"><?php echo $supervisor->hasValueJabatan() ? $supervisor->getJabatan()->getNama() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsJabatanId($supervisorApv->getJabatanId()));?>"><?php echo $supervisor->issetJabatan() ? $supervisor->getJabatan()->getNama() : "";?></span>
 						</td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsJabatanId($supervisorApv->getJabatanId()));?>"><?php echo $supervisorApv->hasValueJabatan() ? $supervisorApv->getJabatan()->getNama() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsJabatanId($supervisorApv->getJabatanId()));?>"><?php echo $supervisorApv->issetJabatan() ? $supervisorApv->getJabatan()->getNama() : "";?></span>
 						</td>
 					</tr>
 					<tr>
@@ -823,6 +881,33 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 						<td>
 							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsTelepon($supervisorApv->getTelepon()));?>"><?php echo $supervisorApv->getTelepon();?></span>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTandaTangan();?></td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsTandaTangan($supervisorApv->getTandaTangan()));?>"><?php echo $supervisor->getTandaTangan();?></span>
+						</td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsTandaTangan($supervisorApv->getTandaTangan()));?>"><?php echo $supervisorApv->getTandaTangan();?></span>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranBaju();?></td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsUkuranBaju($supervisorApv->getUkuranBaju()));?>"><?php echo $supervisor->getUkuranBaju();?></span>
+						</td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsUkuranBaju($supervisorApv->getUkuranBaju()));?>"><?php echo $supervisorApv->getUkuranBaju();?></span>
+						</td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranSepatu();?></td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsUkuranSepatu($supervisorApv->getUkuranSepatu()));?>"><?php echo $supervisor->getUkuranSepatu();?></span>
+						</td>
+						<td>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsUkuranSepatu($supervisorApv->getUkuranSepatu()));?>"><?php echo $supervisorApv->getUkuranSepatu();?></span>
 						</td>
 					</tr>
 					<tr>
@@ -880,21 +965,21 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getPembuat();?></td>
+						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminBuat($supervisorApv->getAdminBuat()));?>"><?php echo $supervisor->hasValuePembuat() ? $supervisor->getPembuat()->getFirstName() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminBuat($supervisorApv->getAdminBuat()));?>"><?php echo $supervisor->getAdminBuat();?></span>
 						</td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminBuat($supervisorApv->getAdminBuat()));?>"><?php echo $supervisorApv->hasValuePembuat() ? $supervisorApv->getPembuat()->getFirstName() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminBuat($supervisorApv->getAdminBuat()));?>"><?php echo $supervisorApv->getAdminBuat();?></span>
 						</td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getPengubah();?></td>
+						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminUbah($supervisorApv->getAdminUbah()));?>"><?php echo $supervisor->hasValuePengubah() ? $supervisor->getPengubah()->getFirstName() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminUbah($supervisorApv->getAdminUbah()));?>"><?php echo $supervisor->getAdminUbah();?></span>
 						</td>
 						<td>
-							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminUbah($supervisorApv->getAdminUbah()));?>"><?php echo $supervisorApv->hasValuePengubah() ? $supervisorApv->getPengubah()->getFirstName() : "";?></span>
+							<span class="<?php echo AppFormBuilder::classCompareData($supervisor->notEqualsAdminUbah($supervisorApv->getAdminUbah()));?>"><?php echo $supervisorApv->getAdminUbah();?></span>
 						</td>
 					</tr>
 					<tr>
@@ -987,8 +1072,16 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $supervisor->getUsername();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getNama();?></td>
-						<td><?php echo $supervisor->getNama();?></td>
+						<td><?php echo $appEntityLanguage->getPassword();?></td>
+						<td><?php echo $supervisor->getPassword();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaDepan();?></td>
+						<td><?php echo $supervisor->getNamaDepan();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getNamaBelakang();?></td>
+						<td><?php echo $supervisor->getNamaBelakang();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getKoordinator();?></td>
@@ -996,7 +1089,7 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getJabatan();?></td>
-						<td><?php echo $supervisor->hasValueJabatan() ? $supervisor->getJabatan()->getNama() : "";?></td>
+						<td><?php echo $supervisor->issetJabatan() ? $supervisor->getJabatan()->getNama() : "";?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getJenisKelamin();?></td>
@@ -1017,6 +1110,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 					<tr>
 						<td><?php echo $appEntityLanguage->getTelepon();?></td>
 						<td><?php echo $supervisor->getTelepon();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getTandaTangan();?></td>
+						<td><?php echo $supervisor->getTandaTangan();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranBaju();?></td>
+						<td><?php echo $supervisor->getUkuranBaju();?></td>
+					</tr>
+					<tr>
+						<td><?php echo $appEntityLanguage->getUkuranSepatu();?></td>
+						<td><?php echo $supervisor->getUkuranSepatu();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getWaktuBuat();?></td>
@@ -1043,12 +1148,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 						<td><?php echo $supervisor->getIpTerakhirAktif();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getPembuat();?></td>
-						<td><?php echo $supervisor->hasValuePembuat() ? $supervisor->getPembuat()->getFirstName() : "";?></td>
+						<td><?php echo $appEntityLanguage->getAdminBuat();?></td>
+						<td><?php echo $supervisor->getAdminBuat();?></td>
 					</tr>
 					<tr>
-						<td><?php echo $appEntityLanguage->getPengubah();?></td>
-						<td><?php echo $supervisor->hasValuePengubah() ? $supervisor->getPengubah()->getFirstName() : "";?></td>
+						<td><?php echo $appEntityLanguage->getAdminUbah();?></td>
+						<td><?php echo $supervisor->getAdminUbah();?></td>
 					</tr>
 					<tr>
 						<td><?php echo $appEntityLanguage->getBlokir();?></td>
@@ -1113,22 +1218,39 @@ else
 {
 $appEntityLanguage = new AppEntityLanguage(new Supervisor(), $appConfig, $currentUser->getLanguageId());
 $mapForJenisKelamin = array(
-	"L" => array("value" => "L", "label" => "Laki-Laki", "default" => "true"),
-	"P" => array("value" => "P", "label" => "Perempuan", "default" => "true")
+	"L" => array("value" => "L", "label" => "Laki-Laki", "default" => "false"),
+	"P" => array("value" => "P", "label" => "Perempuan", "default" => "false")
 );
 $specMap = array(
-	"nama" => PicoSpecification::filter("nama", "fulltext"),
+	"koordinator" => PicoSpecification::filter("koordinator", "boolean"),
 	"jabatanId" => PicoSpecification::filter("jabatanId", "number"),
-	"blokir" => PicoSpecification::filter("blokir", "boolean"),
-	"aktif" => PicoSpecification::filter("aktif", "boolean")
+	"jenisKelamin" => PicoSpecification::filter("jenisKelamin", "fulltext")
 );
 $sortOrderMap = array(
 	"nip" => "nip",
 	"username" => "username",
+	"password" => "password",
+	"namaDepan" => "namaDepan",
+	"namaBelakang" => "namaBelakang",
 	"nama" => "nama",
 	"koordinator" => "koordinator",
 	"jabatanId" => "jabatanId",
 	"jenisKelamin" => "jenisKelamin",
+	"tempatLahir" => "tempatLahir",
+	"tanggalLahir" => "tanggalLahir",
+	"email" => "email",
+	"telepon" => "telepon",
+	"tandaTangan" => "tandaTangan",
+	"ukuranBaju" => "ukuranBaju",
+	"ukuranSepatu" => "ukuranSepatu",
+	"waktuBuat" => "waktuBuat",
+	"waktuUbah" => "waktuUbah",
+	"waktuTerakhirAktif" => "waktuTerakhirAktif",
+	"ipBuat" => "ipBuat",
+	"ipUbah" => "ipUbah",
+	"ipTerakhirAktif" => "ipTerakhirAktif",
+	"adminBuat" => "adminBuat",
+	"adminUbah" => "adminUbah",
 	"blokir" => "blokir",
 	"aktif" => "aktif"
 );
@@ -1162,29 +1284,13 @@ $subqueryMap = array(
 	"primaryKey" => "jabatan_id",
 	"objectName" => "jabatan",
 	"propertyName" => "nama"
-), 
-"adminBuat" => array(
-	"columnName" => "admin_buat",
-	"entityName" => "User",
-	"tableName" => "user",
-	"primaryKey" => "user_id",
-	"objectName" => "pembuat",
-	"propertyName" => "first_name"
-), 
-"adminUbah" => array(
-	"columnName" => "admin_ubah",
-	"entityName" => "User",
-	"tableName" => "user",
-	"primaryKey" => "user_id",
-	"objectName" => "pengubah",
-	"propertyName" => "first_name"
 )
 );
 
 if($inputGet->getUserAction() == UserAction::EXPORT)
 {
-	$exporter = DocumentWriter::getCSVDocumentWriter($appLanguage);
-	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".csv";
+	$exporter = DocumentWriter::getXLSXDocumentWriter($appLanguage);
+	$fileName = $currentModule->getModuleName()."-".date("Y-m-d-H-i-s").".xlsx";
 	$sheetName = "Sheet 1";
 
 	$headerFormat = new XLSXDataFormat($dataLoader, 3);
@@ -1194,6 +1300,9 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getSupervisorId() => $headerFormat->getSupervisorId(),
 		$appEntityLanguage->getNip() => $headerFormat->getNip(),
 		$appEntityLanguage->getUsername() => $headerFormat->getUsername(),
+		$appEntityLanguage->getPassword() => $headerFormat->getPassword(),
+		$appEntityLanguage->getNamaDepan() => $headerFormat->getNamaDepan(),
+		$appEntityLanguage->getNamaBelakang() => $headerFormat->getNamaBelakang(),
 		$appEntityLanguage->getNama() => $headerFormat->getNama(),
 		$appEntityLanguage->getKoordinator() => $headerFormat->asString(),
 		$appEntityLanguage->getJabatan() => $headerFormat->asString(),
@@ -1202,14 +1311,17 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 		$appEntityLanguage->getTanggalLahir() => $headerFormat->getTanggalLahir(),
 		$appEntityLanguage->getEmail() => $headerFormat->getEmail(),
 		$appEntityLanguage->getTelepon() => $headerFormat->getTelepon(),
+		$appEntityLanguage->getTandaTangan() => $headerFormat->getTandaTangan(),
+		$appEntityLanguage->getUkuranBaju() => $headerFormat->getUkuranBaju(),
+		$appEntityLanguage->getUkuranSepatu() => $headerFormat->getUkuranSepatu(),
 		$appEntityLanguage->getWaktuBuat() => $headerFormat->getWaktuBuat(),
 		$appEntityLanguage->getWaktuUbah() => $headerFormat->getWaktuUbah(),
 		$appEntityLanguage->getWaktuTerakhirAktif() => $headerFormat->getWaktuTerakhirAktif(),
 		$appEntityLanguage->getIpBuat() => $headerFormat->getIpBuat(),
 		$appEntityLanguage->getIpUbah() => $headerFormat->getIpUbah(),
 		$appEntityLanguage->getIpTerakhirAktif() => $headerFormat->getIpTerakhirAktif(),
-		$appEntityLanguage->getAdminBuat() => $headerFormat->asString(),
-		$appEntityLanguage->getAdminUbah() => $headerFormat->asString(),
+		$appEntityLanguage->getAdminBuat() => $headerFormat->getAdminBuat(),
+		$appEntityLanguage->getAdminUbah() => $headerFormat->getAdminUbah(),
 		$appEntityLanguage->getBlokir() => $headerFormat->asString(),
 		$appEntityLanguage->getAktif() => $headerFormat->asString()
 	), 
@@ -1220,22 +1332,28 @@ if($inputGet->getUserAction() == UserAction::EXPORT)
 			$row->getSupervisorId(),
 			$row->getNip(),
 			$row->getUsername(),
+			$row->getPassword(),
+			$row->getNamaDepan(),
+			$row->getNamaBelakang(),
 			$row->getNama(),
 			$row->optionKoordinator($appLanguage->getYes(), $appLanguage->getNo()),
-			$row->hasValueJabatan() ? $row->getJabatan()->getNama() : "",
+			$row->issetJabatan() ? $row->getJabatan()->getNama() : "",
 			isset($mapForJenisKelamin) && isset($mapForJenisKelamin[$row->getJenisKelamin()]) && isset($mapForJenisKelamin[$row->getJenisKelamin()]["label"]) ? $mapForJenisKelamin[$row->getJenisKelamin()]["label"] : "",
 			$row->getTempatLahir(),
 			$row->getTanggalLahir(),
 			$row->getEmail(),
 			$row->getTelepon(),
+			$row->getTandaTangan(),
+			$row->getUkuranBaju(),
+			$row->getUkuranSepatu(),
 			$row->getWaktuBuat(),
 			$row->getWaktuUbah(),
 			$row->getWaktuTerakhirAktif(),
 			$row->getIpBuat(),
 			$row->getIpUbah(),
 			$row->getIpTerakhirAktif(),
-			$row->hasValuePembuat() ? $row->getPembuat()->getFirstName() : "",
-			$row->hasValuePengubah() ? $row->getPengubah()->getFirstName() : "",
+			$row->getAdminBuat(),
+			$row->getAdminUbah(),
 			$row->optionBlokir($appLanguage->getYes(), $appLanguage->getNo()),
 			$row->optionAktif($appLanguage->getYes(), $appLanguage->getNo())
 		);
@@ -1251,18 +1369,22 @@ require_once $appInclude->mainAppHeader(__DIR__);
 		<div class="filter-section">
 			<form action="" method="get" class="filter-form">
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getNama();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getKoordinator();?></span>
 					<span class="filter-control">
-						<input type="text" name="nama" class="form-control" value="<?php echo $inputGet->getNama();?>" autocomplete="off"/>
+							<select class="form-control" name="koordinator" data-value="<?php echo $inputGet->getKoordinator();?>">
+								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
+								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getKoordinator(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
+								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getKoordinator(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
+							</select>
 					</span>
 				</span>
 				
 				<span class="filter-group">
 					<span class="filter-label"><?php echo $appEntityLanguage->getJabatan();?></span>
 					<span class="filter-control">
-							<select name="jabatan_id" class="form-control">
+							<select class="form-control" name="jabatan_id">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<?php echo AppFormBuilder::getInstance()->createSelectOption(new JabatanMin(null, $database), 
+								<?php echo AppFormBuilder::getInstance()->createSelectOption(new Jabatan(null, $database), 
 								PicoSpecification::getInstance()
 									->addAnd(new PicoPredicate(Field::of()->aktif, true))
 									->addAnd(new PicoPredicate(Field::of()->draft, true)), 
@@ -1276,23 +1398,12 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				</span>
 				
 				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getBlokir();?></span>
+					<span class="filter-label"><?php echo $appEntityLanguage->getJenisKelamin();?></span>
 					<span class="filter-control">
-							<select name="blokir" class="form-control" data-value="<?php echo $inputGet->getBlokir();?>">
+							<select class="form-control" name="jenis_kelamin" data-value="<?php echo $inputGet->getJenisKelamin();?>">
 								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getBlokir(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getBlokir(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
-							</select>
-					</span>
-				</span>
-				
-				<span class="filter-group">
-					<span class="filter-label"><?php echo $appEntityLanguage->getAktif();?></span>
-					<span class="filter-control">
-							<select name="aktif" class="form-control" data-value="<?php echo $inputGet->getAktif();?>">
-								<option value=""><?php echo $appLanguage->getLabelOptionSelectOne();?></option>
-								<option value="yes" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'yes');?>><?php echo $appLanguage->getOptionLabelYes();?></option>
-								<option value="no" <?php echo AppFormBuilder::selected($inputGet->getAktif(), 'no');?>><?php echo $appLanguage->getOptionLabelNo();?></option>
+								<option value="L" <?php echo AppFormBuilder::selected($inputGet->getJenisKelamin(), 'L');?>>Laki-Laki</option>
+								<option value="P" <?php echo AppFormBuilder::selected($inputGet->getJenisKelamin(), 'P');?>>Perempuan</option>
 							</select>
 					</span>
 				</span>
@@ -1326,18 +1437,18 @@ require_once $appInclude->mainAppHeader(__DIR__);
 				$pageData = $dataLoader->findAll($specification, $pageable, $sortable, true, $subqueryMap, MagicObject::FIND_OPTION_NO_FETCH_DATA);
 				if($pageData->getTotalResult() > 0)
 				{		
-					$pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
-					->setNavigation(
-					'<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
-					'<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
-					)
-					->setMargin($appConfig->getData()->getPageMargin())
-					;
+				    $pageControl = $pageData->getPageControl("page", $currentModule->getSelf())
+				    ->setNavigation(
+				    '<i class="fa-solid fa-angle-left"></i>', '<i class="fa-solid fa-angle-right"></i>',
+				    '<i class="fa-solid fa-angles-left"></i>', '<i class="fa-solid fa-angles-right"></i>'
+				    )
+				    ->setMargin($appConfig->getData()->getPageMargin())
+				    ;
 			?>
 			<div class="pagination pagination-top">
-				<div class="pagination-number">
-				<?php echo $pageControl; ?>
-				</div>
+			    <div class="pagination-number">
+			    <?php echo $pageControl; ?>
+			    </div>
 			</div>
 			<form action="" method="post" class="data-form">
 				<div class="data-wrapper">
@@ -1362,10 +1473,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-controll data-number"><?php echo $appLanguage->getNumero();?></td>
 								<td data-col-name="nip" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNip();?></a></td>
 								<td data-col-name="username" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUsername();?></a></td>
+								<td data-col-name="password" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getPassword();?></a></td>
+								<td data-col-name="nama_depan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNamaDepan();?></a></td>
+								<td data-col-name="nama_belakang" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNamaBelakang();?></a></td>
 								<td data-col-name="nama" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getNama();?></a></td>
 								<td data-col-name="koordinator" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getKoordinator();?></a></td>
 								<td data-col-name="jabatan_id" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getJabatan();?></a></td>
 								<td data-col-name="jenis_kelamin" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getJenisKelamin();?></a></td>
+								<td data-col-name="tempat_lahir" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTempatLahir();?></a></td>
+								<td data-col-name="tanggal_lahir" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTanggalLahir();?></a></td>
+								<td data-col-name="email" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getEmail();?></a></td>
+								<td data-col-name="telepon" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTelepon();?></a></td>
+								<td data-col-name="tanda_tangan" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getTandaTangan();?></a></td>
+								<td data-col-name="ukuran_baju" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUkuranBaju();?></a></td>
+								<td data-col-name="ukuran_sepatu" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getUkuranSepatu();?></a></td>
+								<td data-col-name="waktu_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuBuat();?></a></td>
+								<td data-col-name="waktu_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuUbah();?></a></td>
+								<td data-col-name="waktu_terakhir_aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getWaktuTerakhirAktif();?></a></td>
+								<td data-col-name="ip_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpBuat();?></a></td>
+								<td data-col-name="ip_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpUbah();?></a></td>
+								<td data-col-name="ip_terakhir_aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getIpTerakhirAktif();?></a></td>
+								<td data-col-name="admin_buat" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdminBuat();?></a></td>
+								<td data-col-name="admin_ubah" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAdminUbah();?></a></td>
 								<td data-col-name="blokir" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getBlokir();?></a></td>
 								<td data-col-name="aktif" class="order-controll"><a href="#"><?php echo $appEntityLanguage->getAktif();?></a></td>
 								<?php if($userPermission->isAllowedApprove()){ ?>
@@ -1401,10 +1530,28 @@ require_once $appInclude->mainAppHeader(__DIR__);
 								<td class="data-number"><?php echo $pageData->getDataOffset() + $dataIndex;?></td>
 								<td data-col-name="nip"><?php echo $supervisor->getNip();?></td>
 								<td data-col-name="username"><?php echo $supervisor->getUsername();?></td>
+								<td data-col-name="password"><?php echo $supervisor->getPassword();?></td>
+								<td data-col-name="nama_depan"><?php echo $supervisor->getNamaDepan();?></td>
+								<td data-col-name="nama_belakang"><?php echo $supervisor->getNamaBelakang();?></td>
 								<td data-col-name="nama"><?php echo $supervisor->getNama();?></td>
 								<td data-col-name="koordinator"><?php echo $supervisor->optionKoordinator($appLanguage->getYes(), $appLanguage->getNo());?></td>
-								<td data-col-name="jabatan_id"><?php echo $supervisor->hasValueJabatan() ? $supervisor->getJabatan()->getNama() : "";?></td>
+								<td data-col-name="jabatan_id"><?php echo $supervisor->issetJabatan() ? $supervisor->getJabatan()->getNama() : "";?></td>
 								<td data-col-name="jenis_kelamin"><?php echo isset($mapForJenisKelamin) && isset($mapForJenisKelamin[$supervisor->getJenisKelamin()]) && isset($mapForJenisKelamin[$supervisor->getJenisKelamin()]["label"]) ? $mapForJenisKelamin[$supervisor->getJenisKelamin()]["label"] : "";?></td>
+								<td data-col-name="tempat_lahir"><?php echo $supervisor->getTempatLahir();?></td>
+								<td data-col-name="tanggal_lahir"><?php echo $supervisor->getTanggalLahir();?></td>
+								<td data-col-name="email"><?php echo $supervisor->getEmail();?></td>
+								<td data-col-name="telepon"><?php echo $supervisor->getTelepon();?></td>
+								<td data-col-name="tanda_tangan"><?php echo $supervisor->getTandaTangan();?></td>
+								<td data-col-name="ukuran_baju"><?php echo $supervisor->getUkuranBaju();?></td>
+								<td data-col-name="ukuran_sepatu"><?php echo $supervisor->getUkuranSepatu();?></td>
+								<td data-col-name="waktu_buat"><?php echo $supervisor->getWaktuBuat();?></td>
+								<td data-col-name="waktu_ubah"><?php echo $supervisor->getWaktuUbah();?></td>
+								<td data-col-name="waktu_terakhir_aktif"><?php echo $supervisor->getWaktuTerakhirAktif();?></td>
+								<td data-col-name="ip_buat"><?php echo $supervisor->getIpBuat();?></td>
+								<td data-col-name="ip_ubah"><?php echo $supervisor->getIpUbah();?></td>
+								<td data-col-name="ip_terakhir_aktif"><?php echo $supervisor->getIpTerakhirAktif();?></td>
+								<td data-col-name="admin_buat"><?php echo $supervisor->getAdminBuat();?></td>
+								<td data-col-name="admin_ubah"><?php echo $supervisor->getAdminUbah();?></td>
 								<td data-col-name="blokir"><?php echo $supervisor->optionBlokir($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<td data-col-name="aktif"><?php echo $supervisor->optionAktif($appLanguage->getYes(), $appLanguage->getNo());?></td>
 								<?php if($userPermission->isAllowedApprove()){ ?>

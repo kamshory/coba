@@ -2,13 +2,6 @@
 
 namespace MagicObject\ComplexNumber;
 
-/**
- * ComplexNumber class
- * 
- * @author Kamshory
- * @package MagicObject\Database
- * @link https://github.com/Planetbiru/MagicObject
- */
 class ComplexNumber {
 
     /**

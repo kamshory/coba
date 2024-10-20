@@ -8,9 +8,7 @@ use MagicObject\Util\PicoStringUtil;
  * Class representing an upload file tool.
  *
  * This class is designed to handle uploaded files. All attributes in this class are read-only.
- * 
- * @author Kamshory
- * @package MagicObject\File
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoUploadFile

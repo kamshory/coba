@@ -11,8 +11,6 @@ use stdClass;
  * primary keys, and other related metadata necessary for managing 
  * database interactions.
  * 
- * @author Kamshory
- * @package MagicObject\Database
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoTableInfo // NOSONAR

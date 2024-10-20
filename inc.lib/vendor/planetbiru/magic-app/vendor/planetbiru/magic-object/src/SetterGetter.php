@@ -17,8 +17,6 @@ use stdClass;
  * allowing flexible management of property values and array-like behavior. 
  * Supports annotations for property configuration and JSON serialization.
  *
- * @author Kamshory
- * @package MagicObject
  * @link https://github.com/Planetbiru/MagicObject
  */
 class SetterGetter extends stdClass

@@ -65,6 +65,15 @@ $inputGet = new InputGet();
                     e.target.classList.add('invalid-input');
                 }
             });
+            document.querySelector('#captcha').addEventListener('click', function(e){
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                let src = document.querySelector('#captcha').getAttribute('src');
+                let arr = src.split('?');
+                src = arr[0] + '?rand='+Math.random();
+                e.target.setAttribute('src', src);
+            });
         });
     </script>
   </head>
@@ -112,9 +121,15 @@ $inputGet = new InputGet();
                                 </td>
                             </tr>
                             <tr>
-                                <td><?php echo $appEntityLanguage->getNama();?></td>
+                                <td><?php echo $appEntityLanguage->getNamaDepan();?></td>
                                 <td>
-                                    <input autocomplete="off" class="form-control" type="text" name="nama" id="nama" value="<?php echo htmlspecialchars($inputPost->getNama());?>" required />
+                                    <input autocomplete="off" class="form-control" type="text" name="nama_depan" id="nama_depan" required="required"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $appEntityLanguage->getNamaBelakang();?></td>
+                                <td>
+                                    <input autocomplete="off" class="form-control" type="text" name="nama_belakang" id="nama_belakang"/>
                                 </td>
                             </tr>
                             <tr>
@@ -163,6 +178,18 @@ $inputGet = new InputGet();
                                 </td>
                             </tr>
                             <tr>
+						<td><?php echo $appEntityLanguage->getUkuranBaju();?></td>
+						<td>
+							<input autocomplete="off" class="form-control" type="text" name="ukuran_baju" id="ukuran_baju"/>
+						</td>
+                        </tr>
+                        <tr>
+                            <td><?php echo $appEntityLanguage->getUkuranSepatu();?></td>
+                            <td>
+                                <input autocomplete="off" class="form-control" type="text" name="ukuran_sepatu" id="ukuran_sepatu"/>
+                            </td>
+                        </tr>
+                            <tr>
                                 <td><?php echo $appEntityLanguage->getEmail();?></td>
                                 <td>
                                     <input autocomplete="off" class="form-control" type="email" name="email" id="email" value="<?php echo htmlspecialchars($inputPost->getEmail());?>" required />
@@ -189,7 +216,7 @@ $inputGet = new InputGet();
                             <tr>
                                 <td></td>
                                 <td>
-                                    <img src="<?php echo $baseAssetsUrl;?>lib.captcha/captcha-image.php" alt="" width="98" height="22">
+                                    <img src="<?php echo $baseAssetsUrl;?>lib.captcha/captcha-image.php" alt="" width="98" height="22" id="captcha"> <?php echo $appLanguage->getClickForReload();?>
                                 </td>
                             </tr>
 

@@ -20,9 +20,7 @@ use stdClass;
  * - Supports execution time tracking for performance monitoring.
  * - Provides easy access to pagination controls and metadata.
  * - Facilitates fetching and processing of data with subquery mapping.
- * 
- * @author Kamshory
- * @package MagicObject\Database
+ *
  * @link https://github.com/Planetbiru/MagicObject
  */
 class PicoPageData //NOSONAR

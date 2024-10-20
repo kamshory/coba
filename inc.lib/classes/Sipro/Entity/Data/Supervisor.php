@@ -32,7 +32,7 @@ class Supervisor extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="nip", type="varchar(30)", length=30, nullable=false)
-	 * @Label(content="NIP")
+	 * @Label(content="Nip")
 	 * @var string
 	 */
 	protected $nip;
@@ -54,6 +54,24 @@ class Supervisor extends MagicObject
 	 * @var string
 	 */
 	protected $password;
+
+	/**
+	 * Nama Depan
+	 * 
+	 * @Column(name="nama_depan", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Nama Depan")
+	 * @var string
+	 */
+	protected $namaDepan;
+
+	/**
+	 * Nama Belakang
+	 * 
+	 * @Column(name="nama_belakang", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Nama Belakang")
+	 * @var string
+	 */
+	protected $namaBelakang;
 
 	/**
 	 * Nama
@@ -138,6 +156,36 @@ class Supervisor extends MagicObject
 	protected $telepon;
 
 	/**
+	 * Tanda Tangan
+	 * 
+	 * @NotNull
+	 * @Column(name="tanda_tangan", type="varchar(512)", length=512, nullable=false)
+	 * @Label(content="Tanda Tangan")
+	 * @var string
+	 */
+	protected $tandaTangan;
+
+	/**
+	 * Ukuran Baju
+	 * 
+	 * @NotNull
+	 * @Column(name="ukuran_baju", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Ukuran Baju")
+	 * @var string
+	 */
+	protected $ukuranBaju;
+
+	/**
+	 * Ukuran Sepatu
+	 * 
+	 * @NotNull
+	 * @Column(name="ukuran_sepatu", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Ukuran Sepatu")
+	 * @var string
+	 */
+	protected $ukuranSepatu;
+
+	/**
 	 * Auth
 	 * 
 	 * @Column(name="auth", type="varchar(50)", length=50, nullable=true)
@@ -159,7 +207,7 @@ class Supervisor extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true, updatable=false)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -168,7 +216,7 @@ class Supervisor extends MagicObject
 	/**
 	 * Waktu Ubah
 	 * 
-	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Ubah")
 	 * @var string
 	 */
@@ -177,7 +225,7 @@ class Supervisor extends MagicObject
 	/**
 	 * Waktu Terakhir Aktif
 	 * 
-	 * @Column(name="waktu_terakhir_aktif", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_terakhir_aktif", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Terakhir Aktif")
 	 * @var string
 	 */
@@ -220,15 +268,6 @@ class Supervisor extends MagicObject
 	protected $adminBuat;
 
 	/**
-	 * Pembuat
-	 * 
-	 * @JoinColumn(name="admin_buat", referenceColumnName="user_id")
-	 * @Label(content="Pembuat")
-	 * @var User
-	 */
-	protected $pembuat;
-
-	/**
 	 * Admin Ubah
 	 * 
 	 * @Column(name="admin_ubah", type="bigint(20)", length=20, nullable=true)
@@ -236,15 +275,6 @@ class Supervisor extends MagicObject
 	 * @var integer
 	 */
 	protected $adminUbah;
-
-	/**
-	 * Pengubah
-	 * 
-	 * @JoinColumn(name="admin_ubah", referenceColumnName="user_id")
-	 * @Label(content="Pengubah")
-	 * @var User
-	 */
-	protected $pengubah;
 
 	/**
 	 * Blokir

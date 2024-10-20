@@ -5,9 +5,10 @@ namespace Sipro\Entity\Data;
 use MagicObject\MagicObject;
 
 /**
- * SupervisorMin is entity of table supervisor. You can join this entity to other entity using annotation JoinColumn. 
- * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * SupervisorMin represents the entity for the table supervisor.
+ * You can join this entity to other entities using the @JoinColumn annotation.
  * 
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="supervisor")
@@ -31,10 +32,46 @@ class SupervisorMin extends MagicObject
 	 * 
 	 * @NotNull
 	 * @Column(name="nip", type="varchar(30)", length=30, nullable=false)
-	 * @Label(content="NIP")
+	 * @Label(content="Nip")
 	 * @var string
 	 */
 	protected $nip;
+
+	/**
+	 * Username
+	 * 
+	 * @Column(name="username", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Username")
+	 * @var string
+	 */
+	protected $username;
+
+	/**
+	 * Password
+	 * 
+	 * @Column(name="password", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Password")
+	 * @var string
+	 */
+	protected $password;
+
+	/**
+	 * Nama Depan
+	 * 
+	 * @Column(name="nama_depan", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Nama Depan")
+	 * @var string
+	 */
+	protected $namaDepan;
+
+	/**
+	 * Nama Belakang
+	 * 
+	 * @Column(name="nama_belakang", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="Nama Belakang")
+	 * @var string
+	 */
+	protected $namaBelakang;
 
 	/**
 	 * Nama
@@ -62,7 +99,7 @@ class SupervisorMin extends MagicObject
 	 * @var integer
 	 */
 	protected $jabatanId;
-	
+
 	/**
 	 * Jabatan
 	 * 
@@ -119,13 +156,34 @@ class SupervisorMin extends MagicObject
 	protected $telepon;
 
 	/**
-	 * Password
+	 * Tanda Tangan
 	 * 
-	 * @Column(name="password", type="varchar(50)", length=50, nullable=true)
-	 * @Label(content="Password")
+	 * @NotNull
+	 * @Column(name="tanda_tangan", type="varchar(512)", length=512, nullable=false)
+	 * @Label(content="Tanda Tangan")
 	 * @var string
 	 */
-	protected $password;
+	protected $tandaTangan;
+
+	/**
+	 * Ukuran Baju
+	 * 
+	 * @NotNull
+	 * @Column(name="ukuran_baju", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Ukuran Baju")
+	 * @var string
+	 */
+	protected $ukuranBaju;
+
+	/**
+	 * Ukuran Sepatu
+	 * 
+	 * @NotNull
+	 * @Column(name="ukuran_sepatu", type="varchar(40)", length=40, nullable=false)
+	 * @Label(content="Ukuran Sepatu")
+	 * @var string
+	 */
+	protected $ukuranSepatu;
 
 	/**
 	 * Auth
@@ -149,7 +207,7 @@ class SupervisorMin extends MagicObject
 	/**
 	 * Waktu Buat
 	 * 
-	 * @Column(name="waktu_buat", type="timestamp", length=19, nullable=true, updatable=false)
+	 * @Column(name="waktu_buat", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Buat")
 	 * @var string
 	 */
@@ -158,7 +216,7 @@ class SupervisorMin extends MagicObject
 	/**
 	 * Waktu Ubah
 	 * 
-	 * @Column(name="waktu_ubah", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_ubah", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Ubah")
 	 * @var string
 	 */
@@ -167,7 +225,7 @@ class SupervisorMin extends MagicObject
 	/**
 	 * Waktu Terakhir Aktif
 	 * 
-	 * @Column(name="waktu_terakhir_aktif", type="timestamp", length=19, nullable=true)
+	 * @Column(name="waktu_terakhir_aktif", type="datetime", length=19, nullable=true)
 	 * @Label(content="Waktu Terakhir Aktif")
 	 * @var string
 	 */
@@ -176,7 +234,7 @@ class SupervisorMin extends MagicObject
 	/**
 	 * IP Buat
 	 * 
-	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true, updatable=false)
+	 * @Column(name="ip_buat", type="varchar(50)", length=50, nullable=true)
 	 * @Label(content="IP Buat")
 	 * @var string
 	 */
@@ -203,7 +261,7 @@ class SupervisorMin extends MagicObject
 	/**
 	 * Admin Buat
 	 * 
-	 * @Column(name="admin_buat", type="bigint(20)", length=20, nullable=true, updatable=false)
+	 * @Column(name="admin_buat", type="bigint(20)", length=20, nullable=true)
 	 * @Label(content="Admin Buat")
 	 * @var integer
 	 */
@@ -236,5 +294,59 @@ class SupervisorMin extends MagicObject
 	 * @var boolean
 	 */
 	protected $aktif;
+
+	/**
+	 * Admin Minta Ubah
+	 * 
+	 * @Column(name="admin_minta_ubah", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Admin Minta Ubah")
+	 * @var string
+	 */
+	protected $adminMintaUbah;
+
+	/**
+	 * IP Minta Ubah
+	 * 
+	 * @Column(name="ip_minta_ubah", type="varchar(50)", length=50, nullable=true)
+	 * @Label(content="IP Minta Ubah")
+	 * @var string
+	 */
+	protected $ipMintaUbah;
+
+	/**
+	 * Waktu Minta Ubah
+	 * 
+	 * @Column(name="waktu_minta_ubah", type="timestamp", length=19, nullable=true)
+	 * @Label(content="Waktu Minta Ubah")
+	 * @var string
+	 */
+	protected $waktuMintaUbah;
+
+	/**
+	 * Draft
+	 * 
+	 * @Column(name="draft", type="tinyint(1)", length=1, nullable=true)
+	 * @Label(content="Draft")
+	 * @var boolean
+	 */
+	protected $draft;
+
+	/**
+	 * Waiting For
+	 * 
+	 * @Column(name="waiting_for", type="int(4)", length=4, nullable=true)
+	 * @Label(content="Waiting For")
+	 * @var integer
+	 */
+	protected $waitingFor;
+
+	/**
+	 * Approval ID
+	 * 
+	 * @Column(name="approval_id", type="varchar(40)", length=40, nullable=true)
+	 * @Label(content="Approval ID")
+	 * @var string
+	 */
+	protected $approvalId;
 
 }

@@ -4,20 +4,6 @@ namespace MagicObject\Util\Image;
 
 use Exception;
 
-/**
- * Class ImageUtilException
- *
- * Custom exception class for handling image-related errors in the MagicObject library.
- *
- * Example:
- * ```php
- * throw new ImageUtilException("Error processing image", 500);
- * ```
- *
- * @author Kamshory
- * @package MagicObject\Util\Image
- * @link https://github.com/Planetbiru/MagicObject
- */
 class ImageUtilException extends Exception
 {
     /**
