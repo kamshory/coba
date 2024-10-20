@@ -6,8 +6,9 @@ use MagicObject\MagicObject;
 
 /**
  * AdminUbah is entity of table user. You can join this entity to other entity using annotation JoinColumn.
- * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  *
+ * @package Sipro\Entity\Data
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="user")

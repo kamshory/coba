@@ -2,22 +2,52 @@
 
 namespace Sipro\Util;
 
+/**
+ * Class CalendarUtil
+ *
+ * A utility class for generating a calendar page for a specific month and year.
+ * It allows for the inclusion of previous and next month days, and can be customized
+ * for different calendar types.
+ *
+ * @package Sipro\Util
+ */
 class CalendarUtil
 {
+    /**
+     * @var array The rows of the calendar
+     */
     private $rows = array(); 
     
+    /**
+     * @var boolean Flag to indicate if previous and next month days are included
+     */
     private $withNextPrev = false;
+
+    /**
+     * @var integer The type of calendar layout
+     */
     private $type = 0;
+
+    /**
+     * @var string The start date of the calendar in 'Y-m-d' format
+     */
     private $startDate;
+
+    /**
+     * @var string The end date of the calendar in 'Y-m-d' format
+     */
     private $endDate;
     
     /**
-     * Contructor
+     * Constructor
      *
-     * @param integer $year Year
-     * @param integer $month Month
-     * @param integer $type
-     * @param boolean $withNextPrev Create previous and next month
+     * Initializes the calendar with the given year, month, type, and an option 
+     * to include the previous and next month's days.
+     *
+     * @param integer $year The year for the calendar
+     * @param integer $month The month for the calendar (1-12)
+     * @param integer $type The type of calendar layout (default is 0)
+     * @param boolean $withNextPrev Flag to create previous and next month days (default is false)
      */
     public function __construct($year, $month, $type = 0, $withNextPrev = false)
     {
@@ -29,10 +59,13 @@ class CalendarUtil
     /**
      * Create calendar page
      *
-     * @param integer $year Year
-     * @param integer $month Month
-     * @param boolean $withNextPrev Create previous and next month
-     * @return array
+     * Generates the rows of the calendar for the specified year and month.
+     * It calculates the start and end dates based on the calendar type
+     * and whether to include days from the previous and next month.
+     *
+     * @param integer $year The year for the calendar
+     * @param integer $month The month for the calendar (1-12)
+     * @return array The generated calendar rows
      */
     public function createCalendarPage($year, $month)
     {   
@@ -110,12 +143,42 @@ class CalendarUtil
             );
         }
     }
+
+    /**
+     * Get the minimum date in the calendar
+     *
+     * @return array The first row of the calendar, which contains the minimum date information
+     */
+    public function getMinDate()
+    {
+        return $this->rows[0];
+    }
+
+    /**
+     * Get the maximum date in the calendar
+     *
+     * @return array The last row of the calendar, which contains the maximum date information
+     */
+    public function getMaxDate()
+    {
+        return end($this->rows);
+    }
     
+    /**
+     * Get the entire calendar
+     *
+     * @return array The rows of the calendar
+     */
     public function getCalendar()
     {
         return $this->rows;
     }
     
+    /**
+     * Get the calendar in a flat inline format
+     *
+     * @return array The flattened calendar rows
+     */
     public function getCalendarInline()
     {
         $rows = array();
@@ -132,6 +195,8 @@ class CalendarUtil
 
     /**
      * Get the value of withNextPrev
+     *
+     * @return boolean Indicates if previous and next month days are included
      */ 
     public function getWithNextPrev()
     {
@@ -140,6 +205,8 @@ class CalendarUtil
 
     /**
      * Get the value of type
+     *
+     * @return integer The type of calendar layout
      */ 
     public function getType()
     {
@@ -148,6 +215,8 @@ class CalendarUtil
 
     /**
      * Get the value of startDate
+     *
+     * @return string The start date of the calendar in 'Y-m-d' format
      */ 
     public function getStartDate()
     {
@@ -156,6 +225,8 @@ class CalendarUtil
 
     /**
      * Get the value of endDate
+     *
+     * @return string The end date of the calendar in 'Y-m-d' format
      */ 
     public function getEndDate()
     {

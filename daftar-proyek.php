@@ -26,7 +26,7 @@ require_once __DIR__ . "/inc.app/auth-supervisor.php";
 $inputGet = new InputGet();
 $inputPost = new InputPost();
 
-$currentModule = new PicoModule($appConfig, $database, $appModule, "/", "daftar-proyek", "Daftar Proyek");
+$currentModule = new PicoModule($appConfig, $database, null, "/", "daftar-proyek", "Daftar Proyek");
 $appInclude = new AppIncludeImpl($appConfig, $currentModule);
 
 if($inputGet->getUserAction() == UserAction::DETAIL)
@@ -59,7 +59,8 @@ if($inputGet->getUserAction() == UserAction::DETAIL)
 			"propertyName" => "first_name"
 		)
 		);
-		$proyek->findOneWithPrimaryKeyValue($inputGet->getProyekId(), $subqueryMap);
+		//$proyek->findOneWithPrimaryKeyValue($inputGet->getProyekId(), $subqueryMap);
+		$proyek->find($inputGet->getProyekId());
 		if($proyek->hasValueProyekId())
 		{
 $appEntityLanguage = new AppEntityLanguage(new Proyek(), $appConfig, $currentUser->getLanguageId());

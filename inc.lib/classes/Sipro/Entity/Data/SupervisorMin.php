@@ -9,6 +9,8 @@ use MagicObject\MagicObject;
  * You can join this entity to other entities using the @JoinColumn annotation.
  * 
  * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * 
+ * @package Sipro\Entity\Data
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="supervisor")

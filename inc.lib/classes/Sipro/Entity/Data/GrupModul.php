@@ -7,8 +7,9 @@ use MagicObject\MagicObject;
 /**
  * GrupModul is entity of table grup_modul. You can join this entity to other entity using annotation JoinColumn. 
  * Don't forget to add "use" statement if the entity is outside the namespace.
- * Visit https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
+ * @link https://github.com/Planetbiru/MagicObject/blob/main/tutorial.md#entity
  * 
+ * @package Sipro\Entity\Data
  * @Entity
  * @JSON(property-naming-strategy=SNAKE_CASE, prettify=false)
  * @Table(name="grup_modul")

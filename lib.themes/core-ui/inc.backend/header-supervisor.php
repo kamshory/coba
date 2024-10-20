@@ -73,10 +73,14 @@ else
       </div>
 
       <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
-        <li class="nav-item"><a class="nav-link" href="./">
+      <li class="nav-item"><a class="nav-link" href="dashboard.php">
             <svg class="nav-icon">
               <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-speedometer"></use>
-            </svg> Dashboard</a></li>
+            </svg> <?php echo $appLanguage->getDashboard();?></a></li>
+        <li class="nav-item"><a class="nav-link" href="./">
+            <svg class="nav-icon">
+              <use xlink:href="<?php echo $baseAssetsUrl;?><?php echo $themePath;?>vendors/@coreui/icons/svg/free.svg#cil-home"></use>
+            </svg> <?php echo $appLanguage->getHome();?></a></li>
         <li class="nav-title"><?php echo $appLanguage->getMainMenu();?></li>
 
         <?php
@@ -121,7 +125,7 @@ else
             </svg>
           </button>
           <ul class="header-nav d-none d-lg-flex">
-            <li class="nav-item"><a class="nav-link" href="./">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="./"><?php echo $appLanguage->getHome();?></a></li>
             <li class="nav-item"><a class="nav-link">&raquo;</a></li>
             <li class="nav-item"><a class="nav-link" href="<?php echo basename($_SERVER['PHP_SELF']);?>"><?php echo $currentModule->getModuleTitle();?></a></li>
           </ul>
