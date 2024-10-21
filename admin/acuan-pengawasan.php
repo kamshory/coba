@@ -22,6 +22,7 @@ use MagicApp\AppUserPermission;
 use Sipro\Entity\Data\AcuanPengawasan;
 use Sipro\AppIncludeImpl;
 
+
 require_once dirname(__DIR__) . "/inc.app/auth.php";
 
 $inputGet = new InputGet();
@@ -50,9 +51,16 @@ if($inputPost->getUserAction() == UserAction::CREATE)
 	$acuanPengawasan->setAdminUbah($currentAction->getUserId());
 	$acuanPengawasan->setWaktuUbah($currentAction->getTime());
 	$acuanPengawasan->setIpUbah($currentAction->getIp());
-	$acuanPengawasan->insert();
-	$newId = $acuanPengawasan->getAcuanPengawasanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->acuan_pengawasan_id, $newId);
+	try
+	{
+		$acuanPengawasan->insert();
+		$newId = $acuanPengawasan->getAcuanPengawasanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->acuan_pengawasan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::UPDATE)
 {
@@ -65,9 +73,16 @@ else if($inputPost->getUserAction() == UserAction::UPDATE)
 	$acuanPengawasan->setWaktuUbah($currentAction->getTime());
 	$acuanPengawasan->setIpUbah($currentAction->getIp());
 	$acuanPengawasan->setAcuanPengawasanId($inputPost->getAcuanPengawasanId(PicoFilterConstant::FILTER_SANITIZE_NUMBER_INT, false, false, true));
-	$acuanPengawasan->update();
-	$newId = $acuanPengawasan->getAcuanPengawasanId();
-	$currentModule->redirectTo(UserAction::DETAIL, Field::of()->acuan_pengawasan_id, $newId);
+	try
+	{
+		$acuanPengawasan->update();
+		$newId = $acuanPengawasan->getAcuanPengawasanId();
+		$currentModule->redirectTo(UserAction::DETAIL, Field::of()->acuan_pengawasan_id, $newId);
+	}
+	catch(Exception $e)
+	{
+		$currentModule->redirectToItself();
+	}
 }
 else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 {
@@ -91,6 +106,7 @@ else if($inputPost->getUserAction() == UserAction::ACTIVATE)
 			catch(Exception $e)
 			{
 				// Do something here to handle exception
+				$error_log($e->getMessage());
 			}
 		}
 	}
@@ -118,6 +134,7 @@ else if($inputPost->getUserAction() == UserAction::DEACTIVATE)
 			catch(Exception $e)
 			{
 				// Do something here to handle exception
+				$error_log($e->getMessage());
 			}
 		}
 	}
@@ -140,6 +157,7 @@ else if($inputPost->getUserAction() == UserAction::DELETE)
 			catch(Exception $e)
 			{
 				// Do something here to handle exception
+				$error_log($e->getMessage());
 			}
 		}
 	}
